@@ -1,7 +1,7 @@
 import pyglet
-from pyglet.gl import *
 from pyglet.window import key
 from player import Player
+from camera import Camera
 
 # Window dimensions
 window_width = 800
@@ -11,6 +11,7 @@ window_height = 600
 window = pyglet.window.Window(window_width, window_height, "Pikemnon")
 
 player = Player('assets/player.png', window.width//2, window.height//2)
+camera = Camera(player, window_width, window_height)
 
 key_state = {
     'up': False,
@@ -43,6 +44,7 @@ def on_key_release(symbol, modifiers):
 
 def update(dt):
     player.update(dt, key_state)
+    camera.update()
 
 pyglet.clock.schedule_interval(update, 1/60.0)
 
@@ -50,7 +52,9 @@ pyglet.clock.schedule_interval(update, 1/60.0)
 @window.event
 def on_draw():
     window.clear()
+    camera.begin()
     player.draw()
+    camera.end()
 
 if __name__ == '__main__':
     pyglet.app.run()
