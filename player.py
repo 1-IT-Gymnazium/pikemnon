@@ -4,7 +4,7 @@ from entity import Entity
 class Player(Entity):
     def __init__(self, image_file, x, y):
         super().__init__(image_file, x, y)
-        self.speed = 200
+        self.speed = 220
 
     def update(self, dt, key_state):
         dx = dy = 0
