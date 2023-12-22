@@ -1,20 +1,30 @@
 import pyglet
 
-class Camera:
-    def __init__(self, target, window_width, window_height):
-        self.target = target
-        self.window_width = window_width
-        self.window_height = window_height
-        self.offset_x = 0
-        self.offset_y = 0
+# Initialize variables
+target = None
+window_width = 0
+window_height = 0
+offset_x = 0
+offset_y = 0
 
-    def update(self):
-        self.offset_x = self.window_width // 2 - self.target.sprite.x
-        self.offset_y = self.window_height // 2 - self.target.sprite.y
+def set_camera_target(new_target):
+    global target
+    target = new_target
+    print(target['sprite'].x)
 
-    def begin(self):
-        pyglet.gl.glPushMatrix()
-        pyglet.gl.glTranslatef(self.offset_x, self.offset_y, 0)
+def set_camera_window_size(new_window_width, new_window_height):
+    global window_width, window_height
+    window_width = new_window_width
+    window_height = new_window_height
 
-    def end(self):
-        pyglet.gl.glPopMatrix()
+def update_camera():
+    global offset_x, offset_y, window_width, window_height, target
+    offset_x = window_width // 2 - target['sprite'].x
+    offset_y = window_height // 2 - target['sprite'].y
+
+def begin_camera():
+    pyglet.gl.glPushMatrix()
+    pyglet.gl.glTranslatef(offset_x, offset_y, 0)
+
+def end_camera():
+    pyglet.gl.glPopMatrix()
