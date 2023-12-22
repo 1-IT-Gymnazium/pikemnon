@@ -4,15 +4,18 @@ from pyglet.gl import *
 from player import create_player, update_player
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
+from mapp import create_map_sprites
 
 # Window dimensions
-window_width = 800
-window_height = 600
+window_width = 160*3
+window_height = 144*3
 
 # Create a window
 window = pyglet.window.Window(window_width, window_height, "Pikemnon")
 
 player = create_player('assets/player.png', window.width//2, window.height//2)
+
+map_sprites = create_map_sprites()
 
 set_camera_target(player)
 set_camera_window_size(window_width, window_height)
@@ -56,6 +59,8 @@ pyglet.clock.schedule_interval(update, 1/60.0)
 def on_draw():
     window.clear()
     begin_camera()
+    for sprite in map_sprites:
+        sprite.draw()
     draw_entity(player)
     end_camera()
 
