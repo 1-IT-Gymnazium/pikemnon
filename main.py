@@ -7,8 +7,8 @@ from camera import set_camera_target, set_camera_window_size, update_camera, beg
 from mapp import create_map_sprites
 
 # Window dimensions
-window_width = 160*3
-window_height = 144*3
+window_width = 160*4
+window_height = 144*4
 
 # Create a window
 window = pyglet.window.Window(window_width, window_height, "Pikemnon")
