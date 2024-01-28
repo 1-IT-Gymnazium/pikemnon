@@ -1,5 +1,6 @@
 import pyglet
 from pyglet.gl import *
+from conf import SCALE
 
 game_map = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ],
@@ -43,3 +44,42 @@ def create_map_sprites():
             sprite.scale = 4
             map_sprites.append(sprite)
     return map_sprites
+
+TILE_WIDTH = 8
+TILE_HEIGHT = 8
+
+def what_tile_is_player_on(player):
+    # Calculate the player's tile coordinates
+    player_tile_x = int(player['sprite'].x // (TILE_WIDTH * SCALE))
+    player_tile_y = int((player['sprite'].y) // (TILE_HEIGHT * SCALE))
+
+    # Calculate the number of tiles the player spans
+    player_tiles_x = (player['sprite'].width // (TILE_WIDTH * SCALE)) + 1
+    player_tiles_y = (player['sprite'].height // (TILE_HEIGHT * SCALE))
+
+    # Check all tiles the player is on
+    for y in range(player_tile_y, player_tile_y + player_tiles_y):
+        for x in range(player_tile_x, player_tile_x + player_tiles_x):
+            if (0 <= y < len(game_map) and 0 <= x < len(game_map[0]) and game_map[y][x] == 0):
+                return "Nothing"
+    
+    return None
+
+def is_player_colliding_with_empty(player):
+    # Calculate the player's tile coordinates
+    player_tile_x = int(player['sprite'].x // (TILE_WIDTH * SCALE))
+    player_tile_y = int(player['sprite'].y // (TILE_HEIGHT * SCALE))
+
+    # Calculate the number of tiles the player spans
+    player_tiles_x = (player['sprite'].width // (TILE_WIDTH * SCALE)) + 1
+    player_tiles_y = (player['sprite'].height // (TILE_HEIGHT * SCALE)) + 1
+
+    # Check all tiles the player is on
+    for y in range(player_tile_y, player_tile_y + player_tiles_y):
+        for x in range(player_tile_x, player_tile_x + player_tiles_x):
+            # If the tile is an empty tile, there's a collision
+            if (0 <= y < len(game_map) and 0 <= x < len(game_map[0]) and game_map[y][x] == 0):
+                return True
+
+    # No collision
+    return False
