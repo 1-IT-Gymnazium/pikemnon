@@ -4,7 +4,7 @@ from pyglet.gl import *
 from player import create_player, update_player
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
-from mapp import create_map_sprites, is_player_colliding_with_empty
+from mapp import create_map_sprites, what_tile_is_player_on
 from conf import SCALE
 
 # Window dimensions
@@ -55,9 +55,10 @@ def update(dt):
     old_x, old_y = player['sprite'].x, player['sprite'].y
     update_player(player, dt, key_state)
 
-    # If the player is colliding with an empty tile, move them back
-    if is_player_colliding_with_empty(player):
-        player['sprite'].x, player['sprite'].y = old_x, old_y
+    playerTile = what_tile_is_player_on(player)
+    if playerTile:
+        if playerTile == "Nothing":
+            player['sprite'].x, player['sprite'].y = old_x, old_y
 
     update_camera()
 
