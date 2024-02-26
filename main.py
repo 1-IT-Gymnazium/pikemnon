@@ -4,7 +4,7 @@ from pyglet.gl import *
 from player import create_player, update_player
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
-from mapp import create_map_sprites, what_tile_is_player_on, set_current_map
+from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, get_current_map
 from conf import SCALE
 import maps as mps
 from npc import create_npc, update_npc
@@ -63,8 +63,11 @@ def update(dt):
     # Update the player
     old_x, old_y = player['sprite'].x, player['sprite'].y
     update_player(player, dt, key_state)
-    for npc in outside_npcs:
-        update_npc(npc, player)
+
+    current_map = get_current_map()
+    if current_map == mps.outside_map:
+        for npc in outside_npcs:
+            update_npc(npc, player)
 
     playerTile = what_tile_is_player_on(player)
     if playerTile:
@@ -77,7 +80,6 @@ def update(dt):
 
     update_camera()
 
-
 pyglet.clock.schedule_interval(update, 1/60.0)
 
 
@@ -87,8 +89,10 @@ def on_draw():
     begin_camera()
     for sprite in map_sprites:
         sprite.draw()
-    for npc in outside_npcs:
-        draw_entity(npc)
+    current_map = get_current_map()
+    if current_map == mps.outside_map:
+        for npc in outside_npcs:
+            draw_entity(npc)
     draw_entity(player)
     end_camera()
 

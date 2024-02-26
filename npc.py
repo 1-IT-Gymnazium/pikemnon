@@ -48,7 +48,6 @@ def update_npc(npc, player):
                     npc['fought'] = True
                     change_move(player, True)
         elif lookDir == 'left':
-            print(xVal, yVal)
             if yVal > -10 and yVal < 10 and xVal < 300 and xVal > 0:
                 change_move(player, False)
                 npc['sprite'].x -= 1
