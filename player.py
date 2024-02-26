@@ -1,9 +1,11 @@
 from entity import create_entity, update_entity
 
+
 def create_player(image_file, x, y, speed=220):
     player = create_entity(image_file, x, y)
     player['speed'] = speed
     return player
+
 
 def update_player(player, dt, key_state):
     dx = dy = 0
