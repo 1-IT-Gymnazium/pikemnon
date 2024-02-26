@@ -7,6 +7,7 @@ from camera import set_camera_target, set_camera_window_size, update_camera, beg
 from mapp import create_map_sprites, what_tile_is_player_on, set_current_map
 from conf import SCALE
 import maps as mps
+from npc import create_npc, update_npc
 
 # Window dimensions
 window_width = 160*SCALE
@@ -16,6 +17,8 @@ window_height = 144*SCALE
 window = pyglet.window.Window(window_width, window_height, "Pikemnon")
 
 player = create_player('assets/player.png', window.width//2, window.height//2)
+out_npc = create_npc('assets/player.png', 500, 300, 'left')
+outside_npcs = [out_npc]
 
 set_current_map(mps.starter_map)
 
@@ -55,10 +58,13 @@ def on_key_release(symbol, modifiers):
     elif symbol == key.D:
         key_state['right'] = False
 
+
 def update(dt):
     # Update the player
     old_x, old_y = player['sprite'].x, player['sprite'].y
     update_player(player, dt, key_state)
+    for npc in outside_npcs:
+        update_npc(npc, player)
 
     playerTile = what_tile_is_player_on(player)
     if playerTile:
@@ -71,7 +77,9 @@ def update(dt):
 
     update_camera()
 
+
 pyglet.clock.schedule_interval(update, 1/60.0)
+
 
 @window.event
 def on_draw():
@@ -79,8 +87,11 @@ def on_draw():
     begin_camera()
     for sprite in map_sprites:
         sprite.draw()
+    for npc in outside_npcs:
+        draw_entity(npc)
     draw_entity(player)
     end_camera()
+
 
 if __name__ == '__main__':
     pyglet.app.run()
