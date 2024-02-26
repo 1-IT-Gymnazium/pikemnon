@@ -4,8 +4,9 @@ from pyglet.gl import *
 from player import create_player, update_player
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
-from mapp import create_map_sprites, what_tile_is_player_on
+from mapp import create_map_sprites, what_tile_is_player_on, set_current_map
 from conf import SCALE
+import maps as mps
 
 # Window dimensions
 window_width = 160*SCALE
@@ -15,6 +16,8 @@ window_height = 144*SCALE
 window = pyglet.window.Window(window_width, window_height, "Pikemnon")
 
 player = create_player('assets/player.png', window.width//2, window.height//2)
+
+set_current_map(mps.starter_map)
 
 map_sprites = create_map_sprites()
 
@@ -28,6 +31,7 @@ key_state = {
     'right': False
 }
 
+
 @window.event
 def on_key_press(symbol, modifiers):
     if symbol == key.W:
@@ -38,6 +42,7 @@ def on_key_press(symbol, modifiers):
         key_state['left'] = True
     elif symbol == key.D:
         key_state['right'] = True
+
 
 @window.event
 def on_key_release(symbol, modifiers):
@@ -59,6 +64,10 @@ def update(dt):
     if playerTile:
         if playerTile == "Nothing":
             player['sprite'].x, player['sprite'].y = old_x, old_y
+        if playerTile == "Door":
+            set_current_map(mps.outside_map)
+            global map_sprites
+            map_sprites = create_map_sprites()
 
     update_camera()
 
