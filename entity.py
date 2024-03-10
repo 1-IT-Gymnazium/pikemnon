@@ -1,6 +1,7 @@
 import pyglet
 from pyglet.gl import *
 
+
 def create_entity(image_file, x, y, health=100):
     image = pyglet.resource.image(image_file)
 
@@ -13,8 +14,7 @@ def create_entity(image_file, x, y, health=100):
 
     return {'image': image, 'sprite': sprite, 'health': health}
 
+
 def draw_entity(entity):
     entity['sprite'].draw()
 
-def update_entity(entity, dt):
-    pass

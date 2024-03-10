@@ -36,6 +36,10 @@ def set_current_map(cr_map):
     current_map = cr_map
 
 
+def get_current_map():
+    return current_map
+
+
 TILE_WIDTH = 8
 TILE_HEIGHT = 8
 
