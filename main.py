@@ -8,6 +8,7 @@ from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, ge
 from conf import SCALE
 import maps as mps
 from npc import create_npc, update_npc
+from fighting import fighting_screen
 
 # Window dimensions
 window_width = 160*SCALE
@@ -26,6 +27,8 @@ map_sprites = create_map_sprites()
 
 set_camera_target(player)
 set_camera_window_size(window_width, window_height)
+
+fighton = True
 
 key_state = {
     'up': False,
@@ -86,15 +89,18 @@ pyglet.clock.schedule_interval(update, 1/60.0)
 @window.event
 def on_draw():
     window.clear()
-    begin_camera()
-    for sprite in map_sprites:
-        sprite.draw()
-    current_map = get_current_map()
-    if current_map == mps.outside_map:
-        for npc in outside_npcs:
-            draw_entity(npc)
-    draw_entity(player)
-    end_camera()
+    if not fighton:
+        begin_camera()
+        for sprite in map_sprites:
+            sprite.draw()
+        current_map = get_current_map()
+        if current_map == mps.outside_map:
+            for npc in outside_npcs:
+                draw_entity(npc)
+        draw_entity(player)
+        end_camera()
+    elif fighton:
+        fighting_screen(window)
 
 
 if __name__ == '__main__':
