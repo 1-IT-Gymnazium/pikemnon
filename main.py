@@ -37,17 +37,29 @@ key_state = {
     'right': False
 }
 
+menu_direction = None
 
 @window.event
 def on_key_press(symbol, modifiers):
-    if symbol == key.W:
-        key_state['up'] = True
-    elif symbol == key.S:
-        key_state['down'] = True
-    elif symbol == key.A:
-        key_state['left'] = True
-    elif symbol == key.D:
-        key_state['right'] = True
+    if not fighton:
+        if symbol == key.W:
+            key_state['up'] = True
+        elif symbol == key.S:
+            key_state['down'] = True
+        elif symbol == key.A:
+            key_state['left'] = True
+        elif symbol == key.D:
+            key_state['right'] = True
+    elif fighton:
+        global menu_direction
+        if symbol == key.W:
+            menu_direction = "up"
+        elif symbol == key.S:
+            menu_direction = "down"
+        elif symbol == key.A:
+            menu_direction = "left"
+        elif symbol == key.D:
+            menu_direction = "right"
 
 
 @window.event
@@ -100,7 +112,9 @@ def on_draw():
         draw_entity(player)
         end_camera()
     elif fighton:
-        fighting_screen(window)
+        global menu_direction
+        fighting_screen(window, menu_direction)
+        menu_direction = None
 
 
 if __name__ == '__main__':

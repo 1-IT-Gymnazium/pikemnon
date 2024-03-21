@@ -1,58 +1,50 @@
 import pyglet
 
+player_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
+npc_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
+current_turn = 'player'
+selected_option_index = 0
+
 def calculate_damage(attack, defense, power):
     """
     Simple damage calculation formula
     """
     return int(((2 * power * (attack / defense)) / 50) + 2)
 
-class Battle:
-    def __init__(self, player_pokemon, npc_pokemon):
-        self.player_pokemon = player_pokemon
-        self.npc_pokemon = npc_pokemon
-        self.current_turn = 'player'
+def player_attack():
+    global player_pokemon, npc_pokemon
+    power = 50
+    damage = calculate_damage(player_pokemon['attack'], npc_pokemon['defense'], power)
+    npc_pokemon['health'] -= damage
+    print(f"Player's Pokémon caused {damage} damage. NPC Pokémon health is now {npc_pokemon['health']}.")
+    check_battle_end()
 
-    def player_attack(self):
-        """
-        Handle player's attack
-        """
-        power = 50
-        damage = calculate_damage(self.player_pokemon['attack'], self.npc_pokemon['defense'], power)
-        self.npc_pokemon['health'] -= damage
-        print(f"Player's Pokémon caused {damage} damage. NPC Pokémon health is now {self.npc_pokemon['health']}.")
-        self.check_battle_end()
+def npc_attack():
+    global player_pokemon, npc_pokemon
+    power = 50
+    damage = calculate_damage(npc_pokemon['attack'], player_pokemon['defense'], power)
+    player_pokemon['health'] -= damage
+    print(f"NPC's Pokémon caused {damage} damage. Player Pokémon health is now {player_pokemon['health']}.")
+    check_battle_end()
 
-    def npc_attack(self):
-        """
-        Handle NPC's attack
-        """
-        power = 50
-        damage = calculate_damage(self.npc_pokemon['attack'], self.player_pokemon['defense'], power)
-        self.player_pokemon['health'] -= damage
-        print(f"NPC's Pokémon caused {damage} damage. Player Pokémon health is now {self.player_pokemon['health']}.")
-        self.check_battle_end()
+def check_battle_end():
+    global player_pokemon, npc_pokemon
+    if player_pokemon['health'] <= 0:
+        print("Player's Pokémon fainted. NPC wins!")
+        return True
+    elif npc_pokemon['health'] <= 0:
+        print("NPC's Pokémon fainted. Player wins!")
+        return True
+    return False
 
-    def check_battle_end(self):
-        """
-        Check if the battle has ended
-        """
-        if self.player_pokemon['health'] <= 0:
-            print("Player's Pokémon fainted. NPC wins!")
-            return True
-        elif self.npc_pokemon['health'] <= 0:
-            print("NPC's Pokémon fainted. Player wins!")
-            return True
-        return False
+def next_turn():
+    global current_turn
+    if current_turn == 'player':
+        current_turn = 'npc'
+        npc_attack()
+    else:
+        current_turn = 'player'
 
-    def next_turn(self):
-        """
-        Progress to the next turn
-        """
-        if self.current_turn == 'player':
-            self.current_turn = 'npc'
-            self.npc_attack()
-        else:
-            self.current_turn = 'player'
 
 
 def draw_health_bar(x, y, width, height, health_percentage):
@@ -65,7 +57,72 @@ def draw_health_bar(x, y, width, height, health_percentage):
     current_health_width = width * health_percentage
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + current_health_width, y, x + current_health_width, y + height, x, y + height]))
 
-def fighting_screen(window):
+def draw_menu_options(window, selected):
+    menu_box_x = 20
+    menu_box_y = 20
+    menu_box_width = 600
+    menu_box_height = 150
+    menu_options = ["Attack", "Item", "Run", "Swap"]
+
+    # Colors
+    default_color = (0, 0, 0, 255)  # Black for unselected options
+    highlight_color = (255, 255, 255, 255)  # White for the selected option text
+    highlight_background_color = (0, 0, 255, 255)  # Blue background for selected option
+
+    grid_columns = 2
+    grid_rows = 2
+    column_width = menu_box_width / grid_columns
+    row_height = menu_box_height / grid_rows
+
+    for i, option in enumerate(menu_options):
+        column = i % grid_columns
+        row = i // grid_columns
+
+        x_center = menu_box_x + (column * column_width) + (column_width / 2)
+        y_center = menu_box_y + (menu_box_height - (row * row_height)) - (row_height / 2)
+
+        # Check if the option is the selected one
+        if option == selected:
+            # Draw highlighted background
+            pyglet.graphics.glColor4ub(*highlight_background_color)
+            margin = 5  # Margin for the background rectangle
+            pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
+                x_center - column_width / 2 + margin, y_center - row_height / 2 + margin,
+                x_center + column_width / 2 - margin, y_center - row_height / 2 + margin,
+                x_center + column_width / 2 - margin, y_center + row_height / 2 - margin,
+                x_center - column_width / 2 + margin, y_center + row_height / 2 - margin,
+            ]))
+
+            # Set text color for highlighted option
+            color = highlight_color
+        else:
+            color = default_color
+
+        # Create and draw the label for the option
+        option_label = pyglet.text.Label(option,
+                                         font_name='Courier',
+                                         font_size=12,
+                                         color=color,
+                                         x=x_center,
+                                         y=y_center,
+                                         anchor_x='center', anchor_y='center')
+        option_label.draw()
+
+    # Reset color to default after drawing
+    pyglet.graphics.glColor4ub(255, 255, 255, 255)
+
+def navigate_menu(direction):
+    global selected_option_index
+    if direction == 'up' and selected_option_index >= 2:
+        selected_option_index -= 2
+    elif direction == 'down' and selected_option_index < 2:
+        selected_option_index += 2
+    elif direction == 'left' and selected_option_index % 2 == 1:
+        selected_option_index -= 1
+    elif direction == 'right' and selected_option_index % 2 == 0:
+        selected_option_index += 1
+
+def fighting_screen(window, direction):
     pyglet.gl.glClearColor(1, 1, 1, 1)
     window.clear()
 
@@ -75,12 +132,16 @@ def fighting_screen(window):
     player_box_width = 200
     player_box_height = 80
     enemy_box_x = 400  # Left edge of the window
-    enemy_box_y = 30  # Bottom edge of the window
+    enemy_box_y = 200  # Bottom edge of the window
     enemy_box_width = 200
     enemy_box_height = 80
+    menu_box_x = 20
+    menu_box_y = 20
+    menu_box_width = 600
+    menu_box_height = 150
     border_thickness = 2
 
-    # Draw black border
+    
     pyglet.graphics.glColor4f(0, 0, 0, 1)
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS,
                          ('v2f', [player_box_x - border_thickness, player_box_y - border_thickness, 
@@ -113,6 +174,22 @@ def fighting_screen(window):
                                   enemy_box_x, enemy_box_y + enemy_box_height])
                         )
 
+    pyglet.graphics.glColor4f(0, 0, 0, 1)
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS,
+                         ('v2f', [menu_box_x - border_thickness, menu_box_y - border_thickness, 
+                                  menu_box_x + menu_box_width + border_thickness, menu_box_y - border_thickness, 
+                                  menu_box_x + menu_box_width + border_thickness, menu_box_y + menu_box_height + border_thickness, 
+                                  menu_box_x - border_thickness, menu_box_y + menu_box_height + border_thickness])
+                        )
+
+    pyglet.graphics.glColor4f(1, 1, 1, 1)
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS,
+                         ('v2f', [menu_box_x, menu_box_y, 
+                                  menu_box_x + menu_box_width, menu_box_y, 
+                                  menu_box_x + menu_box_width, menu_box_y + menu_box_height, 
+                                  menu_box_x, menu_box_y + menu_box_height])
+                        )
+
     player_label_x = player_box_x + 40
     player_label_y = player_box_y + player_box_height - 10
 
@@ -136,11 +213,16 @@ def fighting_screen(window):
                               anchor_x='center', anchor_y='center')
     enemy_label.draw()
 
+    menu_options = ["Attack", "Item", "Run", "Swap"]
+    if direction:
+        navigate_menu(direction)
+    draw_menu_options(window, menu_options[selected_option_index])
+
     player_health_bar_x = player_label_x - 30
     player_health_bar_y = player_label_y - 25
     player_health_bar_width = 100
     player_health_bar_height = 10
-    player_health_percentage = 0.1
+    player_health_percentage = 1
     draw_health_bar(player_health_bar_x, player_health_bar_y, player_health_bar_width, player_health_bar_height, player_health_percentage)
 
     enemy_health_bar_x = enemy_label_x - 30
@@ -149,3 +231,4 @@ def fighting_screen(window):
     enemy_health_bar_height = 10
     enemy_health_percentage = 0.1
     draw_health_bar(enemy_health_bar_x, enemy_health_bar_y, enemy_health_bar_width, enemy_health_bar_height, enemy_health_percentage)
+
