@@ -1,9 +1,15 @@
 import pyglet
+from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 
 player_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
 npc_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
 current_turn = 'player'
 selected_option_index = 0
+
+window_width = WINDOW_WIDTH*SCALE
+window_height = WINDOW_HEIGHT*SCALE
+
+player_image = pyglet.image.load('assets/fight-player.png')
 
 def calculate_damage(attack, defense, power):
     """
@@ -18,6 +24,13 @@ def player_attack():
     npc_pokemon['health'] -= damage
     print(f"Player's Pokémon caused {damage} damage. NPC Pokémon health is now {npc_pokemon['health']}.")
     check_battle_end()
+
+def draw_player_image():
+    # Calculate the position to center the image
+    image_x = (window_width - player_image.width) // 2
+    image_y = (window_height - player_image.height) // 2
+    # Draw the image
+    player_image.blit(image_x, image_y)
 
 def npc_attack():
     global player_pokemon, npc_pokemon
@@ -231,4 +244,6 @@ def fighting_screen(window, direction):
     enemy_health_bar_height = 10
     enemy_health_percentage = 0.1
     draw_health_bar(enemy_health_bar_x, enemy_health_bar_y, enemy_health_bar_width, enemy_health_bar_height, enemy_health_percentage)
+
+    draw_player_image()
 

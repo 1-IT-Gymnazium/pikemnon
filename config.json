@@ -1,3 +1,5 @@
 {
-    "SCALE": 4
+    "SCALE": 4,
+    "WINDOW_WIDTH": 160,
+    "WINDOW_HEIGHT": 144
 }

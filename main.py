@@ -5,15 +5,15 @@ from player import create_player, update_player
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
 from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, get_current_map
-from conf import SCALE
+from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
 from fighting import fighting_screen
 from game_state import get_fight_status
 
 # Window dimensions
-window_width = 160*SCALE
-window_height = 144*SCALE
+window_width = WINDOW_WIDTH*SCALE
+window_height = WINDOW_HEIGHT*SCALE
 
 # Create a window
 window = pyglet.window.Window(window_width, window_height, "Pikemnon")
