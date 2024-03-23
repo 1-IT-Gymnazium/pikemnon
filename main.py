@@ -26,6 +26,12 @@ set_current_map(mps.starter_map)
 
 map_sprites = create_map_sprites()
 
+fighting_menu_state = 'main'  # 'main' or 'attack'
+selected_menu_option_index = 0
+menu_options = ["Attack", "Item", "Run", "Swap"]
+attack_options = ["Quick Attack", "Thunderbolt", "Tail Whip", "Growl"]
+menu_direction = None  # Default value indicating no direction
+
 set_camera_target(player)
 set_camera_window_size(window_width, window_height)
 
@@ -40,7 +46,9 @@ menu_direction = None
 
 @window.event
 def on_key_press(symbol, modifiers):
+    global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options
     fighton = get_fight_status()
+    
     if not fighton:
         if symbol == key.W:
             key_state['up'] = True
@@ -51,15 +59,29 @@ def on_key_press(symbol, modifiers):
         elif symbol == key.D:
             key_state['right'] = True
     elif fighton:
-        global menu_direction
-        if symbol == key.W:
-            menu_direction = "up"
-        elif symbol == key.S:
-            menu_direction = "down"
-        elif symbol == key.A:
-            menu_direction = "left"
-        elif symbol == key.D:
-            menu_direction = "right"
+        grid_columns = 2
+        if symbol == key.SPACE:
+            if fighting_menu_state == 'main' and selected_menu_option_index == 0:
+                fighting_menu_state = 'attack'
+                selected_menu_option_index = 0  # Reset for the attack menu
+            elif fighting_menu_state == 'attack':
+                print(f"Selected attack: {attack_options[selected_menu_option_index]}")
+                fighting_menu_state = 'main'
+                selected_menu_option_index = 0
+        elif symbol == key.W or symbol == key.UP:
+            # Move up in the grid
+            selected_menu_option_index = (selected_menu_option_index - 2) % len(menu_options)
+        elif symbol == key.S or symbol == key.DOWN:
+            # Move down in the grid
+            selected_menu_option_index = (selected_menu_option_index + 2) % len(menu_options)
+        elif symbol == key.A or symbol == key.LEFT:
+            # Move left in the grid
+            if selected_menu_option_index % grid_columns > 0:
+                selected_menu_option_index -= 1
+        elif symbol == key.D or symbol == key.RIGHT:
+            # Move right in the grid
+            if selected_menu_option_index % grid_columns < grid_columns - 1:
+                selected_menu_option_index += 1
 
 
 @window.event
@@ -90,7 +112,7 @@ def update(dt):
             player['sprite'].x, player['sprite'].y = old_x, old_y
         if playerTile == "Door":
             set_current_map(mps.outside_map)
-            global map_sprites
+            global map_spritesas
             map_sprites = create_map_sprites()
 
     update_camera()
@@ -114,8 +136,9 @@ def on_draw():
         end_camera()
     elif fighton:
         global menu_direction
-        fighting_screen(window, menu_direction)
-        menu_direction = None
+        current_menu_options = attack_options if fighting_menu_state == 'attack' else menu_options
+        fighting_screen(window, menu_direction, current_menu_options, selected_menu_option_index)
+        menu_direction = None  # Reset after use to avoid unintended navigation
 
 
 if __name__ == '__main__':

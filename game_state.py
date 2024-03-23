@@ -1,4 +1,4 @@
-fighton = True
+fighton = False
 
 def start_fight():
     global fighton
