@@ -9,6 +9,7 @@ from conf import SCALE
 import maps as mps
 from npc import create_npc, update_npc
 from fighting import fighting_screen
+from game_state import get_fight_status
 
 # Window dimensions
 window_width = 160*SCALE
@@ -28,8 +29,6 @@ map_sprites = create_map_sprites()
 set_camera_target(player)
 set_camera_window_size(window_width, window_height)
 
-fighton = True
-
 key_state = {
     'up': False,
     'down': False,
@@ -41,6 +40,7 @@ menu_direction = None
 
 @window.event
 def on_key_press(symbol, modifiers):
+    fighton = get_fight_status()
     if not fighton:
         if symbol == key.W:
             key_state['up'] = True
@@ -101,6 +101,7 @@ pyglet.clock.schedule_interval(update, 1/60.0)
 @window.event
 def on_draw():
     window.clear()
+    fighton = get_fight_status()
     if not fighton:
         begin_camera()
         for sprite in map_sprites:

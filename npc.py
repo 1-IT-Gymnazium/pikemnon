@@ -1,6 +1,6 @@
 from entity import create_entity
 from player import change_move
-
+from game_state import start_fight
 
 def create_npc(image_file, x, y, look):
     npc = create_entity(image_file, x, y)
@@ -26,7 +26,7 @@ def update_npc(npc, player):
                 npc['sprite'].y -= 1
 
                 if yVal < 30:
-                    # Initiate fight
+                    start_fight()
                     npc['fought'] = True
                     change_move(player, True)
         elif lookDir == 'up':
@@ -35,7 +35,7 @@ def update_npc(npc, player):
                 npc['sprite'].y += 1
 
                 if yVal > -30:
-                    # Initiate fight
+                    start_fight()
                     npc['fought'] = True
                     change_move(player, True)
         elif lookDir == 'right':
@@ -44,7 +44,7 @@ def update_npc(npc, player):
                 npc['sprite'].x += 1
 
                 if xVal > -30:
-                    # Initiate fight
+                    start_fight()
                     npc['fought'] = True
                     change_move(player, True)
         elif lookDir == 'left':
@@ -53,6 +53,6 @@ def update_npc(npc, player):
                 npc['sprite'].x -= 1
 
                 if xVal < 30:
-                    # Initiate fight
+                    start_fight()
                     npc['fought'] = True
                     change_move(player, True)
