@@ -1,5 +1,7 @@
 import pyglet
 from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
+from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
+
 
 player_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
 npc_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
@@ -9,7 +11,6 @@ selected_option_index = 0
 window_width = WINDOW_WIDTH*SCALE
 window_height = WINDOW_HEIGHT*SCALE
 
-player_image = pyglet.image.load('assets/fight-player.png')
 
 def calculate_damage(attack, defense, power):
     """
@@ -25,12 +26,30 @@ def player_attack():
     print(f"Player's Pokémon caused {damage} damage. NPC Pokémon health is now {npc_pokemon['health']}.")
     check_battle_end()
 
+
 def draw_player_image():
-    # Calculate the position to center the image
-    image_x = (window_width - player_image.width) // 2
-    image_y = (window_height - player_image.height) // 2
-    # Draw the image
-    player_image.blit(image_x, image_y)
+    # Load the image
+    image = pyglet.resource.image('assets/fight-player.png')
+
+    # Apply nearest neighbor filtering to prevent blurring when scaling
+    texture = image.get_texture()
+    glTexParameteri(texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameteri(texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+
+    # Create a sprite from the image
+    sprite = pyglet.sprite.Sprite(img=image)
+    sprite.scale = 7
+
+    # Calculate the position to center the scaled sprite
+    sprite.x = (window_width - sprite.width) // 2 - 150
+    sprite.y = (window_height - sprite.height) // 2 - 0
+
+    # Reset color to default (white) to ensure no unintended tint is applied
+    pyglet.gl.glColor4f(1.0, 1.0, 1.0, 1.0)
+    
+    # Draw the scaled sprite
+    sprite.draw()
+
 
 def npc_attack():
     global player_pokemon, npc_pokemon
