@@ -162,89 +162,50 @@ def navigate_menu(direction):
     elif direction == 'right' and selected_option_index % 2 == 0:
         selected_option_index += 1
 
-def fighting_screen(window, direction, menu_options, selected_option_index):
+def clear_screen(window):
     pyglet.gl.glClearColor(1, 1, 1, 1)
     window.clear()
 
-    player_box_x = 40
-    player_box_y = 450
-    player_box_width = 200
-    player_box_height = 80
-    enemy_box_x = 400
-    enemy_box_y = 200
-    enemy_box_width = 200
-    enemy_box_height = 80
-    menu_box_x = 20
-    menu_box_y = 20
-    menu_box_width = 600
-    menu_box_height = 150
-    border_thickness = 2
-
-    # Player box
+def draw_box(x, y, width, height, border_thickness=2):
+    # Draw border
     pyglet.graphics.glColor4f(0, 0, 0, 1)
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
-        player_box_x - border_thickness, player_box_y - border_thickness, 
-        player_box_x + player_box_width + border_thickness, player_box_y - border_thickness, 
-        player_box_x + player_box_width + border_thickness, player_box_y + player_box_height + border_thickness, 
-        player_box_x - border_thickness, player_box_y + player_box_height + border_thickness]))
-
+        x - border_thickness, y - border_thickness,
+        x + width + border_thickness, y - border_thickness,
+        x + width + border_thickness, y + height + border_thickness,
+        x - border_thickness, y + height + border_thickness]))
+    # Fill
     pyglet.graphics.glColor4f(1, 1, 1, 1)
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
-        player_box_x, player_box_y, 
-        player_box_x + player_box_width, player_box_y, 
-        player_box_x + player_box_width, player_box_y + player_box_height, 
-        player_box_x, player_box_y + player_box_height]))
+        x, y, x + width, y, x + width, y + height, x, y + height]))
 
-    # Enemy box
-    pyglet.graphics.glColor4f(0, 0, 0, 1)
-    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
-        enemy_box_x - border_thickness, enemy_box_y - border_thickness, 
-        enemy_box_x + enemy_box_width + border_thickness, enemy_box_y - border_thickness, 
-        enemy_box_x + enemy_box_width + border_thickness, enemy_box_y + enemy_box_height + border_thickness, 
-        enemy_box_x - border_thickness, enemy_box_y + enemy_box_height + border_thickness]))
+def draw_label(text, x, y, font_name='Courier', font_size=12, color=(0, 0, 0, 255)):
+    label = pyglet.text.Label(text, font_name=font_name, font_size=font_size, color=color, x=x, y=y, anchor_x='center', anchor_y='center')
+    label.draw()
 
-    pyglet.graphics.glColor4f(1, 1, 1, 1)
-    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
-        enemy_box_x, enemy_box_y, 
-        enemy_box_x + enemy_box_width, enemy_box_y, 
-        enemy_box_x + enemy_box_width, enemy_box_y + enemy_box_height, 
-        enemy_box_x, enemy_box_y + enemy_box_height]))
+def draw_health_bar(x, y, width, height, percentage):
+    # Background
+    pyglet.graphics.glColor4f(0.5, 0.5, 0.5, 1)
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + width, y, x + width, y + height, x, y + height]))
+    # Health
+    pyglet.graphics.glColor4f(0, 1, 0, 1)
+    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + width * percentage, y, x + width * percentage, y + height, x, y + height]))
 
-    # Menu box
-    pyglet.graphics.glColor4f(0, 0, 0, 1)
-    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
-        menu_box_x - border_thickness, menu_box_y - border_thickness, 
-        menu_box_x + menu_box_width + border_thickness, menu_box_y - border_thickness, 
-        menu_box_x + menu_box_width + border_thickness, menu_box_y + menu_box_height + border_thickness, 
-        menu_box_x - border_thickness, menu_box_y + menu_box_height + border_thickness]))
+def fighting_screen(window, direction, menu_options, selected_option_index):
+    clear_screen(window)
 
-    pyglet.graphics.glColor4f(1, 1, 1, 1)
-    pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
-        menu_box_x, menu_box_y, 
-        menu_box_x + menu_box_width, menu_box_y, 
-        menu_box_x + menu_box_width, menu_box_y + menu_box_height, 
-        menu_box_x, menu_box_y + menu_box_height]))
+    draw_box(40, 450, 200, 80)
+    draw_box(400, 200, 200, 80)
 
-    player_label_x = player_box_x + 40
-    player_label_y = player_box_y + player_box_height - 10
+    draw_box(20, 20, 600, 150)
 
-    enemy_label_x = enemy_box_x + 40
-    enemy_label_y = enemy_box_y + enemy_box_height - 10
+    draw_label('Player', 40 + 40, 450 + 80 - 10)
+    draw_label('Enemy', 400 + 40, 200 + 80 - 10)
 
-    player_label = pyglet.text.Label('Player', font_name='Courier', font_size=12, color=(0, 0, 0, 255), x=player_label_x, y=player_label_y, anchor_x='center', anchor_y='center')
-    player_label.draw()
-
-    enemy_label = pyglet.text.Label('Enemy', font_name='Courier', font_size=12, color=(0, 0, 0, 255), x=enemy_label_x, y=enemy_label_y, anchor_y='center')
-    enemy_label.draw()
+    draw_health_bar(40, 450 - 30, 200, 10, 1)  # Assuming full health for demonstration
+    draw_health_bar(400, 200 - 30, 200, 10, 0.5)
 
     draw_menu_options(window, menu_options, selected_option_index)
-
-    # Drawing health bars for player and enemy
-    player_health_percentage = 1  # Assuming full health, adjust as needed
-    enemy_health_percentage = 0.5  # Example, adjust based on actual health
-
-    draw_health_bar(player_box_x, player_box_y - 30, player_box_width, 10, player_health_percentage)
-    draw_health_bar(enemy_box_x, enemy_box_y - 30, enemy_box_width, 10, enemy_health_percentage)
 
     # Assume draw_player_image() and draw_enemy_image() functions are defined to draw the respective images
     draw_player_image()
@@ -253,5 +214,7 @@ def fighting_screen(window, direction, menu_options, selected_option_index):
 
     if direction:
         navigate_menu(direction)
+
+
 
 
