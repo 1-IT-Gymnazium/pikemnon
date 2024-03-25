@@ -8,7 +8,7 @@ from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, ge
 from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
-from fighting import fighting_screen
+from fighting import fighting_screen, player_attack
 from game_state import get_fight_status
 
 # Window dimensions
@@ -66,6 +66,7 @@ def on_key_press(symbol, modifiers):
                 selected_menu_option_index = 0  # Reset for the attack menu
             elif fighting_menu_state == 'attack':
                 print(f"Selected attack: {attack_options[selected_menu_option_index]}")
+                player_attack(attack_options[selected_menu_option_index])
                 fighting_menu_state = 'main'
                 selected_menu_option_index = 0
         elif symbol == key.W or symbol == key.UP:

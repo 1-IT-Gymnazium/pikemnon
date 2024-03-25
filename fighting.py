@@ -2,8 +2,13 @@ import pyglet
 from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 
-
-player_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
+attack_options = ["Quick Attack", "Thunderbolt", "Tail Whip", "Growl"]
+player_pokemon = {'attack': 45, 'defense': 49, 'health': 100, 'moves': {
+    "Quick Attack": 10,
+    "Thunderbolt": 20,
+    "Tail Whip": 30,
+    "Growl": 5
+}}
 npc_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
 current_turn = 'player'
 selected_option_index = 0
@@ -18,15 +23,12 @@ menu_state = 'main'  # 'main' or 'attack'
 
 
 def calculate_damage(attack, defense, power):
-    """
-    Simple damage calculation formula
-    """
     return int(((2 * power * (attack / defense)) / 50) + 2)
 
-def player_attack():
+def player_attack(attack_name):
     global player_pokemon, npc_pokemon
     power = 50
-    damage = calculate_damage(player_pokemon['attack'], npc_pokemon['defense'], power)
+    damage = calculate_damage(player_pokemon['moves'][attack_name], npc_pokemon['defense'], power)
     npc_pokemon['health'] -= damage
     print(f"Player's Pokémon caused {damage} damage. NPC Pokémon health is now {npc_pokemon['health']}.")
     check_battle_end()
@@ -202,15 +204,12 @@ def fighting_screen(window, direction, menu_options, selected_option_index):
     draw_label('Player', 40 + 40, 450 + 80 - 10)
     draw_label('Enemy', 400 + 40, 200 + 80 - 10)
 
-    draw_health_bar(40, 450 - 30, 200, 10, 1)  # Assuming full health for demonstration
-    draw_health_bar(400, 200 - 30, 200, 10, 0.5)
+    draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['health']/100)
+    draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['health']/100)
 
     draw_menu_options(window, menu_options, selected_option_index)
 
-    # Assume draw_player_image() and draw_enemy_image() functions are defined to draw the respective images
     draw_player_image()
-    # Example function call, replace with actual function to draw enemy
-    # draw_enemy_image()
 
     if direction:
         navigate_menu(direction)
