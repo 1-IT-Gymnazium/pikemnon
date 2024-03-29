@@ -1,15 +1,17 @@
 import pyglet
 from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
+from game_state import current_npc, get_current_npc
 
-attack_options = ["Quick Attack", "Thunderbolt", "Tail Whip", "Growl"]
-player_pokemon = {'attack': 45, 'defense': 49, 'health': 100, 'moves': {
+player_pokemon = {'attack': 45, 'defense': 49, 'health': 40, 'max_health': 40, 'moves': {
     "Quick Attack": 10,
     "Thunderbolt": 20,
     "Tail Whip": 30,
     "Growl": 5
 }}
-npc_pokemon = {'attack': 10, 'defense': 10, 'health': 100}
+
+npc_pokemon = None
+
 current_turn = 'player'
 selected_option_index = 0
 
@@ -17,21 +19,37 @@ window_width = WINDOW_WIDTH*SCALE
 window_height = WINDOW_HEIGHT*SCALE
 
 main_menu_options = ["Attack", "Item", "Run", "Swap"]
-attack_menu_options = ["Quick Attack", "Thunderbolt", "Tail Whip", "Growl"]
-current_menu = main_menu_options  # Start with main menu
-menu_state = 'main'  # 'main' or 'attack'
+attack_menu_options = list(player_pokemon['moves'].keys())
+current_menu = main_menu_options
+menu_state = 'main'
 
 
-def calculate_damage(attack, defense, power):
+def calculate_damage(attack: int, defense: int, power: int) -> int:
+    """
+    Calculate the damage inflicted during a Pokemon battle.
+
+    This function uses the formula from the Pokemon games to calculate
+    how much damage an attack will do. The formula takes into account
+    the attack power of the attacking Pokemon, the defense of the
+    defending Pokemon, and the power of the move being used.
+
+    Parameters:
+    attack (int): The attack power of the attacking Pokemon.
+    defense (int): The defense power of the defending Pokemon.
+    power (int): The power of the move being used.
+
+    Returns:
+    int: The calculated damage.
+    """
     return int(((2 * power * (attack / defense)) / 50) + 2)
 
-def player_attack(attack_name):
-    global player_pokemon, npc_pokemon
+def player_attack(attack_name: str):
+    global player_pokemon
     power = 50
     damage = calculate_damage(player_pokemon['moves'][attack_name], npc_pokemon['defense'], power)
     npc_pokemon['health'] -= damage
     print(f"Player's Pokémon caused {damage} damage. NPC Pokémon health is now {npc_pokemon['health']}.")
-    check_battle_end()
+    return check_battle_end()
 
 
 def draw_player_image():
@@ -64,14 +82,16 @@ def npc_attack():
     damage = calculate_damage(npc_pokemon['attack'], player_pokemon['defense'], power)
     player_pokemon['health'] -= damage
     print(f"NPC's Pokémon caused {damage} damage. Player Pokémon health is now {player_pokemon['health']}.")
-    check_battle_end()
+    return check_battle_end()
 
 def check_battle_end():
     global player_pokemon, npc_pokemon
     if player_pokemon['health'] <= 0:
+        player_pokemon['health'] = 0
         print("Player's Pokémon fainted. NPC wins!")
         return True
     elif npc_pokemon['health'] <= 0:
+        npc_pokemon['health'] = 0
         print("NPC's Pokémon fainted. Player wins!")
         return True
     return False
@@ -196,6 +216,10 @@ def draw_health_bar(x, y, width, height, percentage):
 def fighting_screen(window, direction, menu_options, selected_option_index):
     clear_screen(window)
 
+    global npc_pokemon
+    current_npc = get_current_npc()
+    npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
+
     draw_box(40, 450, 200, 80)
     draw_box(400, 200, 200, 80)
 
@@ -204,8 +228,8 @@ def fighting_screen(window, direction, menu_options, selected_option_index):
     draw_label('Player', 40 + 40, 450 + 80 - 10)
     draw_label('Enemy', 400 + 40, 200 + 80 - 10)
 
-    draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['health']/100)
-    draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['health']/100)
+    draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['health']/player_pokemon['max_health'])
+    draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['health']/npc_pokemon['current_health'])
 
     draw_menu_options(window, menu_options, selected_option_index)
 

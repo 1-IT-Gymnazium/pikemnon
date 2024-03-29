@@ -1,0 +1,16 @@
+[
+    {
+        "image": "assets/player.png",
+        "x": 500,
+        "y": 300,
+        "direction": "left",
+        "pikemnons": ["Charmander"]
+    },
+    {
+        "image": "assets/player.png",
+        "x": 600,
+        "y": 400,
+        "direction": "right",
+        "pikemnons": ["Charmander"]
+    }
+]

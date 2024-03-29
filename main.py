@@ -1,3 +1,4 @@
+import json
 import pyglet
 from pyglet.window import key
 from pyglet.gl import *
@@ -9,7 +10,7 @@ from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
 from fighting import fighting_screen, player_attack
-from game_state import get_fight_status
+from game_state import get_fight_status, end_fight
 
 # Window dimensions
 window_width = WINDOW_WIDTH*SCALE
@@ -19,8 +20,15 @@ window_height = WINDOW_HEIGHT*SCALE
 window = pyglet.window.Window(window_width, window_height, "Pikemnon")
 
 player = create_player('assets/player.png', window.width//2, window.height//2)
-out_npc = create_npc('assets/player.png', 500, 300, 'left')
-outside_npcs = [out_npc]
+
+
+with open('npcs.json') as f:
+    data = json.load(f)
+
+outside_npcs = []
+for i, npc_data in enumerate(data):  # Generate a unique ID
+    npc = create_npc(npc_data['image'], npc_data['x'], npc_data['y'], npc_data['direction'], npc_data['pikemnons'])
+    outside_npcs.append(npc)
 
 set_current_map(mps.starter_map)
 
@@ -66,7 +74,8 @@ def on_key_press(symbol, modifiers):
                 selected_menu_option_index = 0  # Reset for the attack menu
             elif fighting_menu_state == 'attack':
                 print(f"Selected attack: {attack_options[selected_menu_option_index]}")
-                player_attack(attack_options[selected_menu_option_index])
+                if  player_attack(attack_options[selected_menu_option_index]):
+                    end_fight()
                 fighting_menu_state = 'main'
                 selected_menu_option_index = 0
         elif symbol == key.W or symbol == key.UP:

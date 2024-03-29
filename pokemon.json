@@ -1,0 +1,26 @@
+{
+    "Bulbasaur": {
+        "health": 45,
+        "attack": 49,
+        "defense": 49,
+        "type": "grass",
+        "moves": {
+            "tackle": 40,
+            "vine whip": 45,
+            "razor leaf": 55,
+            "seed bomb": 80
+        }
+    },
+    "Charmander": {
+        "health": 39,
+        "attack": 52,
+        "defense": 43,
+        "type": "fire",
+        "moves": {
+            "scratch": 40,
+            "ember": 40,
+            "flamethrower": 90,
+            "fire blast": 110
+        }
+    }
+}
