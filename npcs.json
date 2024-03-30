@@ -4,7 +4,7 @@
         "x": 500,
         "y": 300,
         "direction": "left",
-        "pikemnons": ["Charmander"]
+        "pikemnons": ["Charmander", "Bulbasaur"]
     },
     {
         "image": "assets/player.png",

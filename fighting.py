@@ -1,7 +1,8 @@
 import pyglet
 from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
-from game_state import current_npc, get_current_npc
+from game_state import get_current_npc
+from conf import FONT_NAME
 
 player_pokemon = {'attack': 45, 'defense': 49, 'health': 40, 'max_health': 40, 'moves': {
     "Quick Attack": 10,
@@ -91,9 +92,15 @@ def check_battle_end():
         print("Player's Pokémon fainted. NPC wins!")
         return True
     elif npc_pokemon['health'] <= 0:
-        npc_pokemon['health'] = 0
-        print("NPC's Pokémon fainted. Player wins!")
-        return True
+        current_npc = get_current_npc()
+        if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
+            current_npc['pikemnon_index'] += 1
+            npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
+            print("NPC sends out another Pokémon.")
+        else:
+            npc_pokemon['health'] = 0
+            print("NPC's Pokémon fainted. Player wins!")
+            return True
     return False
 
 def next_turn():
@@ -161,7 +168,7 @@ def draw_menu_options(window, menu_options, selected_option_index):
 
         # Create and draw the label for the option
         option_label = pyglet.text.Label(option,
-                                         font_name='Courier',
+                                         font_name=FONT_NAME,
                                          font_size=12,
                                          color=color,
                                          x=x_center,
@@ -201,8 +208,8 @@ def draw_box(x, y, width, height, border_thickness=2):
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
         x, y, x + width, y, x + width, y + height, x, y + height]))
 
-def draw_label(text, x, y, font_name='Courier', font_size=12, color=(0, 0, 0, 255)):
-    label = pyglet.text.Label(text, font_name=font_name, font_size=font_size, color=color, x=x, y=y, anchor_x='center', anchor_y='center')
+def draw_label(text, x, y, font_size=12, color=(0, 0, 0, 255)):
+    label = pyglet.text.Label(text, font_name=FONT_NAME, font_size=font_size, color=color, x=x, y=y, anchor_x='center', anchor_y='center')
     label.draw()
 
 def draw_health_bar(x, y, width, height, percentage):
@@ -226,7 +233,7 @@ def fighting_screen(window, direction, menu_options, selected_option_index):
     draw_box(20, 20, 600, 150)
 
     draw_label('Player', 40 + 40, 450 + 80 - 10)
-    draw_label('Enemy', 400 + 40, 200 + 80 - 10)
+    draw_label(npc_pokemon['name'], 400 + 70, 200 + 80 - 10)
 
     draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['health']/player_pokemon['max_health'])
     draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['health']/npc_pokemon['current_health'])

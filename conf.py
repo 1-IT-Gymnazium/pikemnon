@@ -11,3 +11,4 @@ with open('config.json') as f:
     SCALE = config['SCALE']
     WINDOW_WIDTH = config['WINDOW_WIDTH']
     WINDOW_HEIGHT = config['WINDOW_HEIGHT']  # Corrected variable name
+    FONT_NAME = config['FONT_NAME']

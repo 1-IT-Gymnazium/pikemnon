@@ -15,6 +15,7 @@ def create_npc(image_file, x, y, look, pikemnons):
     for pikemnon in pikemnons:
         if pikemnon in data:
             pik = data[pikemnon]
+            pik['name'] = pikemnon
             pik['current_health'] = pik['health']
             npc['pikemnons'].append(pik)
     return npc
