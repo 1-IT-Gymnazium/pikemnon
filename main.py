@@ -2,7 +2,7 @@ import json
 import pyglet
 from pyglet.window import key
 from pyglet.gl import *
-from player import create_player, update_player
+from player import create_player, update_player, get_player_pikemnon
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
 from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, get_current_map
@@ -37,7 +37,7 @@ map_sprites = create_map_sprites()
 fighting_menu_state = 'main'  # 'main' or 'attack'
 selected_menu_option_index = 0
 menu_options = ["Attack", "Item", "Run", "Swap"]
-attack_options = ["Quick Attack", "Thunderbolt", "Tail Whip", "Growl"]
+attack_options = None
 menu_direction = None  # Default value indicating no direction
 
 set_camera_target(player)
@@ -54,7 +54,7 @@ menu_direction = None
 
 @window.event
 def on_key_press(symbol, modifiers):
-    global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options
+    global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options, player
     fighton = get_fight_status()
     
     if not fighton:
@@ -145,9 +145,10 @@ def on_draw():
         draw_entity(player)
         end_camera()
     elif fighton:
-        global menu_direction
+        global menu_direction, attack_options
+        attack_options = list(get_player_pikemnon(player['pikemnons'])['moves'].keys())
         current_menu_options = attack_options if fighting_menu_state == 'attack' else menu_options
-        fighting_screen(window, menu_direction, current_menu_options, selected_menu_option_index)
+        fighting_screen(window, player, menu_direction, current_menu_options, selected_menu_option_index)
         menu_direction = None  # Reset after use to avoid unintended navigation
 
 

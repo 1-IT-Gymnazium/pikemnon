@@ -3,15 +3,10 @@ from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 from game_state import get_current_npc
 from conf import FONT_NAME
-
-player_pokemon = {'attack': 45, 'defense': 49, 'health': 40, 'max_health': 40, 'moves': {
-    "Quick Attack": 10,
-    "Thunderbolt": 20,
-    "Tail Whip": 30,
-    "Growl": 5
-}}
+from player import get_player_pikemnon
 
 npc_pokemon = None
+player_pokemon = None
 
 current_turn = 'player'
 selected_option_index = 0
@@ -20,7 +15,7 @@ window_width = WINDOW_WIDTH*SCALE
 window_height = WINDOW_HEIGHT*SCALE
 
 main_menu_options = ["Attack", "Item", "Run", "Swap"]
-attack_menu_options = list(player_pokemon['moves'].keys())
+# attack_menu_options = None
 current_menu = main_menu_options
 menu_state = 'main'
 
@@ -46,8 +41,7 @@ def calculate_damage(attack: int, defense: int, power: int) -> int:
 
 def player_attack(attack_name: str):
     global player_pokemon
-    power = 50
-    damage = calculate_damage(player_pokemon['moves'][attack_name], npc_pokemon['defense'], power)
+    damage = calculate_damage(player_pokemon['moves'][attack_name], npc_pokemon['defense'], player_pokemon['attack'])
     npc_pokemon['health'] -= damage
     print(f"Player's Pokémon caused {damage} damage. NPC Pokémon health is now {npc_pokemon['health']}.")
     return check_battle_end()
@@ -220,12 +214,17 @@ def draw_health_bar(x, y, width, height, percentage):
     pyglet.graphics.glColor4f(0, 1, 0, 1)
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + width * percentage, y, x + width * percentage, y + height, x, y + height]))
 
-def fighting_screen(window, direction, menu_options, selected_option_index):
+def fighting_screen(window, player, direction, menu_options, selected_option_index):
     clear_screen(window)
 
-    global npc_pokemon
+    global npc_pokemon, player_pokemon
     current_npc = get_current_npc()
     npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
+
+
+    if not player_pokemon or player_pokemon['health'] <= 0:
+        player_pokemon = get_player_pikemnon(player['pikemnons'])
+        # attack_menu_options = list(player_pokemon['moves'].keys())
 
     draw_box(40, 450, 200, 80)
     draw_box(400, 200, 200, 80)
@@ -235,7 +234,7 @@ def fighting_screen(window, direction, menu_options, selected_option_index):
     draw_label('Player', 40 + 40, 450 + 80 - 10)
     draw_label(npc_pokemon['name'], 400 + 70, 200 + 80 - 10)
 
-    draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['health']/player_pokemon['max_health'])
+    draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['health']/player_pokemon['current_health'])
     draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['health']/npc_pokemon['current_health'])
 
     draw_menu_options(window, menu_options, selected_option_index)

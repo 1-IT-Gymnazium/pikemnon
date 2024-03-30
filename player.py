@@ -1,3 +1,4 @@
+import json
 from entity import create_entity
 
 
@@ -5,6 +6,21 @@ def create_player(image_file, x, y, speed=220):
     player = create_entity(image_file, x, y)
     player['speed'] = speed
     player['canMove'] = True
+    with open('player.json') as f:
+        data = json.load(f)
+        player_pikemnons = data['inventory']['pikemnons']
+        pikemnons = []
+        with open('pokemon.json') as f:
+            pokemon_data = json.load(f)
+        for x, pikemnon in enumerate(player_pikemnons):
+            # pikemnon['current_health'] = pokemon_data[pikemnon['name']]['health']
+            # pikemnon['health'] = pokemon_data[pikemnon['name']]['health']
+            # pikemnon['moves'] = pokemon_data[pikemnon['name']]['moves']
+            pikemnon = pokemon_data[pikemnon['name']]
+            pikemnon['current_health'] = pikemnon['health']
+            pikemnon['level'] = player_pikemnons[x]['level']
+            pikemnons.append(pikemnon)
+        player['pikemnons'] = pikemnons
     return player
 
 
@@ -31,3 +47,8 @@ def update_player(player, dt, key_state):
 
 def change_move(player, can):
     player['canMove'] = can
+
+def get_player_pikemnon(player_inventory):
+    for pikemnon in player_inventory:
+        if pikemnon['current_health'] > 0:
+            return pikemnon
