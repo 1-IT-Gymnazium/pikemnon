@@ -5,10 +5,10 @@
         "defense": 49,
         "type": "grass",
         "moves": {
-            "tackle": 40,
-            "vine whip": 45,
-            "razor leaf": 55,
-            "seed bomb": 80
+            "growl": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "attack"},
+            "tackle": {"power": 40, "move_type": "attack", "type": "normal"},
+            "vine whip": {"power": 45, "move_type": "attack", "type": "grass"},
+            "Growth": {"power": 1, "move_type": "buff", "type": "normal", "target_stat": "attack"}
         }
     },
     "Charmander": {
@@ -17,10 +17,10 @@
         "defense": 43,
         "type": "fire",
         "moves": {
-            "scratch": 40,
-            "ember": 40,
-            "flamethrower": 90,
-            "fire blast": 110
+            "growl": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "attack"},
+            "scratch": {"power": 40, "move_type": "attack", "type": "normal"},
+            "ember": {"power": 40, "move_type": "attack", "type": "fire"},
+            "dragon breatch": {"power": 60, "move_type": "attack", "type": "fire"}
         }
     }
 }

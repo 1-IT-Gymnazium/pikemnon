@@ -20,7 +20,7 @@ current_menu = main_menu_options
 menu_state = 'main'
 
 
-def calculate_damage(attack: int, defense: int, power: int) -> int:
+def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     """
     Calculate the damage inflicted during a Pokemon battle.
 
@@ -37,13 +37,49 @@ def calculate_damage(attack: int, defense: int, power: int) -> int:
     Returns:
     int: The calculated damage.
     """
-    return int(((2 * power * (attack / defense)) / 50) + 2)
+
+    stage_multipliers = {
+    -6: 0.25,
+    -5: 0.29,
+    -4: 0.33,
+    -3: 0.4,
+    -2: 0.5,
+    -1: 0.67,
+    0: 1,
+    1: 1.5,
+    2: 2,
+    3: 2.5,
+    4: 3,
+    5: 3.5,
+    6: 4
+    }
+
+    attack_stage = stage_multipliers[stage['attack']]
+
+    damage = ((2 * power * ((attack * attack_stage) / defense)) / 50) + 2
+    print(damage)
+    print(attack * attack_stage)
+    print(int(damage))
+    
+    return int(((2 * power * ((attack * attack_stage) / defense)) / 50) + 2)
+
+def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
+    move = attacking_pokemon['moves'][attack_name]
+    if move['move_type'] == "attack":
+        damage = calculate_damage(attacking_pokemon['attack'], defending_pokemon['defense'], move['power'], attacking_pokemon['stage'])
+        defending_pokemon['health'] -= damage
+        print(f"used {attack_name} and caused {damage} damage.")
+    elif move['move_type'] == "buff":
+        target_stat = move['target_stat']
+        print(min(attacking_pokemon['stage'][target_stat] + move['power'], 6))
+        attacking_pokemon['stage'][target_stat] = min(attacking_pokemon['stage'][target_stat] + move['power'], 6)
+    elif move['move_type'] == "debuff":
+        target_stat = move['target_stat']
+        defending_pokemon['stage'][target_stat] = max(defending_pokemon['stage'][target_stat] - move['power'], -6)
 
 def player_attack(attack_name: str):
     global player_pokemon
-    damage = calculate_damage(player_pokemon['moves'][attack_name], npc_pokemon['defense'], player_pokemon['attack'])
-    npc_pokemon['health'] -= damage
-    print(f"Player's Pokémon caused {damage} damage. NPC Pokémon health is now {npc_pokemon['health']}.")
+    handle_attack(attack_name, player_pokemon, npc_pokemon)
     return check_battle_end()
 
 
@@ -73,8 +109,7 @@ def draw_player_image():
 
 def npc_attack():
     global player_pokemon, npc_pokemon
-    power = 50
-    damage = calculate_damage(npc_pokemon['attack'], player_pokemon['defense'], power)
+    damage = calculate_damage(npc_pokemon['attack'], player_pokemon['defense'], npc_pokemon['attack'])
     player_pokemon['health'] -= damage
     print(f"NPC's Pokémon caused {damage} damage. Player Pokémon health is now {player_pokemon['health']}.")
     return check_battle_end()

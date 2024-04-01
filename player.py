@@ -19,6 +19,8 @@ def create_player(image_file, x, y, speed=220):
             pikemnon = pokemon_data[pikemnon['name']]
             pikemnon['current_health'] = pikemnon['health']
             pikemnon['level'] = player_pikemnons[x]['level']
+            pikemnon['stage'] = {}
+            pikemnon['stage']['attack'] = 0
             pikemnons.append(pikemnon)
         player['pikemnons'] = pikemnons
     return player

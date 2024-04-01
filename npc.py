@@ -17,6 +17,8 @@ def create_npc(image_file, x, y, look, pikemnons):
             pik = data[pikemnon]
             pik['name'] = pikemnon
             pik['current_health'] = pik['health']
+            pik['stage'] = {}
+            pik['stage']['attack'] = 0
             npc['pikemnons'].append(pik)
     return npc
 
