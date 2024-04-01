@@ -1,3 +1,4 @@
+import random
 import pyglet
 from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
@@ -8,7 +9,6 @@ from player import get_player_pikemnon
 npc_pokemon = None
 player_pokemon = None
 
-current_turn = 'player'
 selected_option_index = 0
 
 window_width = WINDOW_WIDTH*SCALE
@@ -18,6 +18,8 @@ main_menu_options = ["Attack", "Item", "Run", "Swap"]
 # attack_menu_options = None
 current_menu = main_menu_options
 menu_state = 'main'
+
+turn = 0
 
 
 def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
@@ -77,7 +79,7 @@ def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
         target_stat = move['target_stat']
         defending_pokemon['stage'][target_stat] = max(defending_pokemon['stage'][target_stat] - move['power'], -6)
 
-def player_attack(attack_name: str):
+def player_attack(attack_name: str) -> bool:
     global player_pokemon
     handle_attack(attack_name, player_pokemon, npc_pokemon)
     return check_battle_end()
@@ -109,16 +111,37 @@ def draw_player_image():
 
 def npc_attack():
     global player_pokemon, npc_pokemon
-    damage = calculate_damage(npc_pokemon['attack'], player_pokemon['defense'], npc_pokemon['attack'])
-    player_pokemon['health'] -= damage
-    print(f"NPC's Pokémon caused {damage} damage. Player Pokémon health is now {player_pokemon['health']}.")
+    moves = npc_pokemon['moves']
+
+    attacks = {name: details for name, details in moves.items() if details['move_type'] == 'attack'}
+    buffs_and_debuffs = {name: details for name, details in moves.items() if details['move_type'] in ['buff', 'debuff']}
+
+    chance_list = []
+
+    for attack in attacks:
+        for _ in range(attacks[attack]['power']):
+            chance_list.append(attack)
+    
+    if buffs_and_debuffs:
+        for buff in buffs_and_debuffs:
+            chance_list.append(buff)
+    
+        if turn % 2 == 0 and buffs_and_debuffs:
+            for buff in buffs_and_debuffs:
+                for _ in range(buffs_and_debuffs[buff]['power']):
+                    chance_list.append(buff)
+    
+    attack_name = random.choice(chance_list)
+
+    handle_attack(attack_name, npc_pokemon, player_pokemon)
     return check_battle_end()
 
 def check_battle_end():
-    global player_pokemon, npc_pokemon
+    global player_pokemon, npc_pokemon, turn
     if player_pokemon['health'] <= 0:
         player_pokemon['health'] = 0
         print("Player's Pokémon fainted. NPC wins!")
+        turn = 0
         return True
     elif npc_pokemon['health'] <= 0:
         current_npc = get_current_npc()
@@ -129,16 +152,14 @@ def check_battle_end():
         else:
             npc_pokemon['health'] = 0
             print("NPC's Pokémon fainted. Player wins!")
+            turn = 0
             return True
     return False
 
 def next_turn():
-    global current_turn
-    if current_turn == 'player':
-        current_turn = 'npc'
-        npc_attack()
-    else:
-        current_turn = 'player'
+    global turn
+    turn += 1
+    return npc_attack()
 
 
 

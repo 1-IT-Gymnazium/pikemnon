@@ -9,7 +9,7 @@ from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, ge
 from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
-from fighting import fighting_screen, player_attack
+from fighting import fighting_screen, player_attack, next_turn
 from game_state import get_fight_status, end_fight
 
 # Window dimensions
@@ -78,6 +78,8 @@ def on_key_press(symbol, modifiers):
                     end_fight()
                 fighting_menu_state = 'main'
                 selected_menu_option_index = 0
+                if next_turn():
+                    end_fight()
         elif symbol == key.W or symbol == key.UP:
             # Move up in the grid
             selected_menu_option_index = (selected_menu_option_index - 2) % len(menu_options)

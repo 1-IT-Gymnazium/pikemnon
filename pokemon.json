@@ -20,7 +20,7 @@
             "growl": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "attack"},
             "scratch": {"power": 40, "move_type": "attack", "type": "normal"},
             "ember": {"power": 40, "move_type": "attack", "type": "fire"},
-            "dragon breatch": {"power": 60, "move_type": "attack", "type": "fire"}
+            "dragon breath": {"power": 60, "move_type": "attack", "type": "fire"}
         }
     }
 }
