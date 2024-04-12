@@ -168,7 +168,7 @@ def on_draw():
         global menu_direction, attack_options
         attack_options = list(get_player_pikemnon(player['pikemnons'])['moves'].keys())
         current_menu_options = attack_options if fighting_menu_state == 'attack' else menu_options
-        fighting_screen(window, player, menu_direction, current_menu_options, selected_menu_option_index)
+        fighting_screen(window, player, menu_direction, current_menu_options, selected_menu_option_index, fighting_menu_state)
         menu_direction = None  # Reset after use to avoid unintended navigation
 
 

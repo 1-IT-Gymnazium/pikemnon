@@ -174,7 +174,7 @@ def draw_health_bar(x, y, width, height, health_percentage):
     current_health_width = width * health_percentage
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + current_health_width, y, x + current_health_width, y + height, x, y + height]))
 
-def draw_menu_options(window, menu_options, selected_option_index):
+def draw_menu_options(window, menu_options, selected_option_index, state, player_pokemon):
     global current_menu  # Assuming current_menu holds the current state of menu options
     menu_box_x = 20
     menu_box_y = 20
@@ -199,7 +199,7 @@ def draw_menu_options(window, menu_options, selected_option_index):
         y_center = menu_box_y + (menu_box_height - (row * row_height)) - (row_height / 2)
 
         # Appending " 0" to each option for display
-        display_text = f"{option} 0"
+        display_text = f"{option} {player_pokemon['moves'][option]['pp']}" if state == "attack" else f"{option}"
 
         # Use index to check if the option is the selected one
         if i == selected_option_index:
@@ -272,7 +272,7 @@ def draw_health_bar(x, y, width, height, percentage):
     pyglet.graphics.glColor4f(0, 1, 0, 1)
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + width * percentage, y, x + width * percentage, y + height, x, y + height]))
 
-def fighting_screen(window, player, direction, menu_options, selected_option_index):
+def fighting_screen(window, player, direction, menu_options, selected_option_index, menu_state):
     clear_screen(window)
 
     global npc_pokemon, player_pokemon
@@ -295,7 +295,7 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
     draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['health']/player_pokemon['current_health'])
     draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['health']/npc_pokemon['current_health'])
 
-    draw_menu_options(window, menu_options, selected_option_index)
+    draw_menu_options(window, menu_options, selected_option_index, menu_state, player_pokemon)
 
     draw_player_image()
 
