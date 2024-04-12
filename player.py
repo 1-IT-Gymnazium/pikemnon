@@ -13,9 +13,6 @@ def create_player(image_file, x, y, speed=220):
         with open('pokemon.json') as f:
             pokemon_data = json.load(f)
         for x, pikemnon in enumerate(player_pikemnons):
-            # pikemnon['current_health'] = pokemon_data[pikemnon['name']]['health']
-            # pikemnon['health'] = pokemon_data[pikemnon['name']]['health']
-            # pikemnon['moves'] = pokemon_data[pikemnon['name']]['moves']
             pikemnon = pokemon_data[pikemnon['name']]
             pikemnon['current_health'] = pikemnon['health']
             pikemnon['level'] = player_pikemnons[x]['level']

@@ -7,7 +7,6 @@ def create_npc(image_file, x, y, look, pikemnons):
     npc = create_entity(image_file, x, y)
     npc['look'] = look
     npc['fought'] = False
-    npc['id'] = id
     npc['pikemnons'] = []
     npc['pikemnon_index'] = 0
     with open('pokemon.json') as f:

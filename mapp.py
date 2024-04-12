@@ -9,7 +9,11 @@ tile_images = {
     0: pyglet.resource.image('assets/empty.png'),
     1: pyglet.resource.image('assets/floor.png'),
     2: pyglet.resource.image('assets/door_2.png'),
-    3: pyglet.resource.image('assets/grass.png')
+    3: pyglet.resource.image('assets/grass.png'),
+    4: pyglet.resource.image('assets/tall-grass-tl.png'),
+    5: pyglet.resource.image('assets/tall-grass-tr.png'),
+    6: pyglet.resource.image('assets/tall-grass-bl.png'),
+    7: pyglet.resource.image('assets/tall-grass-br.png'),
 }
 
 # Define a list to hold the map sprites
@@ -18,6 +22,7 @@ map_sprites = []
 
 # Define a function to create the map sprites
 def create_map_sprites():
+
     for y, row in enumerate(current_map):
         for x, tile in enumerate(row):
             image = tile_images[tile]
@@ -27,6 +32,8 @@ def create_map_sprites():
             sprite = pyglet.sprite.Sprite(img=image, x=x*image.width*4,
                                           y=y*image.height*4)
             sprite.scale = 4
+            if map and tile == 0:
+                sprite.opacity = 0
             map_sprites.append(sprite)
     return map_sprites
 
@@ -63,6 +70,10 @@ def what_tile_is_player_on(player):
                     return "Nothing"
                 elif current_map[y][x] == 2:
                     return "Door"
+                elif current_map[y][x] == 3:
+                    return "Grass"
+                if current_map[y][x] in [4, 5, 6, 7]:
+                    return "Tall Grass"
     return None
 
 

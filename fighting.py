@@ -17,7 +17,6 @@ window_height = WINDOW_HEIGHT*SCALE
 main_menu_options = ["Attack", "Item", "Run", "Swap"]
 # attack_menu_options = None
 current_menu = main_menu_options
-menu_state = 'main'
 
 turn = 0
 
@@ -59,9 +58,6 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     attack_stage = stage_multipliers[stage['attack']]
 
     damage = ((2 * power * ((attack * attack_stage) / defense)) / 50) + 2
-    print(damage)
-    print(attack * attack_stage)
-    print(int(damage))
     
     return int(((2 * power * ((attack * attack_stage) / defense)) / 50) + 2)
 
@@ -70,10 +66,8 @@ def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
     if move['move_type'] == "attack":
         damage = calculate_damage(attacking_pokemon['attack'], defending_pokemon['defense'], move['power'], attacking_pokemon['stage'])
         defending_pokemon['health'] -= damage
-        print(f"used {attack_name} and caused {damage} damage.")
     elif move['move_type'] == "buff":
         target_stat = move['target_stat']
-        print(min(attacking_pokemon['stage'][target_stat] + move['power'], 6))
         attacking_pokemon['stage'][target_stat] = min(attacking_pokemon['stage'][target_stat] + move['power'], 6)
     elif move['move_type'] == "debuff":
         target_stat = move['target_stat']
@@ -81,6 +75,11 @@ def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
 
 def player_attack(attack_name: str) -> bool:
     global player_pokemon
+    player_pokemon['moves'][attack_name]['pp'] -= 1
+    print(player_pokemon['moves'][attack_name]['pp'])
+    if player_pokemon['moves'][attack_name]['pp'] <= 0:
+        print("Not enough PP to use this move.")
+        return False
     handle_attack(attack_name, player_pokemon, npc_pokemon)
     return check_battle_end()
 
@@ -120,16 +119,18 @@ def npc_attack():
 
     for attack in attacks:
         for _ in range(attacks[attack]['power']):
-            chance_list.append(attack)
+            if attack['pp'] > 0:
+                chance_list.append(attack)
     
     if buffs_and_debuffs:
         for buff in buffs_and_debuffs:
-            chance_list.append(buff)
+            if buff['pp'] > 0:
+                chance_list.append([buff] * (len(chance_list) // 2))
     
         if turn % 2 == 0 and buffs_and_debuffs:
             for buff in buffs_and_debuffs:
-                for _ in range(buffs_and_debuffs[buff]['power']):
-                    chance_list.append(buff)
+                if buff['pp'] > 0:
+                    chance_list.append([buff] * (len(chance_list) // 2))
     
     attack_name = random.choice(chance_list)
 
@@ -180,9 +181,6 @@ def draw_menu_options(window, menu_options, selected_option_index):
     menu_box_width = 600
     menu_box_height = 150
 
-    # No need to determine current_menu here if menu_options is directly passed as an argument
-    # menu_options = current_menu
-
     # Colors
     default_color = (0, 0, 0, 255)  # Black for unselected options
     highlight_color = (255, 255, 255, 255)  # White for the selected option text
@@ -200,6 +198,9 @@ def draw_menu_options(window, menu_options, selected_option_index):
         x_center = menu_box_x + (column * column_width) + (column_width / 2)
         y_center = menu_box_y + (menu_box_height - (row * row_height)) - (row_height / 2)
 
+        # Appending " 0" to each option for display
+        display_text = f"{option} 0"
+
         # Use index to check if the option is the selected one
         if i == selected_option_index:
             # Draw highlighted background
@@ -216,9 +217,9 @@ def draw_menu_options(window, menu_options, selected_option_index):
         else:
             color = default_color
 
-        # Create and draw the label for the option
-        option_label = pyglet.text.Label(option,
-                                         font_name=FONT_NAME,
+        # Create and draw the label for the option with the number appended
+        option_label = pyglet.text.Label(display_text,
+                                         font_name='Arial',  # Adjust FONT_NAME to 'Arial' if not previously defined
                                          font_size=12,
                                          color=color,
                                          x=x_center,
@@ -228,6 +229,7 @@ def draw_menu_options(window, menu_options, selected_option_index):
 
     # Reset color to default after drawing
     pyglet.graphics.glColor4ub(255, 255, 255, 255)
+
 
 
 def navigate_menu(direction):
