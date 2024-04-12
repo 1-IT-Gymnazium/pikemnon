@@ -11,7 +11,7 @@ from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, ge
 from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
-from fighting import fighting_screen, player_attack, next_turn
+from fighting import fighting_screen, handle_item, player_attack, next_turn
 from game_state import get_fight_status, end_fight, start_fight
 
 # Window dimensions
@@ -41,6 +41,7 @@ fighting_menu_state = 'main'  # 'main' or 'attack'
 selected_menu_option_index = 0
 menu_options = ["Attack", "Item", "Run", "Swap"]
 attack_options = None
+inventory_options = None
 menu_direction = None  # Default value indicating no direction
 
 set_camera_target(player)
@@ -66,12 +67,17 @@ def on_key_press(symbol, modifiers):
         handle_fighting_key_press(symbol)
 
 def handle_non_fighting_key_press(symbol):
-    if symbol in [key.W, key.S, key.A, key.D]:
-        key_state['up'] = symbol == key.W
-        key_state['down'] = symbol == key.S
-        key_state['left'] = symbol == key.A
-        key_state['right'] = symbol == key.D
-        wild_encounter()
+    # Ensure that each direction is evaluated independently
+    if symbol == key.W:
+        key_state['up'] = True
+    if symbol == key.S:
+        key_state['down'] = True
+    if symbol == key.A:
+        key_state['left'] = True
+    if symbol == key.D:
+        key_state['right'] = True
+    wild_encounter()
+
 
 def handle_fighting_key_press(symbol):
     global selected_menu_option_index, fighting_menu_state
@@ -102,6 +108,9 @@ def process_space_key():
     elif fighting_menu_state == 'attack':
         player_atk = player_attack(attack_options[selected_menu_option_index])
         handle_attack_result(player_atk)
+    elif fighting_menu_state == 'inventory':
+        handle_item(inventory_options[selected_menu_option_index])
+        fighting_menu_state = 'main'
 
 def handle_attack_result(player_atk):
     global fighting_menu_state, selected_menu_option_index

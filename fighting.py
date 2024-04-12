@@ -57,8 +57,6 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     }
 
     attack_stage = stage_multipliers[stage['attack']]
-
-    damage = ((2 * power * ((attack * attack_stage) / defense)) / 50) + 2
     
     return int(((2 * power * ((attack * attack_stage) / defense)) / 50) + 2)
 
@@ -83,6 +81,12 @@ def player_attack(attack_name: str) -> str:
     handle_attack(attack_name, player_pokemon, npc_pokemon)
     return check_battle_end()
 
+def handle_item(item: str):
+    global player_pokemon
+    if item == "potions":
+        print(player_pokemon['health'])
+        player_pokemon['health'] += 10
+        print(player_pokemon['health'])
 
 def draw_player_image():
     # Load the image
