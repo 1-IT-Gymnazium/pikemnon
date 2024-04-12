@@ -20,6 +20,7 @@ current_menu = main_menu_options
 
 turn = 0
 
+current_player = None
 
 def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     """
@@ -199,8 +200,15 @@ def draw_menu_options(window, menu_options, selected_option_index, state, player
         x_center = menu_box_x + (column * column_width) + (column_width / 2)
         y_center = menu_box_y + (menu_box_height - (row * row_height)) - (row_height / 2)
 
-        # Appending " 0" to each option for display
-        display_text = f"{option} {player_pokemon['moves'][option]['pp']}" if state == "attack" else f"{option}"
+        display_text_functions = {
+            'attack': attack_display_text,
+            'inventory': inventory_display_text,
+            'menu': menu_display_text
+        }
+
+        display_text_function = display_text_functions.get(state, display_text_functions['menu'])
+
+        display_text = display_text_function(option)
 
         # Use index to check if the option is the selected one
         if i == selected_option_index:
@@ -231,7 +239,14 @@ def draw_menu_options(window, menu_options, selected_option_index, state, player
     # Reset color to default after drawing
     pyglet.graphics.glColor4ub(255, 255, 255, 255)
 
+def attack_display_text(option):
+    return f"{option} {player_pokemon['moves'][option]['pp']}"
 
+def inventory_display_text(option):
+    return f"{option} {current_player[option]}"
+
+def menu_display_text(option):
+    return f"{option}"
 
 def navigate_menu(direction):
     global selected_option_index
@@ -276,9 +291,10 @@ def draw_health_bar(x, y, width, height, percentage):
 def fighting_screen(window, player, direction, menu_options, selected_option_index, menu_state):
     clear_screen(window)
 
-    global npc_pokemon, player_pokemon
+    global npc_pokemon, player_pokemon, current_player
     current_npc = get_current_npc()
     npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
+    current_player = player
 
 
     if not player_pokemon or player_pokemon['health'] <= 0:

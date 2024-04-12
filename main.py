@@ -61,53 +61,63 @@ def on_key_press(symbol, modifiers):
     fighton = get_fight_status()
     
     if not fighton:
-        if symbol == key.W:
-            key_state['up'] = True
-            wild_encounter()
-        elif symbol == key.S:
-            key_state['down'] = True
-            wild_encounter()
-        elif symbol == key.A:
-            key_state['left'] = True
-            wild_encounter()
-        elif symbol == key.D:
-            key_state['right'] = True
-            wild_encounter()
-    elif fighton:
-        grid_columns = 2
-        if symbol == key.SPACE:
-            if fighting_menu_state == 'main' and selected_menu_option_index == 0:
-                fighting_menu_state = 'attack'
-                selected_menu_option_index = 0  # Reset for the attack menu
-            elif fighting_menu_state == 'attack':
-                player_atk = player_attack(attack_options[selected_menu_option_index])
-                if player_atk == "player":
-                    end_fight()
-                    random_item = add_random_item(player)
-                    print(f"Player won! You got a {random_item}")
-                    return
-                fighting_menu_state = 'main'
-                if player_atk == "no pp":
-                    fighting_menu_state = 'attack'
-                    return
-                selected_menu_option_index = 0
-                if player_atk != "no pp" and next_turn() == "npc":
-                    end_fight()
-        elif symbol == key.W or symbol == key.UP:
-            # Move up in the grid
-            selected_menu_option_index = (selected_menu_option_index - 2) % len(menu_options)
-        elif symbol == key.S or symbol == key.DOWN:
-            # Move down in the grid
-            selected_menu_option_index = (selected_menu_option_index + 2) % len(menu_options)
-        elif symbol == key.A or symbol == key.LEFT:
-            # Move left in the grid
-            if selected_menu_option_index % grid_columns > 0:
-                selected_menu_option_index -= 1
-        elif symbol == key.D or symbol == key.RIGHT:
-            # Move right in the grid
-            if selected_menu_option_index % grid_columns < grid_columns - 1:
-                selected_menu_option_index += 1
+        handle_non_fighting_key_press(symbol)
+    else:
+        handle_fighting_key_press(symbol)
 
+def handle_non_fighting_key_press(symbol):
+    if symbol in [key.W, key.S, key.A, key.D]:
+        key_state['up'] = symbol == key.W
+        key_state['down'] = symbol == key.S
+        key_state['left'] = symbol == key.A
+        key_state['right'] = symbol == key.D
+        wild_encounter()
+
+def handle_fighting_key_press(symbol):
+    global selected_menu_option_index, fighting_menu_state
+
+    grid_columns = 2
+    if symbol == key.SPACE:
+        process_space_key()
+    elif symbol in [key.W, key.UP]:
+        selected_menu_option_index = (selected_menu_option_index - 2) % len(menu_options)
+    elif symbol in [key.S, key.DOWN]:
+        selected_menu_option_index = (selected_menu_option_index + 2) % len(menu_options)
+    elif symbol in [key.A, key.LEFT]:
+        if selected_menu_option_index % grid_columns > 0:
+            selected_menu_option_index -= 1
+    elif symbol in [key.D, key.RIGHT]:
+        if selected_menu_option_index % grid_columns < grid_columns - 1:
+            selected_menu_option_index += 1
+
+def process_space_key():
+    global fighting_menu_state, selected_menu_option_index
+
+    if fighting_menu_state == 'main':
+        if selected_menu_option_index == 0:
+            fighting_menu_state = 'attack'
+        elif selected_menu_option_index == 1:
+            fighting_menu_state = 'inventory'
+        selected_menu_option_index = 0
+    elif fighting_menu_state == 'attack':
+        player_atk = player_attack(attack_options[selected_menu_option_index])
+        handle_attack_result(player_atk)
+
+def handle_attack_result(player_atk):
+    global fighting_menu_state, selected_menu_option_index
+
+    if player_atk == "player":
+        end_fight()
+        random_item = add_random_item(player)
+        print(f"Player won! You got a {random_item}")
+        return
+    fighting_menu_state = 'main'
+    if player_atk == "no pp":
+        fighting_menu_state = 'attack'
+        return
+    selected_menu_option_index = 0
+    if player_atk != "no pp" and next_turn() == "npc":
+        end_fight()
 
 @window.event
 def on_key_release(symbol, modifiers):
@@ -172,9 +182,18 @@ def on_draw():
         
         end_camera()
     elif fighton:
-        global menu_direction, attack_options
+        global menu_direction, attack_options, inventory_options
+        inventory_options = ['pikeballs', 'better pikeballs', 'potions', 'better potion']
         attack_options = list(get_player_pikemnon(player['pikemnons'])['moves'].keys())
-        current_menu_options = attack_options if fighting_menu_state == 'attack' else menu_options
+        
+        menu_options_dict = {
+            'attack': attack_options,
+            'inventory': inventory_options,
+            'main': menu_options
+        }
+
+        current_menu_options = menu_options_dict[fighting_menu_state]
+
         fighting_screen(window, player, menu_direction, current_menu_options, selected_menu_option_index, fighting_menu_state)
         menu_direction = None  # Reset after use to avoid unintended navigation
 
