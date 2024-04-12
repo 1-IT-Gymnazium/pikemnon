@@ -20,6 +20,7 @@ def create_player(image_file, x, y, speed=220):
             pikemnon['stage']['attack'] = 0
             pikemnons.append(pikemnon)
         player['pikemnons'] = pikemnons
+        player['potions'] = 0
     return player
 
 
@@ -51,3 +52,7 @@ def get_player_pikemnon(player_inventory):
     for pikemnon in player_inventory:
         if pikemnon['current_health'] > 0:
             return pikemnon
+
+def add_random_item(player):
+    player['potions'] += 1
+    return "potion"

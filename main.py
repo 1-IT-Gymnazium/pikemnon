@@ -4,7 +4,7 @@ import time
 import pyglet
 from pyglet.window import key
 from pyglet.gl import *
-from player import create_player, update_player, get_player_pikemnon
+from player import create_player, update_player, get_player_pikemnon, add_random_item
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
 from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, get_current_map
@@ -80,11 +80,18 @@ def on_key_press(symbol, modifiers):
                 fighting_menu_state = 'attack'
                 selected_menu_option_index = 0  # Reset for the attack menu
             elif fighting_menu_state == 'attack':
-                if  player_attack(attack_options[selected_menu_option_index]):
+                player_atk = player_attack(attack_options[selected_menu_option_index])
+                if player_atk == "player":
                     end_fight()
+                    random_item = add_random_item(player)
+                    print(f"Player won! You got a {random_item}")
+                    return
                 fighting_menu_state = 'main'
+                if player_atk == "no pp":
+                    fighting_menu_state = 'attack'
+                    return
                 selected_menu_option_index = 0
-                if next_turn():
+                if player_atk != "no pp" and next_turn() == "npc":
                     end_fight()
         elif symbol == key.W or symbol == key.UP:
             # Move up in the grid

@@ -73,13 +73,12 @@ def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
         target_stat = move['target_stat']
         defending_pokemon['stage'][target_stat] = max(defending_pokemon['stage'][target_stat] - move['power'], -6)
 
-def player_attack(attack_name: str) -> bool:
+def player_attack(attack_name: str) -> str:
     global player_pokemon
-    player_pokemon['moves'][attack_name]['pp'] -= 1
-    print(player_pokemon['moves'][attack_name]['pp'])
     if player_pokemon['moves'][attack_name]['pp'] <= 0:
         print("Not enough PP to use this move.")
-        return False
+        return "no pp"
+    player_pokemon['moves'][attack_name]['pp'] -= 1
     handle_attack(attack_name, player_pokemon, npc_pokemon)
     return check_battle_end()
 
@@ -119,17 +118,17 @@ def npc_attack():
 
     for attack in attacks:
         for _ in range(attacks[attack]['power']):
-            if attack['pp'] > 0:
+            if npc_pokemon['moves'][attack]['pp'] > 0:
                 chance_list.append(attack)
     
     if buffs_and_debuffs:
         for buff in buffs_and_debuffs:
-            if buff['pp'] > 0:
-                chance_list.append([buff] * (len(chance_list) // 2))
+            if npc_pokemon['moves'][buff]['pp'] > 0:
+              chance_list.append([buff] * (len(chance_list) // 2))
     
         if turn % 2 == 0 and buffs_and_debuffs:
             for buff in buffs_and_debuffs:
-                if buff['pp'] > 0:
+                if npc_pokemon['moves'][buff]['pp'] > 0:
                     chance_list.append([buff] * (len(chance_list) // 2))
     
     attack_name = random.choice(chance_list)
@@ -139,13 +138,13 @@ def npc_attack():
     handle_attack(attack_name, npc_pokemon, player_pokemon)
     return check_battle_end()
 
-def check_battle_end():
+def check_battle_end() -> str:
     global player_pokemon, npc_pokemon, turn
     if player_pokemon['health'] <= 0:
         player_pokemon['health'] = 0
         print("Player's Pokémon fainted. NPC wins!")
         turn = 0
-        return True
+        return "npc"
     elif npc_pokemon['health'] <= 0:
         current_npc = get_current_npc()
         if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
@@ -156,8 +155,8 @@ def check_battle_end():
             npc_pokemon['health'] = 0
             print("NPC's Pokémon fainted. Player wins!")
             turn = 0
-            return True
-    return False
+            return "player"
+    return "continue"
 
 def next_turn():
     global turn
