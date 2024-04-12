@@ -134,6 +134,8 @@ def npc_attack():
     
     attack_name = random.choice(chance_list)
 
+    npc_pokemon['moves'][attack_name]['pp'] -= 1
+
     handle_attack(attack_name, npc_pokemon, player_pokemon)
     return check_battle_end()
 
