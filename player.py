@@ -1,5 +1,6 @@
 import json
 from entity import create_entity
+import random
 
 
 def create_player(image_file, x, y, speed=220):
@@ -21,8 +22,8 @@ def create_player(image_file, x, y, speed=220):
             pikemnons.append(pikemnon)
         player['pikemnons'] = pikemnons
         player['potions'] = 0
-        player['pikeballs'] = 0
-        player['better pikeballs'] = 0
+        player['pikeball'] = 0
+        player['better pikeball'] = 0
         player['better potion'] = 0
     return player
 
@@ -57,5 +58,7 @@ def get_player_pikemnon(player_inventory):
             return pikemnon
 
 def add_random_item(player):
-    player['potions'] += 1
-    return "potion"
+    random_items = ['pikeball', 'better pikeball', 'potion', 'better potion']
+    item = random.choice(random_items)
+    player[item] += 1
+    return item
