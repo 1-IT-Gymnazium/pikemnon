@@ -109,7 +109,8 @@ def process_space_key():
         player_atk = player_attack(attack_options[selected_menu_option_index])
         handle_attack_result(player_atk)
     elif fighting_menu_state == 'inventory':
-        handle_item(inventory_options[selected_menu_option_index])
+        handle_item(inventory_options[selected_menu_option_index], player)
+        player[inventory_options[selected_menu_option_index]] -= 1
         fighting_menu_state = 'main'
 
 def handle_attack_result(player_atk):
@@ -192,7 +193,7 @@ def on_draw():
         end_camera()
     elif fighton:
         global menu_direction, attack_options, inventory_options
-        inventory_options = ['pikeballs', 'better pikeballs', 'potions', 'better potion']
+        inventory_options = ['pikeball', 'better pikeball', 'potion', 'better potion']
         attack_options = list(get_player_pikemnon(player['pikemnons'])['moves'].keys())
         
         menu_options_dict = {

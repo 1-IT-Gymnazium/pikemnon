@@ -81,12 +81,31 @@ def player_attack(attack_name: str) -> str:
     handle_attack(attack_name, player_pokemon, npc_pokemon)
     return check_battle_end()
 
-def handle_item(item: str):
+def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
     global player_pokemon
-    if item == "potions":
+    if item == "potion":
         print(player_pokemon['health'])
         player_pokemon['health'] += 10
         print(player_pokemon['health'])
+    if item == "pikeball":
+        if "wild" in npc_pokemon:
+            player = catch_pikemnon(player)
+        else:
+            print("You can't catch this Pokémon.")
+    return player
+
+def catch_pikemnon(player) -> dict[str, any]:
+    global player_pokemon, npc_pokemon
+    # catch_rate = 1 - (3 * npc_pokemon['health'] - 2 * npc_pokemon['current_health']) / (3 * npc_pokemon['health'])
+    # if random.random() < catch_rate:
+    #     print("You caught the Pokémon!")
+    #     end_fight()
+    # else:
+    #     print("The Pokémon broke free!")
+    print('You caught the Pokémon!')
+    player['pikemnons'].append(npc_pokemon)
+    return player
+    
 
 def draw_player_image():
     # Load the image

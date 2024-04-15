@@ -21,7 +21,7 @@ def create_player(image_file, x, y, speed=220):
             pikemnon['stage']['attack'] = 0
             pikemnons.append(pikemnon)
         player['pikemnons'] = pikemnons
-        player['potions'] = 0
+        player['potion'] = 0
         player['pikeball'] = 0
         player['better pikeball'] = 0
         player['better potion'] = 0

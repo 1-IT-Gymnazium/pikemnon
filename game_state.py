@@ -34,5 +34,6 @@ def create_wild_pokemon():
     pik['current_health'] = pik['health']
     pik['stage'] = {}
     pik['stage']['attack'] = 0
+    pik['wild'] = True
     npc['pikemnons'].append(pik)
     return npc
