@@ -112,9 +112,15 @@ def process_space_key() -> None:
         player_atk = player_attack(attack_options[selected_menu_option_index])
         handle_attack_result(player_atk)
     elif fighting_menu_state == 'inventory':
+        player_pikemnons = len(player['pikemnons'])
         handle_item(inventory_options[selected_menu_option_index], player)
+        new_player_pikemnons = len(player['pikemnons'])
         player[inventory_options[selected_menu_option_index]] -= 1
         fighting_menu_state = 'main'
+        if player_pikemnons < new_player_pikemnons:
+            end_fight()
+            random_item = add_random_item(player)
+            print(f"Player won! You got a {random_item}")
     elif fighting_menu_state == 'change':
         pikemnon_name = change_options[selected_menu_option_index]
         player = change_active_pikemnon(player, pikemnon_name)
