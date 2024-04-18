@@ -19,6 +19,8 @@ def create_player(image_file, x, y, speed=220):
             pikemnon['level'] = player_pikemnons[x]['level']
             pikemnon['stage'] = {}
             pikemnon['stage']['attack'] = 0
+            pikemnon['name'] = player_pikemnons[x]['name']
+            pikemnon['active'] = True if x == 0 else False
             pikemnons.append(pikemnon)
         player['pikemnons'] = pikemnons
         player['potion'] = 0
@@ -28,7 +30,7 @@ def create_player(image_file, x, y, speed=220):
     return player
 
 
-def update_player(player, dt, key_state):
+def update_player(player: dict[str, any], dt: float, key_state: dict[str, bool]):
     if player['canMove']:
         dx = dy = 0
         if key_state['up']:
@@ -54,7 +56,7 @@ def change_move(player, can):
 
 def get_player_pikemnon(player_inventory):
     for pikemnon in player_inventory:
-        if pikemnon['current_health'] > 0:
+        if pikemnon['active'] == True:
             return pikemnon
 
 def add_random_item(player):
@@ -62,3 +64,11 @@ def add_random_item(player):
     item = random.choice(random_items)
     player[item] += 1
     return item
+
+def change_active_pikemnon(player: dict[str, any], pikemnon_name: str) -> dict[str, any]:
+    for pikemnon in player['pikemnons']:
+        if pikemnon['name'] == pikemnon_name:
+            pikemnon['active'] = True
+        else:
+            pikemnon['active'] = False
+    return player

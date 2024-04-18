@@ -64,7 +64,7 @@ def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
     move = attacking_pokemon['moves'][attack_name]
     if move['move_type'] == "attack":
         damage = calculate_damage(attacking_pokemon['attack'], defending_pokemon['defense'], move['power'], attacking_pokemon['stage'])
-        defending_pokemon['health'] -= damage
+        defending_pokemon['current_health'] -= damage
     elif move['move_type'] == "buff":
         target_stat = move['target_stat']
         attacking_pokemon['stage'][target_stat] = min(attacking_pokemon['stage'][target_stat] + move['power'], 6)
@@ -84,9 +84,9 @@ def player_attack(attack_name: str) -> str:
 def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
     global player_pokemon
     if item == "potion":
-        print(player_pokemon['health'])
-        player_pokemon['health'] += 10
-        print(player_pokemon['health'])
+        print(player_pokemon['current_health'])
+        player_pokemon['current_health'] += 10
+        print(player_pokemon['current_health'])
     if item == "pikeball":
         if "wild" in npc_pokemon:
             player = catch_pikemnon(player)
@@ -164,19 +164,19 @@ def npc_attack():
 
 def check_battle_end() -> str:
     global player_pokemon, npc_pokemon, turn
-    if player_pokemon['health'] <= 0:
-        player_pokemon['health'] = 0
+    if player_pokemon['current_health'] <= 0:
+        player_pokemon['current_health'] = 0
         print("Player's Pokémon fainted. NPC wins!")
         turn = 0
         return "npc"
-    elif npc_pokemon['health'] <= 0:
+    elif npc_pokemon['current_health'] <= 0:
         current_npc = get_current_npc()
         if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
             current_npc['pikemnon_index'] += 1
             npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
             print("NPC sends out another Pokémon.")
         else:
-            npc_pokemon['health'] = 0
+            npc_pokemon['current_health'] = 0
             print("NPC's Pokémon fainted. Player wins!")
             turn = 0
             return "player"
@@ -319,10 +319,7 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
     npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
     current_player = player
 
-
-    if not player_pokemon or player_pokemon['health'] <= 0:
-        player_pokemon = get_player_pikemnon(player['pikemnons'])
-        # attack_menu_options = list(player_pokemon['moves'].keys())
+    player_pokemon = get_player_pikemnon(player['pikemnons'])
 
     draw_box(40, 450, 200, 80)
     draw_box(400, 200, 200, 80)
@@ -332,8 +329,8 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
     draw_label('Player', 40 + 40, 450 + 80 - 10)
     draw_label(npc_pokemon['name'], 400 + 70, 200 + 80 - 10)
 
-    draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['health']/player_pokemon['current_health'])
-    draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['health']/npc_pokemon['current_health'])
+    draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['current_health']/player_pokemon['health'])
+    draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['current_health']/npc_pokemon['health'])
 
     draw_menu_options(window, menu_options, selected_option_index, menu_state, player_pokemon)
 

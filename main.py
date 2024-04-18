@@ -4,7 +4,7 @@ import time
 import pyglet
 from pyglet.window import key
 from pyglet.gl import *
-from player import create_player, update_player, get_player_pikemnon, add_random_item
+from player import change_active_pikemnon, create_player, update_player, get_player_pikemnon, add_random_item
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
 from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, get_current_map
@@ -43,6 +43,7 @@ menu_options = ["Attack", "Item", "Run", "Swap"]
 attack_options = None
 inventory_options = None
 menu_direction = None  # Default value indicating no direction
+change_options = None
 
 set_camera_target(player)
 set_camera_window_size(window_width, window_height)
@@ -57,7 +58,7 @@ key_state = {
 menu_direction = None
 
 @window.event
-def on_key_press(symbol, modifiers):
+def on_key_press(symbol: int, _) -> None:
     global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options, player
     fighton = get_fight_status()
     
@@ -66,7 +67,7 @@ def on_key_press(symbol, modifiers):
     else:
         handle_fighting_key_press(symbol)
 
-def handle_non_fighting_key_press(symbol):
+def handle_non_fighting_key_press(symbol: int) -> None:
     # Ensure that each direction is evaluated independently
     if symbol == key.W:
         key_state['up'] = True
@@ -79,7 +80,7 @@ def handle_non_fighting_key_press(symbol):
     wild_encounter()
 
 
-def handle_fighting_key_press(symbol):
+def handle_fighting_key_press(symbol: int) -> None:
     global selected_menu_option_index, fighting_menu_state
 
     grid_columns = 2
@@ -96,14 +97,16 @@ def handle_fighting_key_press(symbol):
         if selected_menu_option_index % grid_columns < grid_columns - 1:
             selected_menu_option_index += 1
 
-def process_space_key():
-    global fighting_menu_state, selected_menu_option_index
+def process_space_key() -> None:
+    global fighting_menu_state, selected_menu_option_index, player
 
     if fighting_menu_state == 'main':
         if selected_menu_option_index == 0:
             fighting_menu_state = 'attack'
         elif selected_menu_option_index == 1:
             fighting_menu_state = 'inventory'
+        elif selected_menu_option_index == 3:
+            fighting_menu_state = "change"
         selected_menu_option_index = 0
     elif fighting_menu_state == 'attack':
         player_atk = player_attack(attack_options[selected_menu_option_index])
@@ -112,8 +115,13 @@ def process_space_key():
         handle_item(inventory_options[selected_menu_option_index], player)
         player[inventory_options[selected_menu_option_index]] -= 1
         fighting_menu_state = 'main'
+    elif fighting_menu_state == 'change':
+        pikemnon_name = change_options[selected_menu_option_index]
+        player = change_active_pikemnon(player, pikemnon_name)
+        fighting_menu_state = 'main'
+        selected_menu_option_index = 0
 
-def handle_attack_result(player_atk):
+def handle_attack_result(player_atk: str) -> None:
     global fighting_menu_state, selected_menu_option_index
 
     if player_atk == "player":
@@ -130,7 +138,7 @@ def handle_attack_result(player_atk):
         end_fight()
 
 @window.event
-def on_key_release(symbol, modifiers):
+def on_key_release(symbol: int, _) -> None:
     if symbol == key.W:
         key_state['up'] = False
     elif symbol == key.S:
@@ -141,7 +149,7 @@ def on_key_release(symbol, modifiers):
         key_state['right'] = False
 
 
-def wild_encounter():
+def wild_encounter() -> None:
     global last_fight_time
     figt_chance = 0.1
     playerTile = what_tile_is_player_on(player)
@@ -150,7 +158,7 @@ def wild_encounter():
         last_fight_time = time.time()
 
 
-def update(dt):
+def update(dt: float) -> None:
     # Update the player
     old_x, old_y = player['sprite'].x, player['sprite'].y
     update_player(player, dt, key_state)
@@ -176,7 +184,7 @@ pyglet.clock.schedule_interval(update, 1/60.0)
 
 
 @window.event
-def on_draw():
+def on_draw() -> None:
     window.clear()
     fighton = get_fight_status()
     if not fighton:
@@ -192,14 +200,16 @@ def on_draw():
         
         end_camera()
     elif fighton:
-        global menu_direction, attack_options, inventory_options
+        global menu_direction, attack_options, inventory_options, change_options
         inventory_options = ['pikeball', 'better pikeball', 'potion', 'better potion']
         attack_options = list(get_player_pikemnon(player['pikemnons'])['moves'].keys())
+        change_options = list(pikemnon['name'] for pikemnon in player['pikemnons'])
         
         menu_options_dict = {
             'attack': attack_options,
             'inventory': inventory_options,
-            'main': menu_options
+            'main': menu_options,
+            "change": change_options
         }
 
         current_menu_options = menu_options_dict[fighting_menu_state]
