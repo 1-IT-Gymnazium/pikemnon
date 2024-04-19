@@ -164,6 +164,10 @@ def handle_attack_result(player_atk: str) -> None:
         return
     selected_menu_option_index = 0
     if player_atk != "no pp" and next_turn() == "npc":
+        for pikemnon in player['pikemnons']:
+            if pikemnon['current_health'] >= 0:
+                fighting_menu_state = 'change'
+                return
         end_fight()
 
 @window.event
