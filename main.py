@@ -101,31 +101,54 @@ def process_space_key() -> None:
     global fighting_menu_state, selected_menu_option_index, player
 
     if fighting_menu_state == 'main':
-        if selected_menu_option_index == 0:
-            fighting_menu_state = 'attack'
-        elif selected_menu_option_index == 1:
-            fighting_menu_state = 'inventory'
-        elif selected_menu_option_index == 3:
-            fighting_menu_state = "change"
-        selected_menu_option_index = 0
+        process_main_menu()
     elif fighting_menu_state == 'attack':
-        player_atk = player_attack(attack_options[selected_menu_option_index])
-        handle_attack_result(player_atk)
+        process_attack_menu()
     elif fighting_menu_state == 'inventory':
-        player_pikemnons = len(player['pikemnons'])
-        handle_item(inventory_options[selected_menu_option_index], player)
-        new_player_pikemnons = len(player['pikemnons'])
-        player[inventory_options[selected_menu_option_index]] -= 1
-        fighting_menu_state = 'main'
-        if player_pikemnons < new_player_pikemnons:
-            end_fight()
-            random_item = add_random_item(player)
-            print(f"Player won! You got a {random_item}")
+        process_inventory_menu()
     elif fighting_menu_state == 'change':
-        pikemnon_name = change_options[selected_menu_option_index]
-        player = change_active_pikemnon(player, pikemnon_name)
-        fighting_menu_state = 'main'
+        process_change_menu()
+
+def process_main_menu() -> None:
+    global fighting_menu_state, selected_menu_option_index
+    menu_actions = {
+        0: 'attack',
+        1: 'inventory',
+        2: 'run',
+        3: 'change'
+    }
+    fighting_menu_state = menu_actions.get(selected_menu_option_index, fighting_menu_state)
+    if fighting_menu_state == 'run':
+        end_fight()
+        print("You ran away!")
         selected_menu_option_index = 0
+        fighting_menu_state = 'main'
+    selected_menu_option_index = 0
+
+def process_attack_menu() -> None:
+    global player
+    player_atk = player_attack(attack_options[selected_menu_option_index])
+    handle_attack_result(player_atk)
+
+def process_inventory_menu() -> None:
+    global fighting_menu_state, player
+    player_pikemnons = len(player['pikemnons'])
+    handle_item(inventory_options[selected_menu_option_index], player)
+    new_player_pikemnons = len(player['pikemnons'])
+    player[inventory_options[selected_menu_option_index]] -= 1
+    fighting_menu_state = 'main'
+    if player_pikemnons < new_player_pikemnons:
+        end_fight()
+        random_item = add_random_item(player)
+        print(f"Player won! You got a {random_item}")
+
+def process_change_menu() -> None:
+    global fighting_menu_state, selected_menu_option_index, player
+    pikemnon_name = change_options[selected_menu_option_index]
+    player = change_active_pikemnon(player, pikemnon_name)
+    fighting_menu_state = 'main'
+    selected_menu_option_index = 0
+
 
 def handle_attack_result(player_atk: str) -> None:
     global fighting_menu_state, selected_menu_option_index
@@ -191,6 +214,7 @@ pyglet.clock.schedule_interval(update, 1/60.0)
 
 @window.event
 def on_draw() -> None:
+    pyglet.gl.glClearColor(0, 0, 0, 1)
     window.clear()
     fighton = get_fight_status()
     if not fighton:

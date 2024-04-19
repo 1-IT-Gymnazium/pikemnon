@@ -260,7 +260,6 @@ def draw_menu_options(window, menu_options, selected_option_index, state, player
         option_label.draw()
 
     # Reset color to default after drawing
-    pyglet.graphics.glColor4ub(255, 255, 255, 255)
 
 def attack_display_text(option):
     return f"{option} {player_pokemon['moves'][option]['pp']}"
