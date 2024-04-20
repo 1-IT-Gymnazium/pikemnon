@@ -14,6 +14,7 @@ import maps as mps
 from npc import create_npc, update_npc
 from fighting import fighting_screen, handle_item, player_attack, next_turn
 from game_state import get_fight_status, end_fight, get_main_menu, set_main_menu, start_fight
+from settings_menu import create_volume_labels, draw_settings
 
 # Window dimensions
 window_width = WINDOW_WIDTH*SCALE
@@ -39,6 +40,7 @@ set_current_map(mps.starter_map)
 map_sprites = create_map_sprites()
 
 create_menu_labels(window)
+create_volume_labels(window)
 
 fighting_menu_state = 'main'  # 'main' or 'attack'
 selected_menu_option_index = 0
@@ -65,7 +67,7 @@ def on_key_press(symbol: int, _) -> None:
     global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options, player
     fighton = get_fight_status()
     main_menu = get_main_menu()
-    if main_menu:
+    if main_menu == "main":
         if symbol == key.W or symbol == key.UP:
             update_selection('up')
         elif symbol == key.S or symbol == key.DOWN:
@@ -73,7 +75,9 @@ def on_key_press(symbol: int, _) -> None:
         elif symbol == key.SPACE:
             action = get_selected_action()
             if action == 'Start Game':
-                set_main_menu(False)
+                set_main_menu(None)
+            elif action == "Options":
+                set_main_menu('options')
             elif action == 'Exit':
                 pyglet.app.exit()
     elif not fighton:
@@ -238,8 +242,10 @@ def on_draw() -> None:
     window.clear()
     fighton = get_fight_status()
     main_menu = get_main_menu()
-    if main_menu:
+    if main_menu == 'main':
         draw_menu(window)
+    elif main_menu == 'options':
+        draw_settings(window)
     elif not fighton:
         begin_camera()
         for sprite in map_sprites:
