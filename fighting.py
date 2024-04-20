@@ -1,4 +1,5 @@
 import random
+import time
 import pyglet
 from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
@@ -21,6 +22,10 @@ current_menu = main_menu_options
 turn = 0
 
 current_player = None
+
+text_to_display = ''
+
+display_time = None
 
 def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     """
@@ -73,36 +78,32 @@ def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
         defending_pokemon['stage'][target_stat] = max(defending_pokemon['stage'][target_stat] - move['power'], -6)
 
 def player_attack(attack_name: str) -> str:
-    global player_pokemon
+    global player_pokemon, text_to_display
     if player_pokemon['moves'][attack_name]['pp'] <= 0:
-        print("Not enough PP to use this move.")
+        text_to_display = "No PP left for this move."
         return "no pp"
     player_pokemon['moves'][attack_name]['pp'] -= 1
     handle_attack(attack_name, player_pokemon, npc_pokemon)
     return check_battle_end()
 
 def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
-    global player_pokemon
+    global player_pokemon, text_to_display
     if item == "potion":
-        print(player_pokemon['current_health'])
-        player_pokemon['current_health'] += 10
-        print(player_pokemon['current_health'])
+        if player_pokemon['current_health'] == player_pokemon['health']:
+            text_to_display = "Pokémon is already at full health."
+            return player
+        player_pokemon['current_health'] = min(player_pokemon['current_health'] + 10, player_pokemon['health'])
+        text_to_display = "Healed 10 HP."
     if item == "pikeball":
         if "wild" in npc_pokemon:
             player = catch_pikemnon(player)
         else:
-            print("You can't catch this Pokémon.")
+            text_to_display = "You can't catch this Pokémon."
     return player
 
 def catch_pikemnon(player) -> dict[str, any]:
-    global player_pokemon, npc_pokemon
-    # catch_rate = 1 - (3 * npc_pokemon['health'] - 2 * npc_pokemon['current_health']) / (3 * npc_pokemon['health'])
-    # if random.random() < catch_rate:
-    #     print("You caught the Pokémon!")
-    #     end_fight()
-    # else:
-    #     print("The Pokémon broke free!")
-    print('You caught the Pokémon!')
+    global player_pokemon, npc_pokemon, text_to_display
+    text_to_display = "You caught the Pokémon!"
     player['pikemnons'].append(npc_pokemon)
     return player
     
@@ -308,7 +309,7 @@ def draw_box(x, y, width, height, border_thickness=2):
         x, y, x + width, y, x + width, y + height, x, y + height]))
 
 def draw_label(text, x, y, font_size=12, color=(0, 0, 0, 255)):
-    label = pyglet.text.Label(text, font_name=FONT_NAME, font_size=font_size, color=color, x=x, y=y, anchor_x='center', anchor_y='center')
+    label = pyglet.text.Label(text, font_name=FONT_NAME, font_size=font_size, color=color, x=x, y=y, anchor_x='left', anchor_y='center')
     label.draw()
 
 def draw_health_bar(x, y, width, height, percentage):
@@ -322,7 +323,7 @@ def draw_health_bar(x, y, width, height, percentage):
 def fighting_screen(window, player, direction, menu_options, selected_option_index, menu_state):
     clear_screen(window)
 
-    global npc_pokemon, player_pokemon, current_player
+    global npc_pokemon, player_pokemon, current_player, display_time, text_to_display
     current_npc = get_current_npc()
     npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
     current_player = player
@@ -335,12 +336,19 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
     draw_box(20, 20, 600, 150)
 
     draw_label('Player', 40 + 40, 450 + 80 - 10)
+    draw_label(player_pokemon['name'], 40 + 50, 450 + 50)
     draw_label(npc_pokemon['name'], 400 + 70, 200 + 80 - 10)
 
     draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['current_health']/player_pokemon['health'])
     draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['current_health']/npc_pokemon['health'])
 
-    draw_menu_options(window, menu_options, selected_option_index, menu_state, player_pokemon)
+    draw_label(text_to_display, 50, 150, font_size=16) if text_to_display else draw_menu_options(window, menu_options, selected_option_index, menu_state, player_pokemon)
+
+    if text_to_display and not display_time:
+        display_time = time.time()
+    elif display_time and time.time() - display_time >= 1:
+        text_to_display = ''
+        display_time = None
 
     draw_player_image()
 
