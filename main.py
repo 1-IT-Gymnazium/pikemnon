@@ -14,7 +14,7 @@ import maps as mps
 from npc import create_npc, update_npc
 from fighting import fighting_screen, handle_item, player_attack, next_turn
 from game_state import get_fight_status, end_fight, get_main_menu, set_main_menu, start_fight
-from settings_menu import create_volume_labels, draw_settings
+from settings_menu import adjust_volume, create_volume_labels, draw_settings, update_settings_selection
 
 # Window dimensions
 window_width = WINDOW_WIDTH*SCALE
@@ -80,6 +80,18 @@ def on_key_press(symbol: int, _) -> None:
                 set_main_menu('options')
             elif action == 'Exit':
                 pyglet.app.exit()
+    elif main_menu == "options":
+        if symbol == pyglet.window.key.W:
+            update_settings_selection('up')
+        elif symbol == pyglet.window.key.S:
+            update_settings_selection('down')
+        elif symbol == pyglet.window.key.A:
+            adjust_volume('decrease')
+        elif symbol == pyglet.window.key.D:
+            adjust_volume('increase')
+        # elif symbol == pyglet.window.key.ESCAPE:
+        elif symbol == pyglet.window.key.Q:
+            set_main_menu('main')
     elif not fighton:
         handle_non_fighting_key_press(symbol)
     else:

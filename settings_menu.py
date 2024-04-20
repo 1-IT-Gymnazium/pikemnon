@@ -45,3 +45,10 @@ def adjust_volume(direction):
         volume_settings[setting] -= 10  # Decrease volume
     # Update label text
     volume_labels[selected_index].text = f"{setting}: {volume_settings[setting]}%"
+
+def update_settings_selection(direction):
+    global selected_index
+    if direction == 'up' and selected_index > 0:
+        selected_index -= 1
+    elif direction == 'down' and selected_index < len(volume_settings) - 1:
+        selected_index += 1
