@@ -226,7 +226,8 @@ def draw_menu_options(window, menu_options, selected_option_index, state, player
         display_text_functions = {
             'attack': attack_display_text,
             'inventory': inventory_display_text,
-            'menu': menu_display_text
+            'menu': menu_display_text,
+            'change': change_display_text
         }
 
         display_text_function = display_text_functions.get(state, display_text_functions['menu'])
@@ -270,6 +271,13 @@ def inventory_display_text(option):
 
 def menu_display_text(option):
     return f"{option}"
+
+def change_display_text(option):
+    pikemn = 0
+    for pikemnon in current_player['pikemnons']:
+        if pikemnon['name'] == option:
+            pikemn = pikemnon
+    return f"{option} {pikemn['current_health']/pikemn['health'] * 100}%"
 
 def navigate_menu(direction):
     global selected_option_index

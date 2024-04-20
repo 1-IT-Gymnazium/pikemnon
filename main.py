@@ -145,6 +145,8 @@ def process_inventory_menu() -> None:
 def process_change_menu() -> None:
     global fighting_menu_state, selected_menu_option_index, player
     pikemnon_name = change_options[selected_menu_option_index]
+    if player['pikemnons'][selected_menu_option_index]['current_health'] <= 0:
+        return
     player = change_active_pikemnon(player, pikemnon_name)
     fighting_menu_state = 'main'
     selected_menu_option_index = 0
