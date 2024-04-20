@@ -4,6 +4,7 @@ import time
 import pyglet
 from pyglet.window import key
 from pyglet.gl import *
+from main_menu import create_menu_labels, draw_menu, get_selected_action, update_selection
 from player import change_active_pikemnon, create_player, update_player, get_player_pikemnon, add_random_item
 from entity import draw_entity
 from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
@@ -12,7 +13,7 @@ from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
 from fighting import fighting_screen, handle_item, player_attack, next_turn
-from game_state import get_fight_status, end_fight, start_fight
+from game_state import get_fight_status, end_fight, get_main_menu, set_main_menu, start_fight
 
 # Window dimensions
 window_width = WINDOW_WIDTH*SCALE
@@ -36,6 +37,8 @@ for i, npc_data in enumerate(data):  # Generate a unique ID
 set_current_map(mps.starter_map)
 
 map_sprites = create_map_sprites()
+
+create_menu_labels(window)
 
 fighting_menu_state = 'main'  # 'main' or 'attack'
 selected_menu_option_index = 0
@@ -61,8 +64,19 @@ menu_direction = None
 def on_key_press(symbol: int, _) -> None:
     global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options, player
     fighton = get_fight_status()
-    
-    if not fighton:
+    main_menu = get_main_menu()
+    if main_menu:
+        if symbol == key.W or symbol == key.UP:
+            update_selection('up')
+        elif symbol == key.S or symbol == key.DOWN:
+            update_selection('down')
+        elif symbol == key.SPACE:
+            action = get_selected_action()
+            if action == 'Start Game':
+                set_main_menu(False)
+            elif action == 'Exit':
+                pyglet.app.exit()
+    elif not fighton:
         handle_non_fighting_key_press(symbol)
     else:
         handle_fighting_key_press(symbol)
@@ -223,7 +237,10 @@ def on_draw() -> None:
     pyglet.gl.glClearColor(0, 0, 0, 1)
     window.clear()
     fighton = get_fight_status()
-    if not fighton:
+    main_menu = get_main_menu()
+    if main_menu:
+        draw_menu(window)
+    elif not fighton:
         begin_camera()
         for sprite in map_sprites:
             sprite.draw()

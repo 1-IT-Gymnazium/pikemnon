@@ -5,6 +5,8 @@ import random
 fighton = False
 current_npc = None
 
+main_menu = True
+
 def start_fight(npc):
     global fighton, current_npc
     fighton = True
@@ -37,3 +39,10 @@ def create_wild_pokemon():
     pik['wild'] = True
     npc['pikemnons'].append(pik)
     return npc
+
+def get_main_menu():
+    return main_menu
+
+def set_main_menu(value):
+    global main_menu
+    main_menu = value
