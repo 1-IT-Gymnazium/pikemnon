@@ -123,18 +123,29 @@ def player_attack(attack_name: str) -> str:
 
 def handle_item(item: str, player: dict[str, any]):
     global player_pikemnon, text_to_display
-    if item == "potion":
-        if player['potion'] <= 0:
+    if item == "potion" or item == "better potion":
+        if player['potion'] <= 0 and item == "potion":
             text_to_display = "No potions left."
-        if player_pikemnon['current_health'] == player_pikemnon['health']:
+            return
+        elif player['better potion'] == 0 and item == "better potion":
+            text_to_display = "No Better Potions left."
+            return
+        elif player_pikemnon['current_health'] == player_pikemnon['health']:
             text_to_display = "Pokémon is already at full health."
-        player_pikemnon['current_health'] = min(player_pikemnon['current_health'] + 10, player_pikemnon['health'])
-        text_to_display = "Healed 10 HP."
+            return
+        if item == "potion":
+            player_pikemnon['current_health'] = min(player_pikemnon['health'], player_pikemnon['current_health'] + 10)
+            text_to_display = "Pokémon's health was restored by 10."
+        elif item == "better potion":
+            player_pikemnon['current_health'] = min(player_pikemnon['health'], player_pikemnon['current_health'] + 20)
+            text_to_display = "Pokémon's health was restored by 20."
     if item == "pikeball" or item == "better pikeball":
         if player['pikeball'] <= 0 and item == "pikeball":
             text_to_display = "No Pikeballs left."
-        elif player['better pikeball'] <= 0 and item == "better pikeball":
+            return
+        elif player['better pikeball'] == 0 and item == "better pikeball":
             text_to_display = "No Better Pikeballs left."
+            return
         elif len(player['pikemnons']) == 4:
             text_to_display = "You can't catch this Pokémon. You already have 4 Pokémon."
         elif "wild" in npc_pikemnon:
