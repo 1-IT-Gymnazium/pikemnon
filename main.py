@@ -12,7 +12,7 @@ from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, ge
 from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
-from fighting import fighting_screen, handle_item, npc_attack, player_attack, next_turn
+from fighting import fighting_screen, handle_item, npc_attack, player_attack
 from game_state import get_display_text, get_fight_stat, get_fight_status, end_fight, get_main_menu, set_fight_stat, set_main_menu, start_fight
 from settings_menu import adjust_volume, create_volume_labels, draw_settings, update_settings_selection
 

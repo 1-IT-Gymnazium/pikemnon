@@ -27,6 +27,8 @@ text_to_display = ''
 
 display_time = None
 
+old_fight_stat = None
+
 def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     """
     Calculate the damage inflicted during a Pokemon battle.
@@ -66,10 +68,12 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     return int(((2 * power * ((attack * attack_stage) / defense)) / 50) + 2)
 
 def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
+    global text_to_display
     move = attacking_pokemon['moves'][attack_name]
     if move['move_type'] == "attack":
         damage = calculate_damage(attacking_pokemon['attack'], defending_pokemon['defense'], move['power'], attacking_pokemon['stage'])
         defending_pokemon['current_health'] -= damage
+        text_to_display = f"{attacking_pokemon['name']} used {attack_name} and dealt {damage} damage."
     elif move['move_type'] == "buff":
         target_stat = move['target_stat']
         attacking_pokemon['stage'][target_stat] = min(attacking_pokemon['stage'][target_stat] + move['power'], 6)
@@ -89,12 +93,18 @@ def player_attack(attack_name: str) -> str:
 def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
     global player_pokemon, text_to_display
     if item == "potion":
+        if player['potion'] <= 0:
+            text_to_display = "No potions left."
+            return player
         if player_pokemon['current_health'] == player_pokemon['health']:
             text_to_display = "Pokémon is already at full health."
             return player
         player_pokemon['current_health'] = min(player_pokemon['current_health'] + 10, player_pokemon['health'])
         text_to_display = "Healed 10 HP."
     if item == "pikeball":
+        if player['pikeball'] <= 0:
+            text_to_display = "No Pikeballs left."
+            return player
         if "wild" in npc_pokemon:
             player = catch_pikemnon(player)
         else:
@@ -189,11 +199,6 @@ def check_battle_end() -> str:
             turn = 0
             return "player"
     return "continue" if get_fight_stat() != "attacked" else "attacked"
-
-def next_turn():
-    global turn
-    turn += 1
-    return npc_attack()
 
 
 def draw_health_bar(x, y, width, height, health_percentage):
@@ -329,7 +334,7 @@ def draw_health_bar(x, y, width, height, percentage):
 def fighting_screen(window, player, direction, menu_options, selected_option_index, menu_state):
     clear_screen(window)
 
-    global npc_pokemon, player_pokemon, current_player, display_time, text_to_display
+    global npc_pokemon, player_pokemon, current_player, display_time, text_to_display, old_fight_stat
     current_npc = get_current_npc()
     npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
     current_player = player
@@ -355,9 +360,15 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
 
     if text_to_display and not display_time:
         display_time = time.time()
+        old_fight_stat = get_fight_stat()
     elif display_time and time.time() - display_time >= 1:
         text_to_display = ''
         display_time = None
+        set_fight_stat(old_fight_stat)
+        old_fight_stat = None
+
+    if text_to_display:
+        set_fight_stat("text")
 
     draw_player_image()
 
