@@ -163,7 +163,8 @@ def catch_pikemnon(player: dict[str, any]) -> dict[str, any]:
 
 def draw_player_image():
     # Load the image
-    image = pyglet.resource.image('assets/fight-player.png')
+    active_pikemnon = get_player_pikemnon(current_player['pikemnons'])
+    image = pyglet.resource.image(f'assets/{active_pikemnon['name'].lower()}.png')
 
     # Apply nearest neighbor filtering to prevent blurring when scaling
     texture = image.get_texture()
@@ -173,10 +174,11 @@ def draw_player_image():
     # Create a sprite from the image
     sprite = pyglet.sprite.Sprite(img=image)
     sprite.scale = 7
+    sprite.scale_x *= -1  # Flip the sprite horizontally
 
     # Calculate the position to center the scaled sprite
-    sprite.x = (window_width - sprite.width) // 2 - 150
-    sprite.y = (window_height - sprite.height) // 2 - 0
+    sprite.x = (window_width - sprite.width) // 2 + 100
+    sprite.y = (window_height - sprite.height) // 2 + 50
 
     # Reset color to default (white) to ensure no unintended tint is applied
     pyglet.gl.glColor4f(1.0, 1.0, 1.0, 1.0)
@@ -412,9 +414,9 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
 
     draw_box(20, 20, 600, 150)
 
-    draw_label('Player', 40 + 40, 450 + 80 - 10)
-    draw_label(player_pikemnon['name'], 40 + 50, 450 + 50)
-    draw_label(npc_pikemnon['name'], 400 + 70, 200 + 80 - 10)
+    draw_label('Player', 40 + 10, 450 + 80 - 10)
+    draw_label(player_pikemnon['name'], 40 + 10, 450 + 50)
+    draw_label(npc_pikemnon['name'], 400 + 10, 200 + 80 - 10)
 
     draw_health_bar(40, 450 - 20, 200, 10, player_pikemnon['current_health']/player_pikemnon['health'])
     draw_health_bar(400, 200 - 20, 200, 10, npc_pikemnon['current_health']/npc_pikemnon['health'])
