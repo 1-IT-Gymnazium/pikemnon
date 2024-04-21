@@ -167,7 +167,6 @@ def npc_attack():
                     chance_list.append([buff] * (len(chance_list) // 2))
     
     attack_name = random.choice(chance_list)
-
     npc_pokemon['moves'][attack_name]['pp'] -= 1
 
     handle_attack(attack_name, npc_pokemon, player_pokemon)
@@ -176,7 +175,6 @@ def check_battle_end() -> str:
     global player_pokemon, npc_pokemon, turn, text_to_display
     if player_pokemon['current_health'] <= 0:
         player_pokemon['current_health'] = 0
-        fight_stat = get_fight_stat()
         for pix in current_player['pikemnons']:
             if pix['current_health'] > 0:
                 return "change"

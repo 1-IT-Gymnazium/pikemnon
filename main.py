@@ -67,37 +67,38 @@ fight_status = None
 @window.event
 def on_key_press(symbol: int, _) -> None:
     global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options, player
-    fighton = get_fight_status()
-    main_menu = get_main_menu()
-    if main_menu == "main":
-        if symbol == key.W or symbol == key.UP:
-            update_selection('up')
-        elif symbol == key.S or symbol == key.DOWN:
-            update_selection('down')
-        elif symbol == key.SPACE:
-            action = get_selected_action()
-            if action == 'Start Game':
-                set_main_menu(None)
-            elif action == "Options":
-                set_main_menu('options')
-            elif action == 'Exit':
-                pyglet.app.exit()
-    elif main_menu == "options":
-        if symbol == pyglet.window.key.W:
-            update_settings_selection('up')
-        elif symbol == pyglet.window.key.S:
-            update_settings_selection('down')
-        elif symbol == pyglet.window.key.A:
-            adjust_volume('decrease')
-        elif symbol == pyglet.window.key.D:
-            adjust_volume('increase')
-        # elif symbol == pyglet.window.key.ESCAPE:
-        elif symbol == pyglet.window.key.Q:
-            set_main_menu('main')
-    elif not fighton:
-        handle_non_fighting_key_press(symbol)
-    else:
-        handle_fighting_key_press(symbol)
+    if get_fight_stat() != "text":
+        fighton = get_fight_status()
+        main_menu = get_main_menu()
+        if main_menu == "main":
+            if symbol == key.W or symbol == key.UP:
+                update_selection('up')
+            elif symbol == key.S or symbol == key.DOWN:
+                update_selection('down')
+            elif symbol == key.SPACE:
+                action = get_selected_action()
+                if action == 'Start Game':
+                    set_main_menu(None)
+                elif action == "Options":
+                    set_main_menu('options')
+                elif action == 'Exit':
+                    pyglet.app.exit()
+        elif main_menu == "options":
+            if symbol == pyglet.window.key.W:
+                update_settings_selection('up')
+            elif symbol == pyglet.window.key.S:
+                update_settings_selection('down')
+            elif symbol == pyglet.window.key.A:
+                adjust_volume('decrease')
+            elif symbol == pyglet.window.key.D:
+                adjust_volume('increase')
+            # elif symbol == pyglet.window.key.ESCAPE:
+            elif symbol == pyglet.window.key.Q:
+                set_main_menu('main')
+        elif not fighton:
+            handle_non_fighting_key_press(symbol)
+        else:
+            handle_fighting_key_press(symbol)
 
 def handle_non_fighting_key_press(symbol: int) -> None:
     # Ensure that each direction is evaluated independently
@@ -132,14 +133,15 @@ def handle_fighting_key_press(symbol: int) -> None:
 def process_space_key() -> None:
     global fighting_menu_state, selected_menu_option_index, player
 
-    if fighting_menu_state == 'main':
-        process_main_menu()
-    elif fighting_menu_state == 'attack':
-        process_attack_menu()
-    elif fighting_menu_state == 'inventory':
-        process_inventory_menu()
-    elif fighting_menu_state == 'change':
-        process_change_menu()
+    if get_fight_stat() != "text":
+        if fighting_menu_state == 'main':
+            process_main_menu()
+        elif fighting_menu_state == 'attack':
+            process_attack_menu()
+        elif fighting_menu_state == 'inventory':
+            process_inventory_menu()
+        elif fighting_menu_state == 'change':
+            process_change_menu()
 
 def process_main_menu() -> None:
     global fighting_menu_state, selected_menu_option_index
