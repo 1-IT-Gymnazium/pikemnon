@@ -70,7 +70,7 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_t
     effectiveness = type_effectiveness.get(attack_type, {}).get(defense_type, 1)
 
     base_damage = (power * (attack * attack_stage) / defense) / 50
-    random_factor = random.uniform(0.85, 1.0)  # Random factor between 0.85 and 1.0
+    random_factor = random.uniform(0.5, 2.0) 
     final_damage = int(base_damage * effectiveness * random_factor) + 2
     
     
