@@ -1,3 +1,4 @@
+import json
 import random
 import time
 import uuid
@@ -30,7 +31,7 @@ display_time = None
 
 old_fight_stat = None
 
-def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
+def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_type: str, defense_type: str) -> int:
     """
     Calculate the damage inflicted during a Pokemon battle.
 
@@ -65,8 +66,13 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     }
 
     attack_stage = stage_multipliers[stage['attack']]
+    type_effectiveness = load_type_effectiveness()
+
+    effectiveness = type_effectiveness.get(attack_type, {}).get(defense_type, 1)
+
+    final_damage = int(((2 * power * ((attack * attack_stage) / defense)) / 50) + 2 * effectiveness)
     
-    return int(((2 * power * ((attack * attack_stage) / defense)) / 50) + 2)
+    return final_damage
 
 def handle_attack(attack_name: str, attacking_pokemon: dict[str, any], defending_pokemon: dict[str, any]) -> None:
     """
@@ -87,7 +93,7 @@ def handle_attack(attack_name: str, attacking_pokemon: dict[str, any], defending
     global text_to_display
     move = attacking_pokemon['moves'][attack_name]
     if move['move_type'] == "attack":
-        damage = calculate_damage(attacking_pokemon['attack'], defending_pokemon['defense'], move['power'], attacking_pokemon['stage'])
+        damage = calculate_damage(attacking_pokemon['attack'], defending_pokemon['defense'], move['power'], attacking_pokemon['stage'], attacking_pokemon['type'], defending_pokemon['type'])
         defending_pokemon['current_health'] -= damage
         text_to_display = f"{attacking_pokemon['name']} used {attack_name} and dealt {damage} damage."
     elif move['move_type'] == "buff":
@@ -98,6 +104,10 @@ def handle_attack(attack_name: str, attacking_pokemon: dict[str, any], defending
         target_stat = move['target_stat']
         defending_pokemon['stage'][target_stat] = max(defending_pokemon['stage'][target_stat] - move['power'], -6)
         text_to_display = f"{attacking_pokemon['name']} used {attack_name} and decreased {defending_pokemon['name']}'s {target_stat}."
+
+def load_type_effectiveness():
+    with open('type_advantages.json') as f:
+        return json.load(f)
 
 def player_attack(attack_name: str) -> str:
     global player_pokemon, text_to_display
