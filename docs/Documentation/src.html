@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>src package &#8212; Pikemnon 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <script src="_static/documentation_options.js?v=8d563738"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="main module" href="main.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="src-package">
+<h1>src package<a class="headerlink" href="#src-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-src.camera">
+<span id="src-camera-module"></span><h2>src.camera module<a class="headerlink" href="#module-src.camera" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.camera.begin_camera">
+<span class="sig-prename descclassname"><span class="pre">src.camera.</span></span><span class="sig-name descname"><span class="pre">begin_camera</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/camera.html#begin_camera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.camera.begin_camera" title="Link to this definition">¶</a></dt>
+<dd><p>Begins the camera transformation.</p>
+<p>This function pushes the current matrix stack down by one, duplicating the current matrix.
+Then it applies a translation transformation to the matrix using the current camera offsets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>offset_x (int): The current x-offset of the camera.</p></li>
+<li><p>offset_y (int): The current y-offset of the camera.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.camera.end_camera">
+<span class="sig-prename descclassname"><span class="pre">src.camera.</span></span><span class="sig-name descname"><span class="pre">end_camera</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/camera.html#end_camera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.camera.end_camera" title="Link to this definition">¶</a></dt>
+<dd><p>Ends the camera transformation.</p>
+<p>This function pops the current matrix stack up by one, removing the current matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.camera.set_camera_target">
+<span class="sig-prename descclassname"><span class="pre">src.camera.</span></span><span class="sig-name descname"><span class="pre">set_camera_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/camera.html#set_camera_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.camera.set_camera_target" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the target for the camera.</p>
+<p>This function updates the global target variable to the new target object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_target</strong> (<em>object</em>) – The new target object for the camera.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>target (object): The current target of the camera.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.camera.set_camera_window_size">
+<span class="sig-prename descclassname"><span class="pre">src.camera.</span></span><span class="sig-name descname"><span class="pre">set_camera_window_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_window_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_window_height</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/camera.html#set_camera_window_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.camera.set_camera_window_size" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the target for the camera.</p>
+<p>This function updates the global target variable to the new target object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_target</strong> (<em>object</em>) – The new target object for the camera.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>target (object): The current target of the camera.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.camera.update_camera">
+<span class="sig-prename descclassname"><span class="pre">src.camera.</span></span><span class="sig-name descname"><span class="pre">update_camera</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/camera.html#update_camera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.camera.update_camera" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the camera’s position based on the target’s position.</p>
+<p>This function calculates the new offsets for the camera based on the target’s position and the window size.
+The camera is always centered on the target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>offset_x (int): The current x-offset of the camera.</p></li>
+<li><p>offset_y (int): The current y-offset of the camera.</p></li>
+<li><p>window_width (int): The current width of the camera window.</p></li>
+<li><p>window_height (int): The current height of the camera window.</p></li>
+<li><p>target (dict): The current target of the camera, which is a dictionary containing a ‘sprite’ key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.entity">
+<span id="src-entity-module"></span><h2>src.entity module<a class="headerlink" href="#module-src.entity" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.entity.create_entity">
+<span class="sig-prename descclassname"><span class="pre">src.entity.</span></span><span class="sig-name descname"><span class="pre">create_entity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">health</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/entity.html#create_entity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.entity.create_entity" title="Link to this definition">¶</a></dt>
+<dd><p>Creates an entity with specified attributes.</p>
+<p>This function creates an entity with a specified image, position, and health.
+The image is scaled up by a factor of 4.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_file</strong> (<em>str</em>) – The file path of the image for the entity.</p></li>
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the entity’s position.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the entity’s position.</p></li>
+<li><p><strong>health</strong> (<em>int</em>) – The health of the entity. Default is 100.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary representing the entity, with keys for image, sprite, and health.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.entity.draw_entity">
+<span class="sig-prename descclassname"><span class="pre">src.entity.</span></span><span class="sig-name descname"><span class="pre">draw_entity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/entity.html#draw_entity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.entity.draw_entity" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the entity on the screen.</p>
+<p>This function calls the draw method on the entity’s sprite.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entity</strong> (<em>dict</em>) – The entity to be drawn. The entity should be a dictionary with a ‘sprite’ key.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.fighting">
+<span id="src-fighting-module"></span><h2>src.fighting module<a class="headerlink" href="#module-src.fighting" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.attack_display_text">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">attack_display_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#attack_display_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.attack_display_text" title="Link to this definition">¶</a></dt>
+<dd><p>Generates the display text for an attack option.</p>
+<p>This function returns a string that includes the name of the attack option and the remaining PP for that attack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>option</strong> (<em>str</em>) – The name of the attack option.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string in the format “{option} {PP}”, where {option} is the name of the attack option and {PP} is the remaining PP for that attack.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>player_pikemnon (dict): The player’s current Pikemnon.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.calculate_damage">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">calculate_damage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attack</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defense</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attack_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defense_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/src/fighting.html#calculate_damage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.calculate_damage" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.catch_pikemnon">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">catch_pikemnon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/src/fighting.html#catch_pikemnon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.catch_pikemnon" title="Link to this definition">¶</a></dt>
+<dd><p>Handles the use of an item during a fight.</p>
+<p>This function checks the type of the item and performs the appropriate action.
+If the item is a potion, it restores the player’s Pikemnon’s health.
+If the item is a pikeball, it attempts to catch the NPC’s Pikemnon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> (<em>str</em>) – The name of the item to be used.</p></li>
+<li><p><strong>player</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>any</em><em>]</em>) – The player using the item. The player should be a dictionary with keys for ‘potion’, ‘better potion’, ‘pikeball’, ‘better pikeball’, and ‘pikemnons’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>player_pikemnon (dict): The player’s current Pikemnon.</p></li>
+<li><p>text_to_display (str): The text to be displayed on the screen.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.change_display_text">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">change_display_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#change_display_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.change_display_text" title="Link to this definition">¶</a></dt>
+<dd><p>Generates the display text for a change option.</p>
+<p>This function returns a string that includes the name of the Pikemnon and its current health as a percentage of its total health.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>option</strong> (<em>str</em>) – The id of the Pikemnon.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string in the format “{name} {health_percentage}%”, where {name} is the name of the Pikemnon and {health_percentage} is the Pikemnon’s current health as a percentage of its total health.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>current_player (dict): The current player, which is a dictionary containing a ‘pikemnons’ key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.check_battle_end">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">check_battle_end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/src/fighting.html#check_battle_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.check_battle_end" title="Link to this definition">¶</a></dt>
+<dd><p>Checks if the battle has ended and handles the end of the battle.</p>
+<p>This function checks the health of the player’s and the NPC’s Pikemnons to determine if the battle has ended.
+If a Pikemnon’s health is 0, it handles the end of the battle by displaying a message and returning a status string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A string indicating the status of the battle. Possible values are “end”, “change”, “text”, “npc”, “player”, “continue”, and “attacked”.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>player_pikemnon (dict): The player’s current Pikemnon.</p></li>
+<li><p>npc_pikemnon (dict): The NPC’s current Pikemnon.</p></li>
+<li><p>turn (int): The current turn number.</p></li>
+<li><p>text_to_display (str): The text to be displayed on the screen.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.clear_screen">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">clear_screen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#clear_screen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.clear_screen" title="Link to this definition">¶</a></dt>
+<dd><p>Clears the screen.</p>
+<p>This function sets the clear color to white and then clears the window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>window</strong> (<em>pyglet.window.Window</em>) – The window to be cleared.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.draw_box">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">draw_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">border_thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#draw_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.draw_box" title="Link to this definition">¶</a></dt>
+<dd><p>Draws a box on the screen.</p>
+<p>This function first draws the border of the box in black, then fills the box with white.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the bottom-left corner of the box.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the bottom-left corner of the box.</p></li>
+<li><p><strong>width</strong> (<em>int</em>) – The width of the box.</p></li>
+<li><p><strong>height</strong> (<em>int</em>) – The height of the box.</p></li>
+<li><p><strong>border_thickness</strong> (<em>int</em>) – The thickness of the box’s border. Default is 2.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.draw_health_bar">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">draw_health_bar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#draw_health_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.draw_health_bar" title="Link to this definition">¶</a></dt>
+<dd><p>Draws a health bar on the screen.</p>
+<p>This function first draws the background of the health bar in gray, then fills the health bar with green based on the percentage of health.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the bottom-left corner of the health bar.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the bottom-left corner of the health bar.</p></li>
+<li><p><strong>width</strong> (<em>int</em>) – The width of the health bar.</p></li>
+<li><p><strong>height</strong> (<em>int</em>) – The height of the health bar.</p></li>
+<li><p><strong>percentage</strong> (<em>float</em>) – The percentage of health. This determines how much of the health bar is filled with green.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.draw_label">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">draw_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">255)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#draw_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.draw_label" title="Link to this definition">¶</a></dt>
+<dd><p>Draws a label on the screen.</p>
+<p>This function creates a label with the specified text, font size, and color, and then draws it at the specified x and y coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) – The text to be displayed in the label.</p></li>
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the bottom-left corner of the label.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the bottom-left corner of the label.</p></li>
+<li><p><strong>font_size</strong> (<em>int</em>) – The size of the font to be used in the label. Default is 12.</p></li>
+<li><p><strong>color</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – The color of the text in the label. It is a tuple of four integers representing the red, green, blue, and alpha values. Default is black.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.draw_menu_options">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">draw_menu_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">menu_options</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_option_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#draw_menu_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.draw_menu_options" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the menu options on the screen.</p>
+<p>This function displays the menu options in a grid layout. The selected option is highlighted with a different color.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>menu_options</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – A list of the menu options to be displayed.</p></li>
+<li><p><strong>selected_option_index</strong> (<em>int</em>) – The index of the currently selected menu option.</p></li>
+<li><p><strong>state</strong> (<em>str</em>) – The current state of the game, which determines the display text function to be used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>current_menu (str): The current menu being displayed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.draw_npc_image">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">draw_npc_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#draw_npc_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.draw_npc_image" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the NPC’s Pikemnon image on the screen.</p>
+<p>This function loads the image from the provided path, creates a sprite from the image, scales and positions the sprite, and then draws it on the screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img_path</strong> (<em>str</em>) – The file path of the image for the NPC’s Pikemnon.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>window_width (int): The current width of the window.</p></li>
+<li><p>window_height (int): The current height of the window.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.draw_player_image">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">draw_player_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#draw_player_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.draw_player_image" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the player’s active Pikemnon image on the screen.</p>
+<p>This function loads the image of the player’s active Pikemnon, creates a sprite from the image, scales and positions the sprite, and then draws it on the screen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>window_width (int): The current width of the window.</p></li>
+<li><p>window_height (int): The current height of the window.</p></li>
+<li><p>current_player (dict): The current player, which is a dictionary containing a ‘pikemnons’ key.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.fighting_screen">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">fighting_screen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">menu_options</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_option_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">menu_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#fighting_screen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.fighting_screen" title="Link to this definition">¶</a></dt>
+<dd><p>Handles the fighting screen of the game.</p>
+<p>This function draws the fighting screen, including the player and NPC pikemnons, their health bars, and the menu options. It also handles the navigation of the menu options and the end of the battle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window</strong> (<em>pyglet.window.Window</em>) – The window to draw the fighting screen on.</p></li>
+<li><p><strong>player</strong> (<em>dict</em>) – The player’s data.</p></li>
+<li><p><strong>direction</strong> (<em>str</em>) – The direction to move the selected menu option. Possible values are “up”, “down”, “left”, and “right”.</p></li>
+<li><p><strong>menu_options</strong> (<em>list</em>) – The menu options to be displayed.</p></li>
+<li><p><strong>selected_option_index</strong> (<em>int</em>) – The index of the currently selected menu option.</p></li>
+<li><p><strong>menu_state</strong> (<em>str</em>) – The current state of the menu.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>npc_pikemnon (dict): The NPC’s current pikemnon.</p></li>
+<li><p>player_pikemnon (dict): The player’s current pikemnon.</p></li>
+<li><p>current_player (dict): The current player.</p></li>
+<li><p>display_time (float): The time when the display text was set.</p></li>
+<li><p>text_to_display (str): The text to be displayed on the screen.</p></li>
+<li><p>old_fight_stat (str): The previous fight state.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.handle_attack">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">handle_attack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attack_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attacking_pikemnon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defending_pikemnon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/fighting.html#handle_attack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.handle_attack" title="Link to this definition">¶</a></dt>
+<dd><p>Handles the attack action in the game.</p>
+<p>This function takes the name of the attack, the attacking Pikemnon, and the defending Pikemnon as arguments.
+It calculates the damage based on the attack type and updates the health of the defending Pikemnon.
+It also updates the global variable <cite>text_to_display</cite> with the result of the attack.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attack_name</strong> (<em>str</em>) – The name of the attack.</p></li>
+<li><p><strong>attacking_pikemnon</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>any</em><em>]</em>) – The dictionary representing the attacking Pikemnon.</p></li>
+<li><p><strong>defending_pikemnon</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>any</em><em>]</em>) – The dictionary representing the defending Pikemnon.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.handle_item">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">handle_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#handle_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.handle_item" title="Link to this definition">¶</a></dt>
+<dd><p>Handles the use of an item during a fight.</p>
+<p>This function checks the type of the item and performs the appropriate action.
+If the item is a potion, it restores the player’s Pikemnon’s health.
+If the item is a pikeball, it attempts to catch the NPC’s Pikemnon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>item</strong> (<em>str</em>) – The name of the item to be used.</p></li>
+<li><p><strong>player</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>any</em><em>]</em>) – The player using the item. The player should be a dictionary with keys for ‘potion’, ‘better potion’, ‘pikeball’, ‘better pikeball’, and ‘pikemnons’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>player_pikemnon (dict): The player’s current Pikemnon.</p></li>
+<li><p>text_to_display (str): The text to be displayed on the screen.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.inventory_display_text">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">inventory_display_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#inventory_display_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.inventory_display_text" title="Link to this definition">¶</a></dt>
+<dd><p>Generates the display text for an inventory option.</p>
+<p>This function returns a string that includes the name of the inventory option and the quantity of that item in the player’s inventory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>option</strong> (<em>str</em>) – The name of the inventory option.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string in the format “{option} {quantity}”, where {option} is the name of the inventory option and {quantity} is the quantity of that item in the player’s inventory.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>current_player (dict): The current player, which is a dictionary containing keys for each inventory item and their quantities.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.load_type_effectiveness">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">load_type_effectiveness</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#load_type_effectiveness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.load_type_effectiveness" title="Link to this definition">¶</a></dt>
+<dd><p>Loads the type effectiveness data from a JSON file.</p>
+<p>This function reads the ‘type_advantages.json’ file and returns the JSON object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary representing the type effectiveness data.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.menu_display_text">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">menu_display_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#menu_display_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.menu_display_text" title="Link to this definition">¶</a></dt>
+<dd><p>Generates the display text for a menu option.</p>
+<p>This function returns a string that is the same as the input option.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>option</strong> (<em>str</em>) – The name of the menu option.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A string that is the same as the input option.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.navigate_menu">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">navigate_menu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#navigate_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.navigate_menu" title="Link to this definition">¶</a></dt>
+<dd><p>Navigates the menu options based on the input direction.</p>
+<p>This function changes the selected option index based on the input direction. The menu options are arranged in a grid, so the selected option index can be moved up, down, left, or right.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>direction</strong> (<em>str</em>) – The direction to move the selected option index. Possible values are “up”, “down”, “left”, and “right”.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_option_index (int): The index of the currently selected menu option.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.npc_attack">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">npc_attack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/fighting.html#npc_attack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.npc_attack" title="Link to this definition">¶</a></dt>
+<dd><p>Handles the NPC’s attack during a fight.</p>
+<p>This function selects an attack or buff/debuff move for the NPC’s Pikemnon based on the move’s power and remaining PP.
+The selected move’s PP is then decreased by 1, and the handle_attack function is called with the selected move.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>player_pikemnon (dict): The player’s current Pikemnon.</p></li>
+<li><p>npc_pikemnon (dict): The NPC’s current Pikemnon.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.player_attack">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">player_attack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attack_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/src/fighting.html#player_attack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.player_attack" title="Link to this definition">¶</a></dt>
+<dd><p>Handles the player’s attack during a fight.</p>
+<p>This function checks if the player’s Pikemnon has enough PP for the chosen attack.
+If there is enough PP, it decreases the PP by 1 and calls the handle_attack function.
+If there is not enough PP, it sets the text_to_display to a message indicating this.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>attack_name</strong> (<em>str</em>) – The name of the attack to be used.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>“no pp” if there is not enough PP for the attack, None otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>player_pikemnon (dict): The player’s current Pikemnon.</p></li>
+<li><p>text_to_display (str): The text to be displayed on the screen.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.fighting.set_text_to_display">
+<span class="sig-prename descclassname"><span class="pre">src.fighting.</span></span><span class="sig-name descname"><span class="pre">set_text_to_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/fighting.html#set_text_to_display"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.fighting.set_text_to_display" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the global variable ‘text_to_display’ to the input text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – The text to be set.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>text_to_display (str): The text to be displayed on the screen.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.game_state">
+<span id="src-game-state-module"></span><h2>src.game_state module<a class="headerlink" href="#module-src.game_state" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.create_wild_pokemon">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">create_wild_pokemon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/game_state.html#create_wild_pokemon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.create_wild_pokemon" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a wild Pokemon for a fight.</p>
+<p>This function randomly selects a Pokemon from the available Pokemon data, sets its current health to its maximum health, and adds it to the NPC’s list of Pokemon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary representing the NPC with the wild Pokemon.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>data (dict): The available Pokemon data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.end_fight">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">end_fight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/game_state.html#end_fight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.end_fight" title="Link to this definition">¶</a></dt>
+<dd><p>Ends the current fight.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>fighton (bool): Whether a fight is currently on.</p></li>
+<li><p>current_npc (str): The NPC currently in a fight with.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.get_current_npc">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">get_current_npc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/src/game_state.html#get_current_npc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.get_current_npc" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the NPC currently in a fight with.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The NPC currently in a fight with.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>current_npc (str): The NPC currently in a fight with.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.get_display_text">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">get_display_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/src/game_state.html#get_display_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.get_display_text" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current display text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current display text.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>display_text (str): The current display text.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.get_fight_stat">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">get_fight_stat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/src/game_state.html#get_fight_stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.get_fight_stat" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current fight status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current fight status.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>fight_status (str): The current fight status.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.get_fight_status">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">get_fight_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/src/game_state.html#get_fight_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.get_fight_status" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current fight status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether a fight is currently on.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>fighton (bool): Whether a fight is currently on.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.get_main_menu">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">get_main_menu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/src/game_state.html#get_main_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.get_main_menu" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current status of the main menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current status of the main menu.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>main_menu_status (bool): The current status of the main menu.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.set_display_text">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">set_display_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/game_state.html#set_display_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.set_display_text" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the display text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>str</em>) – The value to set the display text to.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>display_text (str): The current display text.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.set_fight_stat">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">set_fight_stat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/game_state.html#set_fight_stat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.set_fight_stat" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the fight status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>str</em>) – The value to set the fight status to.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>fight_status (str): The current fight status.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.set_main_menu">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">set_main_menu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/game_state.html#set_main_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.set_main_menu" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the status of the main menu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>bool</em>) – The value to set the main menu status to.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>main_menu_status (bool): The current status of the main menu.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.game_state.start_fight">
+<span class="sig-prename descclassname"><span class="pre">src.game_state.</span></span><span class="sig-name descname"><span class="pre">start_fight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/game_state.html#start_fight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.game_state.start_fight" title="Link to this definition">¶</a></dt>
+<dd><p>Starts a fight with an NPC or a wild Pokemon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>npc</strong> (<em>str</em>) – The NPC to start a fight with. If “wild”, a wild Pokemon is created for the fight.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>fighton (bool): Whether a fight is currently on.</p></li>
+<li><p>current_npc (str): The NPC currently in a fight with.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.inventory">
+<span id="src-inventory-module"></span><h2>src.inventory module<a class="headerlink" href="#module-src.inventory" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.inventory.draw_inventory">
+<span class="sig-prename descclassname"><span class="pre">src.inventory.</span></span><span class="sig-name descname"><span class="pre">draw_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player_pikemnons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kill_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/inventory.html#draw_inventory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.inventory.draw_inventory" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the player’s inventory on the screen.</p>
+<p>This function draws a grid of the player’s Pokemon, highlighting the currently selected one. If a Pokemon is selected, it draws a detailed view of that Pokemon with the option to kill it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window</strong> (<em>pyglet.window.Window</em>) – The window to draw on.</p></li>
+<li><p><strong>player_pikemnons</strong> (<em>list</em>) – The player’s list of Pokemon.</p></li>
+<li><p><strong>selected_index</strong> (<em>int</em>) – The index of the currently selected Pokemon.</p></li>
+<li><p><strong>player_x</strong> (<em>float</em>) – The x-coordinate of the player’s position.</p></li>
+<li><p><strong>player_y</strong> (<em>float</em>) – The y-coordinate of the player’s position.</p></li>
+<li><p><strong>kill_index</strong> (<em>int</em><em>, </em><em>optional</em>) – The index of the kill option, if a Pokemon is selected. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.inventory.kill_pikemnon">
+<span class="sig-prename descclassname"><span class="pre">src.inventory.</span></span><span class="sig-name descname"><span class="pre">kill_pikemnon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/src/inventory.html#kill_pikemnon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.inventory.kill_pikemnon" title="Link to this definition">¶</a></dt>
+<dd><p>Kills the selected pikemnon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>any</em><em>]</em>) – The player’s dictionary.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified player’s dictionary.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, any]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.inventory.remove_selected_pikemnon">
+<span class="sig-prename descclassname"><span class="pre">src.inventory.</span></span><span class="sig-name descname"><span class="pre">remove_selected_pikemnon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/inventory.html#remove_selected_pikemnon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.inventory.remove_selected_pikemnon" title="Link to this definition">¶</a></dt>
+<dd><p>Removes the selected pikemnon from the global variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.inventory.select_selected_pikemnon">
+<span class="sig-prename descclassname"><span class="pre">src.inventory.</span></span><span class="sig-name descname"><span class="pre">select_selected_pikemnon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_pikemnons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/inventory.html#select_selected_pikemnon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.inventory.select_selected_pikemnon" title="Link to this definition">¶</a></dt>
+<dd><p>Assigns the selected pikemnon to a global variable and prints its name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player_pikemnons</strong> (<em>list</em>) – The list of the player’s pikemnons.</p></li>
+<li><p><strong>selected_index</strong> (<em>int</em>) – The index of the selected pikemnon.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.main_menu">
+<span id="src-main-menu-module"></span><h2>src.main_menu module<a class="headerlink" href="#module-src.main_menu" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.main_menu.create_menu_labels">
+<span class="sig-prename descclassname"><span class="pre">src.main_menu.</span></span><span class="sig-name descname"><span class="pre">create_menu_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/main_menu.html#create_menu_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.main_menu.create_menu_labels" title="Link to this definition">¶</a></dt>
+<dd><p>Creates the labels for the main menu.</p>
+<p>This function creates a label for the game title and labels for each of the menu items, positioning them in the center of the window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>window</strong> (<em>pyglet.window.Window</em>) – The window to draw the labels on.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>menu_labels (list): The list of menu item labels.</p></li>
+<li><p>game_title_label (pyglet.text.Label): The label for the game title.</p></li>
+<li><p>menu_items (list): The list of menu items.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.main_menu.draw_menu">
+<span class="sig-prename descclassname"><span class="pre">src.main_menu.</span></span><span class="sig-name descname"><span class="pre">draw_menu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/main_menu.html#draw_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.main_menu.draw_menu" title="Link to this definition">¶</a></dt>
+<dd><p>Creates the labels for the main menu.</p>
+<p>This function creates a label for the game title and labels for each of the menu items, positioning them in the center of the window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>window</strong> (<em>pyglet.window.Window</em>) – The window to draw the labels on.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>menu_labels (list): The list of menu item labels.</p></li>
+<li><p>game_title_label (pyglet.text.Label): The label for the game title.</p></li>
+<li><p>menu_items (list): The list of menu items.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.main_menu.get_selected_action">
+<span class="sig-prename descclassname"><span class="pre">src.main_menu.</span></span><span class="sig-name descname"><span class="pre">get_selected_action</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/main_menu.html#get_selected_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.main_menu.get_selected_action" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the action associated with the currently selected menu item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The action associated with the currently selected menu item.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_index (int): The index of the currently selected menu item.</p></li>
+<li><p>menu_items (list): The list of menu items.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.main_menu.update_selection">
+<span class="sig-prename descclassname"><span class="pre">src.main_menu.</span></span><span class="sig-name descname"><span class="pre">update_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/main_menu.html#update_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.main_menu.update_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the selected menu item based on the input direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>direction</strong> (<em>str</em>) – The direction to move the selection. Possible values are “up” and “down”.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_index (int): The index of the currently selected menu item.</p></li>
+<li><p>menu_items (list): The list of menu items.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.mapp">
+<span id="src-mapp-module"></span><h2>src.mapp module<a class="headerlink" href="#module-src.mapp" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.mapp.create_map_sprites">
+<span class="sig-prename descclassname"><span class="pre">src.mapp.</span></span><span class="sig-name descname"><span class="pre">create_map_sprites</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/mapp.html#create_map_sprites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.mapp.create_map_sprites" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the action associated with the currently selected menu item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The action associated with the currently selected menu item.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_index (int): The index of the currently selected menu item.</p></li>
+<li><p>menu_items (list): The list of menu items.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.mapp.get_current_map">
+<span class="sig-prename descclassname"><span class="pre">src.mapp.</span></span><span class="sig-name descname"><span class="pre">get_current_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/mapp.html#get_current_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.mapp.get_current_map" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the current map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current map.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>current_map (list): The current map.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.mapp.is_player_colliding_with_empty">
+<span class="sig-prename descclassname"><span class="pre">src.mapp.</span></span><span class="sig-name descname"><span class="pre">is_player_colliding_with_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/mapp.html#is_player_colliding_with_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.mapp.is_player_colliding_with_empty" title="Link to this definition">¶</a></dt>
+<dd><p>Determines if the player is colliding with an empty tile.</p>
+<p>This function calculates the player’s tile coordinates and checks all tiles the player is on. If the player is on an empty tile, it returns True. Otherwise, it returns False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player</strong> (<em>dict</em>) – The player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the player is colliding with an empty tile.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>current_map (list): The current map.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.mapp.load_tile_images">
+<span class="sig-prename descclassname"><span class="pre">src.mapp.</span></span><span class="sig-name descname"><span class="pre">load_tile_images</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/mapp.html#load_tile_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.mapp.load_tile_images" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the action associated with the currently selected menu item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The action associated with the currently selected menu item.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_index (int): The index of the currently selected menu item.</p></li>
+<li><p>menu_items (list): The list of menu items.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.mapp.set_current_map">
+<span class="sig-prename descclassname"><span class="pre">src.mapp.</span></span><span class="sig-name descname"><span class="pre">set_current_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cr_map</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/mapp.html#set_current_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.mapp.set_current_map" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the action associated with the currently selected menu item.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The action associated with the currently selected menu item.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_index (int): The index of the currently selected menu item.</p></li>
+<li><p>menu_items (list): The list of menu items.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.mapp.what_tile_is_player_on">
+<span class="sig-prename descclassname"><span class="pre">src.mapp.</span></span><span class="sig-name descname"><span class="pre">what_tile_is_player_on</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/mapp.html#what_tile_is_player_on"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.mapp.what_tile_is_player_on" title="Link to this definition">¶</a></dt>
+<dd><p>Determines what type of tile the player is currently on.</p>
+<p>This function calculates the player’s tile coordinates and checks all tiles the player is on. It returns a string representing the type of tile the player is on.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player</strong> (<em>dict</em>) – The player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The type of tile the player is on.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>current_map (list): The current map.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.maps">
+<span id="src-maps-module"></span><h2>src.maps module<a class="headerlink" href="#module-src.maps" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-src.npc">
+<span id="src-npc-module"></span><h2>src.npc module<a class="headerlink" href="#module-src.npc" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.npc.create_npc">
+<span class="sig-prename descclassname"><span class="pre">src.npc.</span></span><span class="sig-name descname"><span class="pre">create_npc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">look</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pikemnons</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/npc.html#create_npc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.npc.create_npc" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a Non-Player Character (NPC) with specified attributes and a set of Pikemnons.</p>
+<p>This function creates an NPC with a specified image, position, look direction, and number of Pikemnons.
+The Pikemnons are randomly chosen from a JSON file of available Pikemnons.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_file</strong> (<em>str</em>) – The file path of the image for the NPC.</p></li>
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the NPC’s position.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the NPC’s position.</p></li>
+<li><p><strong>look</strong> (<em>str</em>) – The direction the NPC is looking (‘up’, ‘down’, ‘left’, ‘right’).</p></li>
+<li><p><strong>pikemnons</strong> (<em>int</em>) – The number of Pikemnons the NPC has.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary representing the NPC, with keys for image, position, look direction, fight status, Pikemnons, and current Pikemnon.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.npc.fighting">
+<span class="sig-prename descclassname"><span class="pre">src.npc.</span></span><span class="sig-name descname"><span class="pre">fighting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/npc.html#fighting"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.npc.fighting" title="Link to this definition">¶</a></dt>
+<dd><p>Starts a fight between the NPC and the player.</p>
+<p>This function starts a fight with the NPC, sets the NPC’s ‘fought’ status to True, and stops the player’s movement.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>npc</strong> (<em>dict</em>) – The NPC to fight.</p></li>
+<li><p><strong>player</strong> (<em>dict</em>) – The player.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>npc[‘fought’] (bool): Whether the NPC has fought the player.</p></li>
+<li><p>player[‘sprite’] (pyglet.sprite.Sprite): The player’s sprite.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.npc.update_npc">
+<span class="sig-prename descclassname"><span class="pre">src.npc.</span></span><span class="sig-name descname"><span class="pre">update_npc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">npc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/npc.html#update_npc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.npc.update_npc" title="Link to this definition">¶</a></dt>
+<dd><p>Determines if the player is colliding with an empty tile.</p>
+<p>This function calculates the player’s tile coordinates and checks all tiles the player is on. If the player is on an empty tile, it returns True. Otherwise, it returns False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player</strong> (<em>dict</em>) – The player.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the player is colliding with an empty tile.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+<dt class="field-even">Global Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>current_map (list): The current map.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.player">
+<span id="src-player-module"></span><h2>src.player module<a class="headerlink" href="#module-src.player" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.player.add_random_item">
+<span class="sig-prename descclassname"><span class="pre">src.player.</span></span><span class="sig-name descname"><span class="pre">add_random_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/player.html#add_random_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player.add_random_item" title="Link to this definition">¶</a></dt>
+<dd><p>Adds a random item to the player’s inventory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player</strong> (<em>dict</em>) – The player entity.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The added item.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.player.change_active_pikemnon">
+<span class="sig-prename descclassname"><span class="pre">src.player.</span></span><span class="sig-name descname"><span class="pre">change_active_pikemnon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pikemnon_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/src/player.html#change_active_pikemnon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player.change_active_pikemnon" title="Link to this definition">¶</a></dt>
+<dd><p>Changes the active Pikemnon in the player’s inventory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player</strong> (<em>dict</em>) – The player entity.</p></li>
+<li><p><strong>pikemnon_id</strong> (<em>str</em>) – The ID of the Pikemnon to activate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated player entity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.player.change_move">
+<span class="sig-prename descclassname"><span class="pre">src.player.</span></span><span class="sig-name descname"><span class="pre">change_move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">can</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/player.html#change_move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player.change_move" title="Link to this definition">¶</a></dt>
+<dd><p>Changes the player’s movement status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player</strong> (<em>dict</em>) – The player entity.</p></li>
+<li><p><strong>can</strong> (<em>bool</em>) – Whether the player can move.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.player.create_player">
+<span class="sig-prename descclassname"><span class="pre">src.player.</span></span><span class="sig-name descname"><span class="pre">create_player</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">220</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/player.html#create_player"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player.create_player" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a player entity at the specified coordinates with the specified speed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the player.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the player.</p></li>
+<li><p><strong>speed</strong> (<em>int</em><em>, </em><em>optional</em>) – The speed of the player, defaults to 220.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The player entity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.player.get_player_pikemnon">
+<span class="sig-prename descclassname"><span class="pre">src.player.</span></span><span class="sig-name descname"><span class="pre">get_player_pikemnon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_inventory</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/player.html#get_player_pikemnon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player.get_player_pikemnon" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the active Pikemnon from the player’s inventory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>player_inventory</strong> (<em>list</em>) – The player’s inventory.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The active Pikemnon.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.player.remove_pikemnon">
+<span class="sig-prename descclassname"><span class="pre">src.player.</span></span><span class="sig-name descname"><span class="pre">remove_pikemnon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pikemnon_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/src/player.html#remove_pikemnon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player.remove_pikemnon" title="Link to this definition">¶</a></dt>
+<dd><p>Removes a Pikemnon from the player’s inventory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player</strong> (<em>dict</em>) – The player entity.</p></li>
+<li><p><strong>pikemnon_id</strong> (<em>str</em>) – The ID of the Pikemnon to remove.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated player entity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.player.update_player">
+<span class="sig-prename descclassname"><span class="pre">src.player.</span></span><span class="sig-name descname"><span class="pre">update_player</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/player.html#update_player"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player.update_player" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the player’s position based on the current key state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player</strong> (<em>dict</em>) – The player entity.</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – The time delta.</p></li>
+<li><p><strong>key_state</strong> (<em>dict</em>) – The current key state.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.settings_menu">
+<span id="src-settings-menu-module"></span><h2>src.settings_menu module<a class="headerlink" href="#module-src.settings_menu" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.settings_menu.adjust_volume">
+<span class="sig-prename descclassname"><span class="pre">src.settings_menu.</span></span><span class="sig-name descname"><span class="pre">adjust_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/settings_menu.html#adjust_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.settings_menu.adjust_volume" title="Link to this definition">¶</a></dt>
+<dd><p>Adjusts the volume of the selected setting based on the input direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>direction</strong> (<em>str</em>) – The direction to adjust the volume. Possible values are “increase” and “decrease”.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_index (int): The index of the currently selected setting.</p></li>
+<li><p>volume_settings (dict): The dictionary of volume settings.</p></li>
+<li><p>volume_labels (list): The list of volume setting labels.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.settings_menu.create_volume_labels">
+<span class="sig-prename descclassname"><span class="pre">src.settings_menu.</span></span><span class="sig-name descname"><span class="pre">create_volume_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/settings_menu.html#create_volume_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.settings_menu.create_volume_labels" title="Link to this definition">¶</a></dt>
+<dd><p>Changes the active Pikemnon in the player’s inventory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player</strong> (<em>dict</em>) – The player entity.</p></li>
+<li><p><strong>pikemnon_id</strong> (<em>str</em>) – The ID of the Pikemnon to activate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The updated player entity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.settings_menu.draw_settings">
+<span class="sig-prename descclassname"><span class="pre">src.settings_menu.</span></span><span class="sig-name descname"><span class="pre">draw_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/settings_menu.html#draw_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.settings_menu.draw_settings" title="Link to this definition">¶</a></dt>
+<dd><p>Draws the settings on the window.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>window</strong> (<em>pyglet.window.Window</em>) – The window to draw the settings on.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>volume_labels (list): The list of volume setting labels.</p></li>
+<li><p>selected_index (int): The index of the currently selected setting.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.settings_menu.update_selection">
+<span class="sig-prename descclassname"><span class="pre">src.settings_menu.</span></span><span class="sig-name descname"><span class="pre">update_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/settings_menu.html#update_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.settings_menu.update_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the selected setting based on the input direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>direction</strong> (<em>str</em>) – The direction to move the selection. Possible values are “up” and “down”.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_index (int): The index of the currently selected setting.</p></li>
+<li><p>volume_settings (dict): The dictionary of volume settings.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.settings_menu.update_settings_selection">
+<span class="sig-prename descclassname"><span class="pre">src.settings_menu.</span></span><span class="sig-name descname"><span class="pre">update_settings_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/settings_menu.html#update_settings_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.settings_menu.update_settings_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Updates the selected setting based on the input direction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>direction</strong> (<em>str</em>) – The direction to move the selection. Possible values are “up” and “down”.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Global Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>selected_index (int): The index of the currently selected setting.</p></li>
+<li><p>volume_settings (dict): The dictionary of volume settings.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Pikemnon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pikemnon</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="conf.html">conf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">data package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">src package</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">pikemnon</a><ul>
+      <li>Previous: <a href="main.html" title="previous chapter">main module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zdenek Sojka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/src.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

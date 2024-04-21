@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.mapp &#8212; Pikemnon 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.mapp</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyglet</span>
+<span class="kn">from</span> <span class="nn">pyglet.gl</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">conf</span> <span class="kn">import</span> <span class="n">SCALE</span>
+
+<span class="n">current_map</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">tile_images</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Load the tile images</span>
+<div class="viewcode-block" id="load_tile_images">
+<a class="viewcode-back" href="../../src.html#src.mapp.load_tile_images">[docs]</a>
+<span class="k">def</span> <span class="nf">load_tile_images</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the action associated with the currently selected menu item.</span>
+
+<span class="sd">    :return: The action associated with the currently selected menu item.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * selected_index (int): The index of the currently selected menu item.</span>
+<span class="sd">        * menu_items (list): The list of menu items.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">tile_images</span>
+    <span class="n">tile_images</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="s1">&#39;assets/empty.png&#39;</span><span class="p">),</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="s1">&#39;assets/floor.png&#39;</span><span class="p">),</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="s1">&#39;assets/door_2.png&#39;</span><span class="p">),</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="s1">&#39;assets/grass.png&#39;</span><span class="p">),</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="s1">&#39;assets/tall-grass-tl.png&#39;</span><span class="p">),</span>
+        <span class="mi">5</span><span class="p">:</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="s1">&#39;assets/tall-grass-tr.png&#39;</span><span class="p">),</span>
+        <span class="mi">6</span><span class="p">:</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="s1">&#39;assets/tall-grass-bl.png&#39;</span><span class="p">),</span>
+        <span class="mi">7</span><span class="p">:</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="s1">&#39;assets/tall-grass-br.png&#39;</span><span class="p">),</span>
+    <span class="p">}</span></div>
+
+
+<span class="c1"># Define a list to hold the map sprites</span>
+<span class="n">map_sprites</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="c1"># Define a function to create the map sprites</span>
+<div class="viewcode-block" id="create_map_sprites">
+<a class="viewcode-back" href="../../src.html#src.mapp.create_map_sprites">[docs]</a>
+<span class="k">def</span> <span class="nf">create_map_sprites</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the action associated with the currently selected menu item.</span>
+
+<span class="sd">    :return: The action associated with the currently selected menu item.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * selected_index (int): The index of the currently selected menu item.</span>
+<span class="sd">        * menu_items (list): The list of menu items.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_map</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">tile</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">tile_images</span><span class="p">[</span><span class="n">tile</span><span class="p">]</span>
+            <span class="n">texture</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">get_texture</span><span class="p">()</span>
+            <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">GL_TEXTURE_MAG_FILTER</span><span class="p">,</span> <span class="n">GL_NEAREST</span><span class="p">)</span>
+            <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">GL_TEXTURE_MIN_FILTER</span><span class="p">,</span> <span class="n">GL_NEAREST</span><span class="p">)</span>
+            <span class="n">sprite</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">sprite</span><span class="o">.</span><span class="n">Sprite</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">image</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="o">*</span><span class="n">image</span><span class="o">.</span><span class="n">width</span><span class="o">*</span><span class="mi">4</span><span class="p">,</span>
+                                          <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="o">*</span><span class="n">image</span><span class="o">.</span><span class="n">height</span><span class="o">*</span><span class="mi">4</span><span class="p">)</span>
+            <span class="n">sprite</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="mi">4</span>
+            <span class="k">if</span> <span class="nb">map</span> <span class="ow">and</span> <span class="n">tile</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sprite</span><span class="o">.</span><span class="n">opacity</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">map_sprites</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sprite</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">map_sprites</span></div>
+
+
+
+<div class="viewcode-block" id="set_current_map">
+<a class="viewcode-back" href="../../src.html#src.mapp.set_current_map">[docs]</a>
+<span class="k">def</span> <span class="nf">set_current_map</span><span class="p">(</span><span class="n">cr_map</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the action associated with the currently selected menu item.</span>
+
+<span class="sd">    :return: The action associated with the currently selected menu item.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * selected_index (int): The index of the currently selected menu item.</span>
+<span class="sd">        * menu_items (list): The list of menu items.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">current_map</span>
+    <span class="n">current_map</span> <span class="o">=</span> <span class="n">cr_map</span></div>
+
+
+
+<div class="viewcode-block" id="get_current_map">
+<a class="viewcode-back" href="../../src.html#src.mapp.get_current_map">[docs]</a>
+<span class="k">def</span> <span class="nf">get_current_map</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the current map.</span>
+
+<span class="sd">    :return: The current map.</span>
+<span class="sd">    :rtype: list</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * current_map (list): The current map.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">current_map</span></div>
+
+
+
+<span class="n">TILE_WIDTH</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">TILE_HEIGHT</span> <span class="o">=</span> <span class="mi">8</span>
+
+
+<div class="viewcode-block" id="what_tile_is_player_on">
+<a class="viewcode-back" href="../../src.html#src.mapp.what_tile_is_player_on">[docs]</a>
+<span class="k">def</span> <span class="nf">what_tile_is_player_on</span><span class="p">(</span><span class="n">player</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines what type of tile the player is currently on.</span>
+
+<span class="sd">    This function calculates the player&#39;s tile coordinates and checks all tiles the player is on. It returns a string representing the type of tile the player is on.</span>
+
+<span class="sd">    :param player: The player.</span>
+<span class="sd">    :type player: dict</span>
+<span class="sd">    :return: The type of tile the player is on.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * current_map (list): The current map.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate the player&#39;s tile coordinates</span>
+    <span class="n">player_tile_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">//</span> <span class="p">(</span><span class="n">TILE_WIDTH</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">))</span>
+    <span class="n">player_tile_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">//</span> <span class="p">(</span><span class="n">TILE_HEIGHT</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">))</span>
+
+    <span class="c1"># Calculate the number of tiles the player spans</span>
+    <span class="n">player_tiles_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="p">(</span><span class="n">TILE_WIDTH</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">player_tiles_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span> <span class="o">//</span> <span class="p">(</span><span class="n">TILE_HEIGHT</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">))</span>
+
+    <span class="c1"># Check all tiles the player is on</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">player_tile_y</span><span class="p">,</span> <span class="n">player_tile_y</span> <span class="o">+</span> <span class="n">player_tiles_y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">player_tile_x</span><span class="p">,</span> <span class="n">player_tile_x</span> <span class="o">+</span> <span class="n">player_tiles_x</span><span class="p">):</span>
+            <span class="n">player_in_map</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_map</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_map</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">player_in_map</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">current_map</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;Nothing&quot;</span>
+                <span class="k">elif</span> <span class="n">current_map</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;Door&quot;</span>
+                <span class="k">elif</span> <span class="n">current_map</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;Grass&quot;</span>
+                <span class="k">if</span> <span class="n">current_map</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="s2">&quot;Tall Grass&quot;</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="is_player_colliding_with_empty">
+<a class="viewcode-back" href="../../src.html#src.mapp.is_player_colliding_with_empty">[docs]</a>
+<span class="k">def</span> <span class="nf">is_player_colliding_with_empty</span><span class="p">(</span><span class="n">player</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines if the player is colliding with an empty tile.</span>
+
+<span class="sd">    This function calculates the player&#39;s tile coordinates and checks all tiles the player is on. If the player is on an empty tile, it returns True. Otherwise, it returns False.</span>
+
+<span class="sd">    :param player: The player.</span>
+<span class="sd">    :type player: dict</span>
+<span class="sd">    :return: Whether the player is colliding with an empty tile.</span>
+<span class="sd">    :rtype: bool</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * current_map (list): The current map.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate the player&#39;s tile coordinates</span>
+    <span class="n">player_tile_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">//</span> <span class="p">(</span><span class="n">TILE_WIDTH</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">))</span>
+    <span class="n">player_tile_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">//</span> <span class="p">(</span><span class="n">TILE_HEIGHT</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">))</span>
+
+    <span class="c1"># Calculate the number of tiles the player spans</span>
+    <span class="n">player_tiles_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="p">(</span><span class="n">TILE_WIDTH</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">player_tiles_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span> <span class="o">//</span> <span class="p">(</span><span class="n">TILE_HEIGHT</span> <span class="o">*</span> <span class="n">SCALE</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Check all tiles the player is on</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">player_tile_y</span><span class="p">,</span> <span class="n">player_tile_y</span> <span class="o">+</span> <span class="n">player_tiles_y</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">player_tile_x</span><span class="p">,</span> <span class="n">player_tile_x</span> <span class="o">+</span> <span class="n">player_tiles_x</span><span class="p">):</span>
+            <span class="c1"># If the tile is an empty tile, there&#39;s a collision</span>
+            <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_map</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_map</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span> <span class="n">current_map</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># No collision</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Pikemnon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">pikemnon</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zdenek Sojka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
