@@ -8,16 +8,44 @@ def get_npcs_data():
     return [
         {
             "image": "assets/player.png",
-            "x": 500,
-            "y": 300,
-            "direction": "left",
+            "x": 300,
+            "y": 150,
+            "direction": "top",
             "pikemnons": 1
         },
         {
             "image": "assets/player.png",
-            "x": 600,
-            "y": 400,
+            "x": 250,
+            "y": 100,
             "direction": "left",
-            "pikemnons": 1
+            "pikemnons": 3
+        },
+        {
+            "image": "assets/player.png",
+            "x": 250,
+            "y": 150,
+            "direction": "top",
+            "pikemnons": 2
+        },
+        {
+            "image": "assets/player.png",
+            "x": 300,
+            "y": 100,
+            "direction": "top",
+            "pikemnons": 4
+        },
+        {
+            "image": "assets/player.png",
+            "x": 350,
+            "y": 100,
+            "direction": "right",
+            "pikemnons": 3
+        },
+        {
+            "image": "assets/player.png",
+            "x": 350,
+            "y": 150,
+            "direction": "top",
+            "pikemnons": 2
         }
     ]
