@@ -39,7 +39,7 @@ def create_wild_pokemon():
     npc = {}
     npc['pikemnons'] = []
     npc['pikemnon_index'] = 0
-    with open('pokemon.json') as f:
+    with open('data/pokemon.json') as f:
         data = json.load(f)
     pikemnon = random.choice(list(data.keys()))
     pik = data[pikemnon]
