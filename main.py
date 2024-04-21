@@ -171,10 +171,6 @@ def process_inventory_menu() -> None:
     new_player_pikemnons = len(player['pikemnons'])
     player[inventory_options[selected_menu_option_index]] -= 1
     fighting_menu_state = 'main'
-    if player_pikemnons < new_player_pikemnons:
-        end_fight()
-        random_item = add_random_item(player)
-        print(f"Player won! You got a {random_item}")
 
 def process_change_menu() -> None:
     global fighting_menu_state, selected_menu_option_index, player
@@ -198,8 +194,7 @@ def handle_attack_result() -> None:
         set_fight_stat('continue')
     elif fight_stat == "player":
         end_fight()
-        random_item = add_random_item(player)
-        print(f"Player won! You got a {random_item}")
+        fighting_menu_state = 'main'
         return
     fighting_menu_state = 'main'
     if fight_stat == "no pp":
@@ -214,6 +209,7 @@ def handle_attack_result() -> None:
                 return
         set_fight_stat(None)
         end_fight()
+        fighting_menu_state = 'main'
     elif fight_stat == "change":
         fighting_menu_state = 'change'
         set_fight_stat('continue')

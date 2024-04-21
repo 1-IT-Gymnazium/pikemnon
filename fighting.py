@@ -5,7 +5,7 @@ from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
 from game_state import get_current_npc, get_fight_stat, set_display_text, set_fight_stat
 from conf import FONT_NAME
-from player import get_player_pikemnon
+from player import add_random_item, get_player_pikemnon
 
 npc_pokemon = None
 player_pokemon = None
@@ -186,8 +186,6 @@ def check_battle_end() -> str:
         if not text_to_display and get_fight_stat() != "text":
             text_to_display = "Player's Pokémon fainted. NPC wins!"
             return "text"
-        elif text_to_display:
-            return "text"
         elif not text_to_display:
             return "npc"
     elif npc_pokemon['current_health'] <= 0:
@@ -195,12 +193,16 @@ def check_battle_end() -> str:
         if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
             current_npc['pikemnon_index'] += 1
             npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
-            print("NPC sends out another Pokémon.")
+            text_to_display = f"NPC sent out {npc_pokemon['name']}."
         else:
             npc_pokemon['current_health'] = 0
-            print("NPC's Pokémon fainted. Player wins!")
-            turn = 0
-            return "player"
+            if not text_to_display and get_fight_stat() != "text":
+                random_item = add_random_item(current_player)
+                print(f"Player won! You got a {random_item}")
+                text_to_display = "NPC's Pokémon fainted. Player wins!"
+                return "text"
+            elif not text_to_display:
+                return "player"
     return "continue" if get_fight_stat() != "attacked" else "attacked"
 
 
@@ -292,7 +294,8 @@ def change_display_text(option):
     for pikemnon in current_player['pikemnons']:
         if pikemnon['name'] == option:
             pikemn = pikemnon
-    return f"{option} {pikemn['current_health']/pikemn['health'] * 100}%"
+    health_percentage = round(pikemn['current_health']/pikemn['health'] * 100, 2)
+    return f"{option} {health_percentage}%"
 
 def navigate_menu(direction):
     global selected_option_index
