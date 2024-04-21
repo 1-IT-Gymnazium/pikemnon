@@ -62,7 +62,15 @@ def get_player_pikemnon(player_inventory):
 
 def add_random_item(player):
     random_items = ['pikeball', 'better pikeball', 'potion', 'better potion']
-    item = random.choice(random_items)
+    probabilities = [0.4, 0.1, 0.4, 0.1]
+    cumulative_probabilities = [sum(probabilities[:i+1]) for i in range(len(probabilities))]
+
+    rand = random.random()
+    for i, cumulative_probability in enumerate(cumulative_probabilities):
+        if rand < cumulative_probability:
+            item = random_items[i]
+            break
+
     player[item] += 1
     return item
 

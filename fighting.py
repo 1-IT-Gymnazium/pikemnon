@@ -9,8 +9,8 @@ from game_state import get_current_npc, get_fight_stat, set_display_text, set_fi
 from conf import FONT_NAME
 from player import add_random_item, get_player_pikemnon
 
-npc_pokemon = None
-player_pokemon = None
+npc_pikemnon = None
+player_pikemnon = None
 
 selected_option_index = 0
 
@@ -33,22 +33,21 @@ old_fight_stat = None
 
 def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_type: str, defense_type: str) -> int:
     """
-    Calculate the damage inflicted during a Pokemon battle.
+    Calculates the damage dealt by an attack in a Pikemnon battle.
 
-    This function uses the formula from the Pokemon games to calculate
-    how much damage an attack will do. The formula takes into account
-    the attack power of the attacking Pokemon, the defense of the
-    defending Pokemon, and the power of the move being used.
+    This function takes the attack and defense stats of the Pikemnon, the power and stage of the attack, and the types of the attack and defense. It calculates the base damage, applies a random factor to make the battles less predictable, and multiplies the result by the effectiveness of the attack type against the defense type.
 
     Parameters:
-    attack (int): The attack power of the attacking Pokemon.
-    defense (int): The defense power of the defending Pokemon.
-    power (int): The power of the move being used.
+    attack (int): The attack stat of the attacking Pikemnon.
+    defense (int): The defense stat of the defending Pikemnon.
+    power (int): The power of the attack.
+    stage (int): The stage of the attack.
+    attack_type (str): The type of the attacking.
+    defense_type (str): The type of the defense.
 
     Returns:
-    int: The calculated damage.
+    int: The final damage dealt by the attack.
     """
-
     stage_multipliers = {
     -6: 0.25,
     -5: 0.29,
@@ -70,74 +69,82 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_t
 
     effectiveness = type_effectiveness.get(attack_type, {}).get(defense_type, 1)
 
-    final_damage = int(((2 * power * ((attack * attack_stage) / defense)) / 50) + 2 * effectiveness)
+    base_damage = (power * (attack * attack_stage) / defense) / 50
+    random_factor = random.uniform(0.85, 1.0)  # Random factor between 0.85 and 1.0
+    final_damage = int(base_damage * effectiveness * random_factor) + 2
+    
     
     return final_damage
 
-def handle_attack(attack_name: str, attacking_pokemon: dict[str, any], defending_pokemon: dict[str, any]) -> None:
+def handle_attack(attack_name: str, attacking_pikemnon: dict[str, any], defending_pikemnon: dict[str, any]) -> None:
     """
     Handles the attack action in the game.
 
-    This function takes the name of the attack, the attacking Pokemon, and the defending Pokemon as arguments.
-    It calculates the damage based on the attack type and updates the health of the defending Pokemon.
+    This function takes the name of the attack, the attacking Pikemnon, and the defending Pikemnon as arguments.
+    It calculates the damage based on the attack type and updates the health of the defending Pikemnon.
     It also updates the global variable `text_to_display` with the result of the attack.
 
     Parameters:
     attack_name (str): The name of the attack.
-    attacking_pokemon (dict): The dictionary representing the attacking Pokemon.
-    defending_pokemon (dict): The dictionary representing the defending Pokemon.
+    attacking_pikemnon (dict): The dictionary representing the attacking Pikemnon.
+    defending_pikemnon (dict): The dictionary representing the defending Pikemnon.
 
     Returns:
     None
     """
     global text_to_display
-    move = attacking_pokemon['moves'][attack_name]
+    move = attacking_pikemnon['moves'][attack_name]
     if move['move_type'] == "attack":
-        damage = calculate_damage(attacking_pokemon['attack'], defending_pokemon['defense'], move['power'], attacking_pokemon['stage'], attacking_pokemon['type'], defending_pokemon['type'])
-        defending_pokemon['current_health'] -= damage
-        text_to_display = f"{attacking_pokemon['name']} used {attack_name} and dealt {damage} damage."
+        damage = calculate_damage(attacking_pikemnon['attack'], defending_pikemnon['defense'], move['power'], attacking_pikemnon['stage'], attacking_pikemnon['type'], defending_pikemnon['type'])
+        defending_pikemnon['current_health'] -= damage
+        text_to_display = f"{attacking_pikemnon['name']} used {attack_name} and dealt {damage} damage."
     elif move['move_type'] == "buff":
         target_stat = move['target_stat']
-        attacking_pokemon['stage'][target_stat] = min(attacking_pokemon['stage'][target_stat] + move['power'], 6)
-        text_to_display = f"{attacking_pokemon['name']} used {attack_name} and increased {target_stat}."
+        attacking_pikemnon['stage'][target_stat] = min(attacking_pikemnon['stage'][target_stat] + move['power'], 6)
+        text_to_display = f"{attacking_pikemnon['name']} used {attack_name} and increased {target_stat}."
     elif move['move_type'] == "debuff":
         target_stat = move['target_stat']
-        defending_pokemon['stage'][target_stat] = max(defending_pokemon['stage'][target_stat] - move['power'], -6)
-        text_to_display = f"{attacking_pokemon['name']} used {attack_name} and decreased {defending_pokemon['name']}'s {target_stat}."
+        defending_pikemnon['stage'][target_stat] = max(defending_pikemnon['stage'][target_stat] - move['power'], -6)
+        text_to_display = f"{attacking_pikemnon['name']} used {attack_name} and decreased {defending_pikemnon['name']}'s {target_stat}."
 
 def load_type_effectiveness():
     with open('type_advantages.json') as f:
         return json.load(f)
 
 def player_attack(attack_name: str) -> str:
-    global player_pokemon, text_to_display
+    global player_pikemnon, text_to_display
     if get_fight_stat() != "text":
-        if player_pokemon['moves'][attack_name]['pp'] <= 0:
+        if player_pikemnon['moves'][attack_name]['pp'] <= 0:
             text_to_display = "No PP left for this move."
             return "no pp"
-        player_pokemon['moves'][attack_name]['pp'] -= 1
-        handle_attack(attack_name, player_pokemon, npc_pokemon)
+        player_pikemnon['moves'][attack_name]['pp'] -= 1
+        handle_attack(attack_name, player_pikemnon, npc_pikemnon)
         set_fight_stat("attacked")
 
 def handle_item(item: str, player: dict[str, any]):
-    global player_pokemon, text_to_display
+    global player_pikemnon, text_to_display
     if item == "potion":
         if player['potion'] <= 0:
             text_to_display = "No potions left."
-        if player_pokemon['current_health'] == player_pokemon['health']:
+        if player_pikemnon['current_health'] == player_pikemnon['health']:
             text_to_display = "Pokémon is already at full health."
-        player_pokemon['current_health'] = min(player_pokemon['current_health'] + 10, player_pokemon['health'])
+        player_pikemnon['current_health'] = min(player_pikemnon['current_health'] + 10, player_pikemnon['health'])
         text_to_display = "Healed 10 HP."
-    if item == "pikeball":
-        if player['pikeball'] <= 0:
+    if item == "pikeball" or item == "better pikeball":
+        if player['pikeball'] <= 0 and item == "pikeball":
             text_to_display = "No Pikeballs left."
+        elif player['better pikeball'] <= 0 and item == "better pikeball":
+            text_to_display = "No Better Pikeballs left."
         elif len(player['pikemnons']) == 4:
             text_to_display = "You can't catch this Pokémon. You already have 4 Pokémon."
-        elif "wild" in npc_pokemon:
-            base_catch_rate = 1
-            health_percentage = npc_pokemon['current_health'] / npc_pokemon['health']
-            catch_probability = base_catch_rate + (1 - health_percentage) * (1 - base_catch_rate)
-            if random.random() < catch_probability:
+        elif "wild" in npc_pikemnon:
+            base_catch_rate = 0.3 if item == "pikeball" else 0.8
+            health_percentage = npc_pikemnon['current_health'] / npc_pikemnon['health']
+            catch_rate = base_catch_rate + (1 - health_percentage) * (1 - base_catch_rate)
+            catch_rate = min(1, catch_rate)  # Ensure catch rate does not exceed 1
+            random_factor = random.uniform(0.7, 1.0)  # Random factor between 0.7 and 1.0
+            final_catch_probability = catch_rate * random_factor
+            if random.random() < final_catch_probability:
                 player = catch_pikemnon(player)
                 text_to_display = "You caught the Pokémon!"
             else:
@@ -147,10 +154,10 @@ def handle_item(item: str, player: dict[str, any]):
     player[item] -= 1
 
 def catch_pikemnon(player: dict[str, any]) -> dict[str, any]:
-    global player_pokemon, npc_pokemon, text_to_display
+    global player_pikemnon, npc_pikemnon, text_to_display
     text_to_display = "You caught the Pokémon!"
-    npc_pokemon['id'] = str(uuid.uuid4())
-    player['pikemnons'].append(npc_pokemon)
+    npc_pikemnon['id'] = str(uuid.uuid4())
+    player['pikemnons'].append(npc_pikemnon)
     return player
     
 
@@ -196,8 +203,8 @@ def draw_npc_image(img_path: str):
 
 
 def npc_attack():
-    global player_pokemon, npc_pokemon
-    moves = npc_pokemon['moves']
+    global player_pikemnon, npc_pikemnon
+    moves = npc_pikemnon['moves']
 
     attacks = {name: details for name, details in moves.items() if details['move_type'] == 'attack'}
     buffs_and_debuffs = {name: details for name, details in moves.items() if details['move_type'] in ['buff', 'debuff']}
@@ -206,32 +213,32 @@ def npc_attack():
 
     for attack in attacks:
         for _ in range(attacks[attack]['power']):
-            if npc_pokemon['moves'][attack]['pp'] > 0:
+            if npc_pikemnon['moves'][attack]['pp'] > 0:
                 chance_list.append(attack)
     
     if buffs_and_debuffs:
         for buff in buffs_and_debuffs:
-            if npc_pokemon['moves'][buff]['pp'] > 0:
+            if npc_pikemnon['moves'][buff]['pp'] > 0:
                 for _ in range(len(chance_list) // 2):
                     chance_list.append(buff)
     
         if turn % 2 == 0 and buffs_and_debuffs:
             for buff in buffs_and_debuffs:
-                if npc_pokemon['moves'][buff]['pp'] > 0:
+                if npc_pikemnon['moves'][buff]['pp'] > 0:
                     for _ in range(len(chance_list) // 2):
                         chance_list.append(buff)
     
     attack_name = random.choice(chance_list)
-    npc_pokemon['moves'][attack_name]['pp'] -= 1
+    npc_pikemnon['moves'][attack_name]['pp'] -= 1
 
-    handle_attack(attack_name, npc_pokemon, player_pokemon)
+    handle_attack(attack_name, npc_pikemnon, player_pikemnon)
 
 def check_battle_end() -> str:
-    global player_pokemon, npc_pokemon, turn, text_to_display
+    global player_pikemnon, npc_pikemnon, turn, text_to_display
     if get_fight_stat() == "end":
         return "end"
-    if player_pokemon['current_health'] <= 0:
-        player_pokemon['current_health'] = 0
+    if player_pikemnon['current_health'] <= 0:
+        player_pikemnon['current_health'] = 0
         for pix in current_player['pikemnons']:
             if pix['current_health'] > 0:
                 return "change"
@@ -240,14 +247,14 @@ def check_battle_end() -> str:
             return "text"
         elif not text_to_display:
             return "npc"
-    elif npc_pokemon['current_health'] <= 0:
+    elif npc_pikemnon['current_health'] <= 0:
         current_npc = get_current_npc()
         if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
             current_npc['pikemnon_index'] += 1
-            npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
-            text_to_display = f"NPC sent out {npc_pokemon['name']}."
+            npc_pikemnon = current_npc['pikemnons'][current_npc['pikemnon_index']]
+            text_to_display = f"NPC sent out {npc_pikemnon['name']}."
         else:
-            npc_pokemon['current_health'] = 0
+            npc_pikemnon['current_health'] = 0
             if not text_to_display and get_fight_stat() != "text":
                 random_item = add_random_item(current_player)
                 print(f"Player won! You got a {random_item}")
@@ -333,7 +340,7 @@ def draw_menu_options(menu_options, selected_option_index, state):
     pyglet.graphics.glColor4ub(255, 255, 255, 255)
 
 def attack_display_text(option):
-    return f"{option} {player_pokemon['moves'][option]['pp']}"
+    return f"{option} {player_pikemnon['moves'][option]['pp']}"
 
 def inventory_display_text(option):
     return f"{option} {current_player[option]}"
@@ -393,12 +400,12 @@ def draw_health_bar(x, y, width, height, percentage):
 def fighting_screen(window, player, direction, menu_options, selected_option_index, menu_state):
     clear_screen(window)
 
-    global npc_pokemon, player_pokemon, current_player, display_time, text_to_display, old_fight_stat
+    global npc_pikemnon, player_pikemnon, current_player, display_time, text_to_display, old_fight_stat
     current_npc = get_current_npc()
-    npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
+    npc_pikemnon = current_npc['pikemnons'][current_npc['pikemnon_index']]
     current_player = player
 
-    player_pokemon = get_player_pikemnon(player['pikemnons'])
+    player_pikemnon = get_player_pikemnon(player['pikemnons'])
 
     draw_box(40, 450, 200, 80)
     draw_box(400, 200, 200, 80)
@@ -406,11 +413,11 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
     draw_box(20, 20, 600, 150)
 
     draw_label('Player', 40 + 40, 450 + 80 - 10)
-    draw_label(player_pokemon['name'], 40 + 50, 450 + 50)
-    draw_label(npc_pokemon['name'], 400 + 70, 200 + 80 - 10)
+    draw_label(player_pikemnon['name'], 40 + 50, 450 + 50)
+    draw_label(npc_pikemnon['name'], 400 + 70, 200 + 80 - 10)
 
-    draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['current_health']/player_pokemon['health'])
-    draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['current_health']/npc_pokemon['health'])
+    draw_health_bar(40, 450 - 20, 200, 10, player_pikemnon['current_health']/player_pikemnon['health'])
+    draw_health_bar(400, 200 - 20, 200, 10, npc_pikemnon['current_health']/npc_pikemnon['health'])
 
     if text_to_display:
         set_display_text(True)
@@ -427,7 +434,7 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
         old_fight_stat = None
 
     draw_player_image()
-    draw_npc_image(f'assets/{npc_pokemon['name'].lower()}.png')
+    draw_npc_image(f'assets/{npc_pikemnon['name'].lower()}.png')
 
     if direction:
         navigate_menu(direction)
