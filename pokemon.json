@@ -18,7 +18,7 @@
         "type": "fire",
         "moves": {
             "growl": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "attack", "pp": 40},
-            "scratch": {"power": 40, "move_type": "attack", "type": "normal", "pp": 35},
+            "scratch": {"power": 1000, "move_type": "attack", "type": "normal", "pp": 35},
             "ember": {"power": 40, "move_type": "attack", "type": "fire", "pp": 25},
             "dragon breath": {"power": 60, "move_type": "attack", "type": "fire", "pp": 20}
         }

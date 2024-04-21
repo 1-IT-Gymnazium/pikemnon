@@ -164,23 +164,30 @@ def npc_attack():
 
 def check_battle_end() -> str:
     global player_pokemon, npc_pokemon, turn, text_to_display
-    if not text_to_display:
-        if player_pokemon['current_health'] <= 0:
-            player_pokemon['current_health'] = 0
+    if player_pokemon['current_health'] <= 0:
+        player_pokemon['current_health'] = 0
+        fight_stat = get_fight_stat()
+        for pix in current_player['pikemnons']:
+            if pix['current_health'] > 0:
+                return "change"
+        if not text_to_display and get_fight_stat() != "text":
             text_to_display = "Player's Pokémon fainted. NPC wins!"
-            turn = 0
+            return "text"
+        elif text_to_display:
+            return "text"
+        elif not text_to_display:
             return "npc"
-        elif npc_pokemon['current_health'] <= 0:
-            current_npc = get_current_npc()
-            if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
-                current_npc['pikemnon_index'] += 1
-                npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
-                print("NPC sends out another Pokémon.")
-            else:
-                npc_pokemon['current_health'] = 0
-                print("NPC's Pokémon fainted. Player wins!")
-                turn = 0
-                return "player"
+    elif npc_pokemon['current_health'] <= 0:
+        current_npc = get_current_npc()
+        if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
+            current_npc['pikemnon_index'] += 1
+            npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
+            print("NPC sends out another Pokémon.")
+        else:
+            npc_pokemon['current_health'] = 0
+            print("NPC's Pokémon fainted. Player wins!")
+            turn = 0
+            return "player"
     return "continue" if get_fight_stat() != "attacked" else "attacked"
 
 def next_turn():

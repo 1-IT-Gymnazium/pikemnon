@@ -189,7 +189,7 @@ def handle_attack_result() -> None:
 
     fight_stat = get_fight_stat()
 
-    if fight_stat == 'continue':
+    if fight_stat == 'continue' or fighting_menu_state == 'change' or fight_stat == "text":
         return
     elif fight_stat == "attacked":
         npc_attack()
@@ -208,8 +208,13 @@ def handle_attack_result() -> None:
         for pikemnon in player['pikemnons']:
             if pikemnon['current_health'] > 0:
                 fighting_menu_state = 'change'
+                set_fight_stat('continue')
                 return
+        set_fight_stat(None)
         end_fight()
+    elif fight_stat == "change":
+        fighting_menu_state = 'change'
+        set_fight_stat('continue')
 
 @window.event
 def on_key_release(symbol: int, _) -> None:
@@ -280,7 +285,7 @@ def on_draw() -> None:
         
         end_camera()
     elif fighton:
-        global menu_direction, attack_options, inventory_options, change_options, fight_status
+        global menu_direction, attack_options, inventory_options, change_options
         inventory_options = ['pikeball', 'better pikeball', 'potion', 'better potion']
         attack_options = list(get_player_pikemnon(player['pikemnons'])['moves'].keys())
         change_options = list(pikemnon['name'] for pikemnon in player['pikemnons'])
@@ -294,7 +299,7 @@ def on_draw() -> None:
 
         current_menu_options = menu_options_dict[fighting_menu_state]
 
-        fight_status = fighting_screen(window, player, menu_direction, current_menu_options, selected_menu_option_index, fighting_menu_state)
+        fighting_screen(window, player, menu_direction, current_menu_options, selected_menu_option_index, fighting_menu_state)
         menu_direction = None  # Reset after use to avoid unintended navigation
 
         handle_attack_result()

@@ -28,6 +28,15 @@ def update_npc(npc, player):
     playerX = player['sprite'].x
     playerY = player['sprite'].y
 
+    player_player = False
+
+    for pik in player['pikemnons']:
+        if pik['current_health'] > 0:
+            player_player = True
+
+    if not player_player:
+        return
+
     xVal = npcX - playerX
     yVal = npcY - playerY
 
