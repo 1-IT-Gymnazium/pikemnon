@@ -262,8 +262,13 @@ def process_main_menu() -> None:
     }
     fighting_menu_state = menu_actions.get(selected_menu_option_index, fighting_menu_state)
     if fighting_menu_state == 'run':
-        set_text_to_display("You ran away!")
-        set_fight_stat('end')
+        run_chance = 0.3
+        if random.random() < run_chance:
+            set_text_to_display("You ran away!")
+            set_fight_stat('end')
+        else:
+            set_text_to_display("You couldn't run away!")
+            set_fight_stat('attacked')
         selected_menu_option_index = 0
         fighting_menu_state = 'main'
     selected_menu_option_index = 0
