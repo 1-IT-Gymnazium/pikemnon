@@ -121,8 +121,10 @@ def handle_item(item: str, player: dict[str, any]):
     if item == "pikeball":
         if player['pikeball'] <= 0:
             text_to_display = "No Pikeballs left."
-        if "wild" in npc_pokemon:
-            base_catch_rate = 0.5
+        elif len(player['pikemnons']) == 4:
+            text_to_display = "You can't catch this Pokémon. You already have 4 Pokémon."
+        elif "wild" in npc_pokemon:
+            base_catch_rate = 1
             health_percentage = npc_pokemon['current_health'] / npc_pokemon['health']
             catch_probability = base_catch_rate + (1 - health_percentage) * (1 - base_catch_rate)
             if random.random() < catch_probability:
@@ -134,7 +136,7 @@ def handle_item(item: str, player: dict[str, any]):
             text_to_display = "You can't catch this Pokémon."
     player[item] -= 1
 
-def catch_pikemnon(player) -> dict[str, any]:
+def catch_pikemnon(player: dict[str, any]) -> dict[str, any]:
     global player_pokemon, npc_pokemon, text_to_display
     text_to_display = "You caught the Pokémon!"
     npc_pokemon['id'] = str(uuid.uuid4())
