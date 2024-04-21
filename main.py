@@ -1,15 +1,18 @@
+"""The main game loop for Pikemnon."""
+
 import json
 import random
 import time
 import pyglet
 from pyglet.window import key
 from pyglet.gl import *
+from data.npc_data import get_npcs_data
 from src.main_menu import create_menu_labels, draw_menu, get_selected_action, update_selection
 from src.player import change_active_pikemnon, create_player, update_player, get_player_pikemnon, add_random_item
 from src.entity import draw_entity
 from src.camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
-from src.mapp import create_map_sprites, what_tile_is_player_on, set_current_map, get_current_map
-from config.conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
+from src.mapp import create_map_sprites, load_tile_images, what_tile_is_player_on, set_current_map, get_current_map
+from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import src.maps as mps
 from src.npc import create_npc, update_npc
 from src.fighting import fighting_screen, handle_item, npc_attack, player_attack, set_text_to_display
@@ -26,22 +29,11 @@ last_fight_time = 0
 # Create a window
 window = pyglet.window.Window(window_width, window_height, "Pikemnon")
 
-player = create_player('assets/player.png', window.width//2, window.height//2)
+player = None
 
-with open('data/npcs.json') as f:
-    data = json.load(f)
+outside_npcs = None
 
-outside_npcs = []
-for i, npc_data in enumerate(data):  # Generate a unique ID
-    npc = create_npc(npc_data['image'], npc_data['x'], npc_data['y'], npc_data['direction'], npc_data['pikemnons'])
-    outside_npcs.append(npc)
-
-set_current_map(mps.starter_map)
-
-map_sprites = create_map_sprites()
-
-create_menu_labels(window)
-create_volume_labels(window)
+map_sprites = None
 
 fighting_menu_state = 'main'  # 'main' or 'attack'
 selected_menu_option_index = 0
@@ -50,9 +42,6 @@ attack_options = None
 inventory_options = None
 menu_direction = None  # Default value indicating no direction
 change_options = None
-
-set_camera_target(player)
-set_camera_window_size(window_width, window_height)
 
 inventory = False
 kill_inventory = False
@@ -498,8 +487,6 @@ def update(dt: float) -> None:
 
     update_camera()
 
-pyglet.clock.schedule_interval(update, 1/60.0)
-
 
 @window.event
 def on_draw() -> None:
@@ -571,6 +558,28 @@ def on_draw() -> None:
 
         handle_attack_result()
 
+def start_game():
+    global window, player, outside_npcs, map_sprites
+    player = create_player(window.width//2, window.height//2)
+    load_tile_images()
+    set_current_map(mps.starter_map)
+    data = get_npcs_data()
+    outside_npcs = []
+    for i, npc_data in enumerate(data):  # Generate a unique ID
+        npc = create_npc(npc_data['image'], npc_data['x'], npc_data['y'], npc_data['direction'], npc_data['pikemnons'])
+        outside_npcs.append(npc)
 
-if __name__ == '__main__':
+    map_sprites = create_map_sprites()
+
+    create_menu_labels(window)
+    create_volume_labels(window)
+
+    set_camera_target(player)
+    set_camera_window_size(window_width, window_height)
+
+    pyglet.clock.schedule_interval(update, 1/60.0)
+
     pyglet.app.run()
+
+if __name__ == "__main__":
+    start_game()

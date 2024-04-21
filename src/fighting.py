@@ -3,10 +3,10 @@ import random
 import time
 import uuid
 import pyglet
-from config.conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
+from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE, FONT_NAME
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
+from data.type_advantage_data import get_type_advantages
 from src.game_state import get_current_npc, get_fight_stat, set_display_text, set_fight_stat
-from config.conf import FONT_NAME
 from src.player import add_random_item, get_player_pikemnon
 
 npc_pikemnon = None
@@ -32,22 +32,19 @@ display_time = None
 old_fight_stat = None
 
 def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_type: str, defense_type: str) -> int:
-    """
-    Calculates the damage dealt by an attack in a Pikemnon battle.
+    def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_type: str, defense_type: str) -> int:
+        """
+        Calculates the damage dealt by an attack in a Pikemnon battle.
 
-    This function takes the attack and defense stats of the Pikemnon, the power and stage of the attack, and the types of the attack and defense. It calculates the base damage, applies a random factor to make the battles less predictable, and multiplies the result by the effectiveness of the attack type against the defense type.
-
-    Parameters:
-    attack (int): The attack stat of the attacking Pikemnon.
-    defense (int): The defense stat of the defending Pikemnon.
-    power (int): The power of the attack.
-    stage (int): The stage of the attack.
-    attack_type (str): The type of the attacking.
-    defense_type (str): The type of the defense.
-
-    Returns:
-    int: The final damage dealt by the attack.
-    """
+        :param attack: The attack stat of the attacking Pikemnon.
+        :param defense: The defense stat of the defending Pikemnon.
+        :param power: The power of the attack.
+        :param stage: The stage of the attack.
+        :param attack_type: The type of the attacking Pikemnon.
+        :param defense_type: The type of the defending Pikemnon.
+        :return: The final damage dealt by the attack.
+        :rtype: int
+        """
     stage_multipliers = {
     -6: 0.25,
     -5: 0.29,
@@ -84,13 +81,13 @@ def handle_attack(attack_name: str, attacking_pikemnon: dict[str, any], defendin
     It calculates the damage based on the attack type and updates the health of the defending Pikemnon.
     It also updates the global variable `text_to_display` with the result of the attack.
 
-    Parameters:
-    attack_name (str): The name of the attack.
-    attacking_pikemnon (dict): The dictionary representing the attacking Pikemnon.
-    defending_pikemnon (dict): The dictionary representing the defending Pikemnon.
-
-    Returns:
-    None
+    :param attack_name: The name of the attack.
+    :type attack_name: str
+    :param attacking_pikemnon: The dictionary representing the attacking Pikemnon.
+    :type attacking_pikemnon: dict[str, any]
+    :param defending_pikemnon: The dictionary representing the defending Pikemnon.
+    :type defending_pikemnon: dict[str, any]
+    :return: None
     """
     global text_to_display
     move = attacking_pikemnon['moves'][attack_name]
@@ -108,10 +105,33 @@ def handle_attack(attack_name: str, attacking_pikemnon: dict[str, any], defendin
         text_to_display = f"{attacking_pikemnon['name']} used {attack_name} and decreased {defending_pikemnon['name']}'s {target_stat}."
 
 def load_type_effectiveness():
-    with open('data/type_advantages.json') as f:
-        return json.load(f)
+    """
+    Loads the type effectiveness data from a JSON file.
+
+    This function reads the 'type_advantages.json' file and returns the JSON object.
+
+    :return: A dictionary representing the type effectiveness data.
+    :rtype: dict
+    """
+    return get_type_advantages()
 
 def player_attack(attack_name: str) -> str:
+    """
+    Handles the player's attack during a fight.
+
+    This function checks if the player's Pikemnon has enough PP for the chosen attack.
+    If there is enough PP, it decreases the PP by 1 and calls the handle_attack function.
+    If there is not enough PP, it sets the text_to_display to a message indicating this.
+
+    :param attack_name: The name of the attack to be used.
+    :type attack_name: str
+    :return: "no pp" if there is not enough PP for the attack, None otherwise.
+    :rtype: str
+
+    :Global Variables: 
+        * player_pikemnon (dict): The player's current Pikemnon.
+        * text_to_display (str): The text to be displayed on the screen.
+    """
     global player_pikemnon, text_to_display
     if get_fight_stat() != "text":
         if player_pikemnon['moves'][attack_name]['pp'] <= 0:
@@ -122,6 +142,23 @@ def player_attack(attack_name: str) -> str:
         set_fight_stat("attacked")
 
 def handle_item(item: str, player: dict[str, any]):
+    """
+    Handles the use of an item during a fight.
+
+    This function checks the type of the item and performs the appropriate action.
+    If the item is a potion, it restores the player's Pikemnon's health.
+    If the item is a pikeball, it attempts to catch the NPC's Pikemnon.
+
+    :param item: The name of the item to be used.
+    :type item: str
+    :param player: The player using the item. The player should be a dictionary with keys for 'potion', 'better potion', 'pikeball', 'better pikeball', and 'pikemnons'.
+    :type player: dict[str, any]
+    :return: None
+
+    :Global Variables: 
+        * player_pikemnon (dict): The player's current Pikemnon.
+        * text_to_display (str): The text to be displayed on the screen.
+    """
     global player_pikemnon, text_to_display
     if item == "potion" or item == "better potion":
         if player['potion'] <= 0 and item == "potion":
@@ -165,6 +202,23 @@ def handle_item(item: str, player: dict[str, any]):
     player[item] -= 1
 
 def catch_pikemnon(player: dict[str, any]) -> dict[str, any]:
+    """
+    Handles the use of an item during a fight.
+
+    This function checks the type of the item and performs the appropriate action.
+    If the item is a potion, it restores the player's Pikemnon's health.
+    If the item is a pikeball, it attempts to catch the NPC's Pikemnon.
+
+    :param item: The name of the item to be used.
+    :type item: str
+    :param player: The player using the item. The player should be a dictionary with keys for 'potion', 'better potion', 'pikeball', 'better pikeball', and 'pikemnons'.
+    :type player: dict[str, any]
+    :return: None
+
+    :Global Variables: 
+        * player_pikemnon (dict): The player's current Pikemnon.
+        * text_to_display (str): The text to be displayed on the screen.
+    """
     global player_pikemnon, npc_pikemnon, text_to_display
     text_to_display = "You caught the Pokémon!"
     npc_pikemnon['id'] = str(uuid.uuid4())
@@ -173,6 +227,18 @@ def catch_pikemnon(player: dict[str, any]) -> dict[str, any]:
     
 
 def draw_player_image():
+    """
+    Draws the player's active Pikemnon image on the screen.
+
+    This function loads the image of the player's active Pikemnon, creates a sprite from the image, scales and positions the sprite, and then draws it on the screen.
+
+    :return: None
+
+    :Global Variables: 
+        * window_width (int): The current width of the window.
+        * window_height (int): The current height of the window.
+        * current_player (dict): The current player, which is a dictionary containing a 'pikemnons' key.
+    """
     # Load the image
     active_pikemnon = get_player_pikemnon(current_player['pikemnons'])
     image = pyglet.resource.image(f'assets/{active_pikemnon['name'].lower()}.png')
@@ -198,6 +264,19 @@ def draw_player_image():
     sprite.draw()
 
 def draw_npc_image(img_path: str):
+    """
+    Draws the NPC's Pikemnon image on the screen.
+
+    This function loads the image from the provided path, creates a sprite from the image, scales and positions the sprite, and then draws it on the screen.
+
+    :param img_path: The file path of the image for the NPC's Pikemnon.
+    :type img_path: str
+    :return: None
+
+    :Global Variables: 
+        * window_width (int): The current width of the window.
+        * window_height (int): The current height of the window.
+    """
     image = pyglet.resource.image(img_path)
 
     texture = image.get_texture()
@@ -216,6 +295,18 @@ def draw_npc_image(img_path: str):
 
 
 def npc_attack():
+    """
+    Handles the NPC's attack during a fight.
+
+    This function selects an attack or buff/debuff move for the NPC's Pikemnon based on the move's power and remaining PP.
+    The selected move's PP is then decreased by 1, and the handle_attack function is called with the selected move.
+
+    :return: None
+
+    :Global Variables: 
+        * player_pikemnon (dict): The player's current Pikemnon.
+        * npc_pikemnon (dict): The NPC's current Pikemnon.
+    """
     global player_pikemnon, npc_pikemnon
     moves = npc_pikemnon['moves']
 
@@ -247,6 +338,21 @@ def npc_attack():
     handle_attack(attack_name, npc_pikemnon, player_pikemnon)
 
 def check_battle_end() -> str:
+    """
+    Checks if the battle has ended and handles the end of the battle.
+
+    This function checks the health of the player's and the NPC's Pikemnons to determine if the battle has ended.
+    If a Pikemnon's health is 0, it handles the end of the battle by displaying a message and returning a status string.
+
+    :return: A string indicating the status of the battle. Possible values are "end", "change", "text", "npc", "player", "continue", and "attacked".
+    :rtype: str
+
+    :Global Variables: 
+        * player_pikemnon (dict): The player's current Pikemnon.
+        * npc_pikemnon (dict): The NPC's current Pikemnon.
+        * turn (int): The current turn number.
+        * text_to_display (str): The text to be displayed on the screen.
+    """
     global player_pikemnon, npc_pikemnon, turn, text_to_display
     if get_fight_stat() == "end":
         return "end"
@@ -279,6 +385,24 @@ def check_battle_end() -> str:
 
 
 def draw_health_bar(x, y, width, height, health_percentage):
+    """
+    Draws a health bar on the screen.
+
+    This function first draws the background of the health bar in gray, representing the depleted health.
+    Then it draws the current health in green over the background.
+
+    :param x: The x-coordinate of the bottom-left corner of the health bar.
+    :type x: int
+    :param y: The y-coordinate of the bottom-left corner of the health bar.
+    :type y: int
+    :param width: The width of the health bar.
+    :type width: int
+    :param height: The height of the health bar.
+    :type height: int
+    :param health_percentage: The current health as a percentage of the total health.
+    :type health_percentage: float
+    :return: None
+    """
     # Draw the health bar background (e.g., gray for depleted health)
     pyglet.graphics.glColor4f(0.5, 0.5, 0.5, 1)  # Gray color
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + width, y, x + width, y + height, x, y + height]))
@@ -289,6 +413,22 @@ def draw_health_bar(x, y, width, height, health_percentage):
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + current_health_width, y, x + current_health_width, y + height, x, y + height]))
 
 def draw_menu_options(menu_options, selected_option_index, state):
+    """
+    Draws the menu options on the screen.
+
+    This function displays the menu options in a grid layout. The selected option is highlighted with a different color.
+
+    :param menu_options: A list of the menu options to be displayed.
+    :type menu_options: list[str]
+    :param selected_option_index: The index of the currently selected menu option.
+    :type selected_option_index: int
+    :param state: The current state of the game, which determines the display text function to be used.
+    :type state: str
+    :return: None
+
+    :Global Variables: 
+        * current_menu (str): The current menu being displayed.
+    """
     global current_menu 
     menu_box_x = 20
     menu_box_y = 20
@@ -353,15 +493,64 @@ def draw_menu_options(menu_options, selected_option_index, state):
     pyglet.graphics.glColor4ub(255, 255, 255, 255)
 
 def attack_display_text(option):
+    """
+    Generates the display text for an attack option.
+
+    This function returns a string that includes the name of the attack option and the remaining PP for that attack.
+
+    :param option: The name of the attack option.
+    :type option: str
+    :return: A string in the format "{option} {PP}", where {option} is the name of the attack option and {PP} is the remaining PP for that attack.
+    :rtype: str
+
+    :Global Variables: 
+        * player_pikemnon (dict): The player's current Pikemnon.
+    """
     return f"{option} {player_pikemnon['moves'][option]['pp']}"
 
 def inventory_display_text(option):
+    """
+    Generates the display text for an inventory option.
+
+    This function returns a string that includes the name of the inventory option and the quantity of that item in the player's inventory.
+
+    :param option: The name of the inventory option.
+    :type option: str
+    :return: A string in the format "{option} {quantity}", where {option} is the name of the inventory option and {quantity} is the quantity of that item in the player's inventory.
+    :rtype: str
+
+    :Global Variables: 
+        * current_player (dict): The current player, which is a dictionary containing keys for each inventory item and their quantities.
+    """
     return f"{option} {current_player[option]}"
 
 def menu_display_text(option):
+    """
+    Generates the display text for a menu option.
+
+    This function returns a string that is the same as the input option.
+
+    :param option: The name of the menu option.
+    :type option: str
+    :return: A string that is the same as the input option.
+    :rtype: str
+    """
     return f"{option}"
 
 def change_display_text(option):
+    """
+    Generates the display text for a change option.
+
+    This function returns a string that includes the name of the Pikemnon and its current health as a percentage of its total health.
+
+    :param option: The id of the Pikemnon.
+    :type option: str
+    :return: A string in the format "{name} {health_percentage}%", where {name} is the name of the Pikemnon and {health_percentage} is the Pikemnon's current health as a percentage of its total health.
+    :rtype: str
+
+    :Global Variables: 
+        * current_player (dict): The current player, which is a dictionary containing a 'pikemnons' key.
+    """
     pikemn = 0
     for pikemnon in current_player['pikemnons']:
         if pikemnon['id'] == option:
@@ -371,6 +560,18 @@ def change_display_text(option):
 
 
 def navigate_menu(direction):
+    """
+    Navigates the menu options based on the input direction.
+
+    This function changes the selected option index based on the input direction. The menu options are arranged in a grid, so the selected option index can be moved up, down, left, or right.
+
+    :param direction: The direction to move the selected option index. Possible values are "up", "down", "left", and "right".
+    :type direction: str
+    :return: None
+
+    :Global Variables: 
+        * selected_option_index (int): The index of the currently selected menu option.
+    """
     global selected_option_index
     if direction == 'up' and selected_option_index >= 2:
         selected_option_index -= 2
@@ -382,10 +583,36 @@ def navigate_menu(direction):
         selected_option_index += 1
 
 def clear_screen(window):
+    """
+    Clears the screen.
+
+    This function sets the clear color to white and then clears the window.
+
+    :param window: The window to be cleared.
+    :type window: pyglet.window.Window
+    :return: None
+    """
     pyglet.gl.glClearColor(1, 1, 1, 1)
     window.clear()
 
 def draw_box(x, y, width, height, border_thickness=2):
+    """
+    Draws a box on the screen.
+
+    This function first draws the border of the box in black, then fills the box with white.
+
+    :param x: The x-coordinate of the bottom-left corner of the box.
+    :type x: int
+    :param y: The y-coordinate of the bottom-left corner of the box.
+    :type y: int
+    :param width: The width of the box.
+    :type width: int
+    :param height: The height of the box.
+    :type height: int
+    :param border_thickness: The thickness of the box's border. Default is 2.
+    :type border_thickness: int
+    :return: None
+    """
     # Draw border
     pyglet.graphics.glColor4f(0, 0, 0, 1)
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [
@@ -399,10 +626,44 @@ def draw_box(x, y, width, height, border_thickness=2):
         x, y, x + width, y, x + width, y + height, x, y + height]))
 
 def draw_label(text, x, y, font_size=12, color=(0, 0, 0, 255)):
+    """
+    Draws a label on the screen.
+
+    This function creates a label with the specified text, font size, and color, and then draws it at the specified x and y coordinates.
+
+    :param text: The text to be displayed in the label.
+    :type text: str
+    :param x: The x-coordinate of the bottom-left corner of the label.
+    :type x: int
+    :param y: The y-coordinate of the bottom-left corner of the label.
+    :type y: int
+    :param font_size: The size of the font to be used in the label. Default is 12.
+    :type font_size: int
+    :param color: The color of the text in the label. It is a tuple of four integers representing the red, green, blue, and alpha values. Default is black.
+    :type color: Tuple[int, int, int, int]
+    :return: None
+    """
     label = pyglet.text.Label(text, font_name=FONT_NAME, font_size=font_size, color=color, x=x, y=y, anchor_x='left', anchor_y='center')
     label.draw()
 
 def draw_health_bar(x, y, width, height, percentage):
+    """
+    Draws a health bar on the screen.
+
+    This function first draws the background of the health bar in gray, then fills the health bar with green based on the percentage of health.
+
+    :param x: The x-coordinate of the bottom-left corner of the health bar.
+    :type x: int
+    :param y: The y-coordinate of the bottom-left corner of the health bar.
+    :type y: int
+    :param width: The width of the health bar.
+    :type width: int
+    :param height: The height of the health bar.
+    :type height: int
+    :param percentage: The percentage of health. This determines how much of the health bar is filled with green.
+    :type percentage: float
+    :return: None
+    """
     # Background
     pyglet.graphics.glColor4f(0.5, 0.5, 0.5, 1)
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + width, y, x + width, y + height, x, y + height]))
@@ -411,6 +672,33 @@ def draw_health_bar(x, y, width, height, percentage):
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + width * percentage, y, x + width * percentage, y + height, x, y + height]))
 
 def fighting_screen(window, player, direction, menu_options, selected_option_index, menu_state):
+    """
+    Handles the fighting screen of the game.
+
+    This function draws the fighting screen, including the player and NPC pikemnons, their health bars, and the menu options. It also handles the navigation of the menu options and the end of the battle.
+
+    :param window: The window to draw the fighting screen on.
+    :param player: The player's data.
+    :param direction: The direction to move the selected menu option. Possible values are "up", "down", "left", and "right".
+    :param menu_options: The menu options to be displayed.
+    :param selected_option_index: The index of the currently selected menu option.
+    :param menu_state: The current state of the menu.
+    :type window: pyglet.window.Window
+    :type player: dict
+    :type direction: str
+    :type menu_options: list
+    :type selected_option_index: int
+    :type menu_state: str
+    :return: None
+
+    :Global Variables: 
+        * npc_pikemnon (dict): The NPC's current pikemnon.
+        * player_pikemnon (dict): The player's current pikemnon.
+        * current_player (dict): The current player.
+        * display_time (float): The time when the display text was set.
+        * text_to_display (str): The text to be displayed on the screen.
+        * old_fight_stat (str): The previous fight state.
+    """
     clear_screen(window)
 
     global npc_pikemnon, player_pikemnon, current_player, display_time, text_to_display, old_fight_stat
@@ -458,5 +746,15 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
         set_fight_stat("text")
 
 def set_text_to_display(text: str) -> None:
+    """
+    Sets the global variable 'text_to_display' to the input text.
+
+    :param text: The text to be set.
+    :type text: str
+    :return: None
+
+    :Global Variables: 
+        * text_to_display (str): The text to be displayed on the screen.
+    """
     global text_to_display
     text_to_display = text
