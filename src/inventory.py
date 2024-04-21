@@ -5,7 +5,7 @@ from src.player import remove_pikemnon
 
 selected_pikemnon = None
 
-def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y, kill_index=None):
+def draw_inventory(window, player_pikemnons, selected_index, player_x, player_y, kill_index=None):
     """
     Draws a 2x2 grid of blocks in the middle of the screen, with the names of the player's Pokemon.
     Highlights the selected Pokemon.
@@ -25,8 +25,8 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         glColor3f(1.0, 1.0, 1.0)  # White background
         block_width = 400
         block_height = 300
-        x = window.width // 2 - block_width // 2
-        y = window.height // 2 - block_height // 2
+        x = int(player_x - window.width // 2 + block_width // 2)
+        y = int(player_y - window.height // 2 + block_height // 2)
 
         # Draw background rectangle
         pyglet.graphics.draw(4, GL_QUADS,
@@ -37,17 +37,17 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         label = pyglet.text.Label(selected_pikemnon['name'],
                                   font_name=FONT_NAME,
                                   font_size=24,
-                                  x=window.width // 2,
-                                  y=window.height // 2 + 50,
+                                  x=x + block_width // 2,
+                                  y=y + block_height - 30,
                                   anchor_x='center', anchor_y='center',
                                   color=(0, 0, 0, 255))
         label.draw()
 
         subtext = pyglet.text.Label("Do you want to kill this Pikemnon?",
                                     font_name=FONT_NAME,
-                                    font_size=18,
-                                    x=window.width // 2,
-                                    y=window.height // 2 - 10,
+                                    font_size=16,
+                                    x=x + block_width // 2,
+                                    y=y + block_height - 150,
                                     anchor_x='center', anchor_y='center',
                                     color=(0, 0, 0, 255))
         subtext.draw()
@@ -59,8 +59,8 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         yes_label = pyglet.text.Label("Yes",
                                       font_name=FONT_NAME,
                                       font_size=18,
-                                      x=window.width // 2 - 60,
-                                      y=window.height // 2 - 60,
+                                      x=x + block_width // 2 - 60,
+                                      y=y + block_height // 2 - 60,
                                       anchor_x='center', anchor_y='center',
                                       color=yes_color)
         yes_label.draw()
@@ -68,8 +68,8 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         no_label = pyglet.text.Label("No",
                                      font_name=FONT_NAME,
                                      font_size=18,
-                                     x=window.width // 2 + 60,
-                                     y=window.height // 2 - 60,
+                                     x=x + block_width // 2 + 60,
+                                     y=y + block_height // 2 - 60,
                                      anchor_x='center', anchor_y='center',
                                      color=no_color)
         no_label.draw()
@@ -86,8 +86,8 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         grid_height = 2 * block_height
 
         # Calculate the position of the grid relative to the camera's position
-        grid_x = camera_x - window.width // 2 + grid_width // 2
-        grid_y = camera_y - window.height // 2 + grid_height // 2
+        grid_x = player_x - window.width // 2 + grid_width // 2
+        grid_y = player_y - window.height // 2 + grid_height // 2
 
         # Create a label for each Pokemon
         labels = [pyglet.text.Label(pikemnon['name'],

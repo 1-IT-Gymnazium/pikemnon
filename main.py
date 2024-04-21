@@ -164,11 +164,16 @@ def handle_non_fighting_key_press(symbol: int) -> None:
         elif symbol == key.D:
             kill_index = 1
         elif symbol == key.SPACE:
-            kill_pikemnon(player)
-            inventory = False
-            kill_inventory = False
-            kill_index = 0
-            inventory_index = 0
+            if kill_index == 0:
+                kill_pikemnon(player)
+                inventory = False
+                kill_inventory = False
+                kill_index = 0
+                inventory_index = 0
+            else:
+                kill_inventory = False
+                kill_index = 0
+                remove_selected_pikemnon()
     if symbol == key.I:
         if inventory:
             inventory = False
