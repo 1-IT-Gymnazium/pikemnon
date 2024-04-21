@@ -77,18 +77,21 @@ def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
     elif move['move_type'] == "buff":
         target_stat = move['target_stat']
         attacking_pokemon['stage'][target_stat] = min(attacking_pokemon['stage'][target_stat] + move['power'], 6)
+        text_to_display = f"{attacking_pokemon['name']} used {attack_name} and increased {target_stat}."
     elif move['move_type'] == "debuff":
         target_stat = move['target_stat']
         defending_pokemon['stage'][target_stat] = max(defending_pokemon['stage'][target_stat] - move['power'], -6)
+        text_to_display = f"{attacking_pokemon['name']} used {attack_name} and decreased {defending_pokemon['name']}'s {target_stat}."
 
 def player_attack(attack_name: str) -> str:
     global player_pokemon, text_to_display
-    if player_pokemon['moves'][attack_name]['pp'] <= 0:
-        text_to_display = "No PP left for this move."
-        return "no pp"
-    player_pokemon['moves'][attack_name]['pp'] -= 1
-    handle_attack(attack_name, player_pokemon, npc_pokemon)
-    set_fight_stat("attacked")
+    if get_fight_stat() != "text":
+        if player_pokemon['moves'][attack_name]['pp'] <= 0:
+            text_to_display = "No PP left for this move."
+            return "no pp"
+        player_pokemon['moves'][attack_name]['pp'] -= 1
+        handle_attack(attack_name, player_pokemon, npc_pokemon)
+        set_fight_stat("attacked")
 
 def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
     global player_pokemon, text_to_display
@@ -159,12 +162,14 @@ def npc_attack():
     if buffs_and_debuffs:
         for buff in buffs_and_debuffs:
             if npc_pokemon['moves'][buff]['pp'] > 0:
-              chance_list.append([buff] * (len(chance_list) // 2))
+                for _ in range(len(chance_list) // 2):
+                    chance_list.append(buff)
     
         if turn % 2 == 0 and buffs_and_debuffs:
             for buff in buffs_and_debuffs:
                 if npc_pokemon['moves'][buff]['pp'] > 0:
-                    chance_list.append([buff] * (len(chance_list) // 2))
+                    for _ in range(len(chance_list) // 2):
+                        chance_list.append(buff)
     
     attack_name = random.choice(chance_list)
     npc_pokemon['moves'][attack_name]['pp'] -= 1
@@ -354,7 +359,7 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
     if text_to_display:
         set_display_text(True)
 
-    draw_label(text_to_display, 50, 150, font_size=16) if text_to_display else draw_menu_options(window, menu_options, selected_option_index, menu_state, player_pokemon)
+    draw_label(text_to_display, 50, 150) if text_to_display else draw_menu_options(window, menu_options, selected_option_index, menu_state, player_pokemon)
 
     if text_to_display and not display_time:
         display_time = time.time()
@@ -365,15 +370,15 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
         set_fight_stat(old_fight_stat)
         old_fight_stat = None
 
-    if text_to_display:
-        set_fight_stat("text")
-
     draw_player_image()
 
     if direction:
         navigate_menu(direction)
 
     set_fight_stat(check_battle_end())
+
+    if text_to_display:
+        set_fight_stat("text")
 
 
 
