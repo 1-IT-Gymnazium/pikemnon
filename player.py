@@ -1,14 +1,37 @@
+import json
 from entity import create_entity
+import random
+import uuid
 
 
 def create_player(image_file, x, y, speed=220):
     player = create_entity(image_file, x, y)
     player['speed'] = speed
     player['canMove'] = True
+    with open('player.json') as f:
+        data = json.load(f)
+        player_pikemnons = data['inventory']['pikemnons']
+        pikemnons = []
+        with open('pokemon.json') as f:
+            pokemon_data = json.load(f)
+        for x, pikemnon in enumerate(player_pikemnons):
+            pikemnon = pokemon_data[pikemnon['name']]
+            pikemnon['current_health'] = pikemnon['health']
+            pikemnon['stage'] = {}
+            pikemnon['stage']['attack'] = 0
+            pikemnon['name'] = player_pikemnons[x]['name']
+            pikemnon['active'] = True if x == 0 else False
+            pikemnon['id'] = str(uuid.uuid4())
+            pikemnons.append(pikemnon)
+        player['pikemnons'] = pikemnons
+        player['potion'] = 5
+        player['pikeball'] = 5
+        player['better pikeball'] = 0
+        player['better potion'] = 0
     return player
 
 
-def update_player(player, dt, key_state):
+def update_player(player: dict[str, any], dt: float, key_state: dict[str, bool]):
     if player['canMove']:
         dx = dy = 0
         if key_state['up']:
@@ -31,3 +54,30 @@ def update_player(player, dt, key_state):
 
 def change_move(player, can):
     player['canMove'] = can
+
+def get_player_pikemnon(player_inventory):
+    for pikemnon in player_inventory:
+        if pikemnon['active'] == True:
+            return pikemnon
+
+def add_random_item(player):
+    random_items = ['pikeball', 'better pikeball', 'potion', 'better potion']
+    probabilities = [0.4, 0.1, 0.4, 0.1]
+    cumulative_probabilities = [sum(probabilities[:i+1]) for i in range(len(probabilities))]
+
+    rand = random.random()
+    for i, cumulative_probability in enumerate(cumulative_probabilities):
+        if rand < cumulative_probability:
+            item = random_items[i]
+            break
+
+    player[item] += 1
+    return item
+
+def change_active_pikemnon(player: dict[str, any], pikemnon_id: str) -> dict[str, any]:
+    for pikemnon in player['pikemnons']:
+        if pikemnon['id'] == pikemnon_id:
+            pikemnon['active'] = True
+        else:
+            pikemnon['active'] = False
+    return player
