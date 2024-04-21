@@ -6,8 +6,12 @@
                 "level": 10
             },
             {
-                "name": "Charmander",
+                "name": "Jigglypuff",
                 "level": 5
+            },
+            {
+                "name": "Squirtle",
+                "level": 15
             }
         ]
     }
