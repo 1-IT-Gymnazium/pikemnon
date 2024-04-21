@@ -9,7 +9,8 @@
             "tackle": {"power": 40, "move_type": "attack", "type": "normal", "pp": 35},
             "vine whip": {"power": 45, "move_type": "attack", "type": "grass", "pp": 25},
             "Growth": {"power": 1, "move_type": "buff", "type": "normal", "target_stat": "attack", "pp": 20}
-        }
+        },
+        "img_path": "bulbasaur.png"
     },
     "Charmander": {
         "health": 39,

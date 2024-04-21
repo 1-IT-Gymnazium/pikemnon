@@ -1,5 +1,6 @@
 import random
 import time
+import uuid
 import pyglet
 from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
@@ -67,7 +68,22 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int) -> int:
     
     return int(((2 * power * ((attack * attack_stage) / defense)) / 50) + 2)
 
-def handle_attack(attack_name, attacking_pokemon, defending_pokemon):
+def handle_attack(attack_name: str, attacking_pokemon: dict[str, any], defending_pokemon: dict[str, any]) -> None:
+    """
+    Handles the attack action in the game.
+
+    This function takes the name of the attack, the attacking Pokemon, and the defending Pokemon as arguments.
+    It calculates the damage based on the attack type and updates the health of the defending Pokemon.
+    It also updates the global variable `text_to_display` with the result of the attack.
+
+    Parameters:
+    attack_name (str): The name of the attack.
+    attacking_pokemon (dict): The dictionary representing the attacking Pokemon.
+    defending_pokemon (dict): The dictionary representing the defending Pokemon.
+
+    Returns:
+    None
+    """
     global text_to_display
     move = attacking_pokemon['moves'][attack_name]
     if move['move_type'] == "attack":
@@ -93,21 +109,18 @@ def player_attack(attack_name: str) -> str:
         handle_attack(attack_name, player_pokemon, npc_pokemon)
         set_fight_stat("attacked")
 
-def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
+def handle_item(item: str, player: dict[str, any]):
     global player_pokemon, text_to_display
     if item == "potion":
         if player['potion'] <= 0:
             text_to_display = "No potions left."
-            return player
         if player_pokemon['current_health'] == player_pokemon['health']:
             text_to_display = "Pokémon is already at full health."
-            return player
         player_pokemon['current_health'] = min(player_pokemon['current_health'] + 10, player_pokemon['health'])
         text_to_display = "Healed 10 HP."
     if item == "pikeball":
         if player['pikeball'] <= 0:
             text_to_display = "No Pikeballs left."
-            return player
         if "wild" in npc_pokemon:
             base_catch_rate = 0.5
             health_percentage = npc_pokemon['current_health'] / npc_pokemon['health']
@@ -119,11 +132,12 @@ def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
                 text_to_display = "You didn't catch the Pokémon."
         else:
             text_to_display = "You can't catch this Pokémon."
-    return player
+    player[item] -= 1
 
 def catch_pikemnon(player) -> dict[str, any]:
     global player_pokemon, npc_pokemon, text_to_display
     text_to_display = "You caught the Pokémon!"
+    npc_pokemon['id'] = str(uuid.uuid4())
     player['pikemnons'].append(npc_pokemon)
     return player
     
@@ -149,6 +163,23 @@ def draw_player_image():
     pyglet.gl.glColor4f(1.0, 1.0, 1.0, 1.0)
     
     # Draw the scaled sprite
+    sprite.draw()
+
+def draw_npc_image(img_path: str):
+    image = pyglet.resource.image(img_path)
+
+    texture = image.get_texture()
+    glTexParameteri(texture.target, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameteri(texture.target, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+
+    sprite = pyglet.sprite.Sprite(img=image)
+    sprite.scale = 7
+
+    sprite.x = (window_width - sprite.width) // 2 + 150
+    sprite.y = (window_height - sprite.height) // 2 + 150
+
+    pyglet.gl.glColor4f(1.0, 1.0, 1.0, 1.0)
+
     sprite.draw()
 
 
@@ -225,8 +256,8 @@ def draw_health_bar(x, y, width, height, health_percentage):
     current_health_width = width * health_percentage
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + current_health_width, y, x + current_health_width, y + height, x, y + height]))
 
-def draw_menu_options(window, menu_options, selected_option_index, state, player_pokemon):
-    global current_menu  # Assuming current_menu holds the current state of menu options
+def draw_menu_options(menu_options, selected_option_index, state):
+    global current_menu 
     menu_box_x = 20
     menu_box_y = 20
     menu_box_width = 600
@@ -278,7 +309,7 @@ def draw_menu_options(window, menu_options, selected_option_index, state, player
 
         # Create and draw the label for the option with the number appended
         option_label = pyglet.text.Label(display_text,
-                                         font_name='Arial',  # Adjust FONT_NAME to 'Arial' if not previously defined
+                                         font_name=FONT_NAME,
                                          font_size=12,
                                          color=color,
                                          x=x_center,
@@ -301,10 +332,11 @@ def menu_display_text(option):
 def change_display_text(option):
     pikemn = 0
     for pikemnon in current_player['pikemnons']:
-        if pikemnon['name'] == option:
+        if pikemnon['id'] == option:
             pikemn = pikemnon
     health_percentage = round(pikemn['current_health']/pikemn['health'] * 100, 2)
-    return f"{option} {health_percentage}%"
+    return f"{pikemn['name']} {health_percentage}%"
+
 
 def navigate_menu(direction):
     global selected_option_index
@@ -371,7 +403,7 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
     if text_to_display:
         set_display_text(True)
 
-    draw_label(text_to_display, 50, 150) if text_to_display else draw_menu_options(window, menu_options, selected_option_index, menu_state, player_pokemon)
+    draw_label(text_to_display, 50, 150) if text_to_display else draw_menu_options(menu_options, selected_option_index, menu_state)
 
     if text_to_display and not display_time:
         display_time = time.time()
@@ -383,6 +415,7 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
         old_fight_stat = None
 
     draw_player_image()
+    draw_npc_image(f'assets/{npc_pokemon['name'].lower()}.png')
 
     if direction:
         navigate_menu(direction)
@@ -391,6 +424,10 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
 
     if text_to_display:
         set_fight_stat("text")
+
+def set_text_to_display(text: str) -> None:
+    global text_to_display
+    text_to_display = text
 
 
 

@@ -12,7 +12,7 @@ from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, ge
 from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
-from fighting import fighting_screen, handle_item, npc_attack, player_attack
+from fighting import fighting_screen, handle_item, npc_attack, player_attack, set_text_to_display
 from game_state import get_display_text, get_fight_stat, get_fight_status, end_fight, get_main_menu, set_fight_stat, set_main_menu, start_fight
 from settings_menu import adjust_volume, create_volume_labels, draw_settings, update_settings_selection
 
@@ -65,7 +65,21 @@ menu_direction = None
 fight_status = None
 
 @window.event
-def on_key_press(symbol: int, _) -> None:
+def on_key_press(symbol: int, modifier: int) -> None:
+    """
+    Handles the key press event in the game.
+
+    This function takes the key symbol and modifier and modifies the game state based on the key pressed.
+    It handles navigation and selection in the main menu and options menu, adjusts the volume,
+    and handles key presses during fighting and non-fighting game states.
+
+    Parameters:
+    symbol (int): The key symbol of the pressed key.
+    modifier (int): The modifier key pressed along with the symbol key.
+
+    Returns:
+    None
+    """
     global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options, player
     if get_fight_stat() != "text":
         fighton = get_fight_status()
@@ -92,7 +106,6 @@ def on_key_press(symbol: int, _) -> None:
                 adjust_volume('decrease')
             elif symbol == pyglet.window.key.D:
                 adjust_volume('increase')
-            # elif symbol == pyglet.window.key.ESCAPE:
             elif symbol == pyglet.window.key.Q:
                 set_main_menu('main')
         elif not fighton:
@@ -101,7 +114,19 @@ def on_key_press(symbol: int, _) -> None:
             handle_fighting_key_press(symbol)
 
 def handle_non_fighting_key_press(symbol: int) -> None:
-    # Ensure that each direction is evaluated independently
+    """
+    Handles the key press event in the non-fighting game state.
+
+    This function takes the key symbol and modifies the key_state dictionary based on the key pressed.
+    It handles navigation in the game world by setting the appropriate direction to True in the key_state dictionary.
+    It also checks for wild encounters after each key press.
+
+    Parameters:
+    symbol (int): The key symbol of the pressed key.
+
+    Returns:
+    None
+    """
     if symbol == key.W:
         key_state['up'] = True
     if symbol == key.S:
@@ -114,6 +139,18 @@ def handle_non_fighting_key_press(symbol: int) -> None:
 
 
 def handle_fighting_key_press(symbol: int) -> None:
+    """
+    Handles the key press event in the fighting game state.
+
+    This function takes the key symbol and modifies the selected menu option index and the fighting menu state
+    based on the key pressed. It handles navigation and selection in the fighting menu.
+
+    Parameters:
+    symbol (int): The key symbol of the pressed key.
+
+    Returns:
+    None
+    """
     global selected_menu_option_index, fighting_menu_state
 
     grid_columns = 2
@@ -153,8 +190,8 @@ def process_main_menu() -> None:
     }
     fighting_menu_state = menu_actions.get(selected_menu_option_index, fighting_menu_state)
     if fighting_menu_state == 'run':
-        end_fight()
-        print("You ran away!")
+        set_text_to_display("You ran away!")
+        set_fight_stat('end')
         selected_menu_option_index = 0
         fighting_menu_state = 'main'
     selected_menu_option_index = 0
@@ -169,7 +206,6 @@ def process_inventory_menu() -> None:
     player_pikemnons = len(player['pikemnons'])
     handle_item(inventory_options[selected_menu_option_index], player)
     new_player_pikemnons = len(player['pikemnons'])
-    player[inventory_options[selected_menu_option_index]] -= 1
     fighting_menu_state = 'main'
     if new_player_pikemnons > player_pikemnons:
         selected_menu_option_index = 0
@@ -177,12 +213,23 @@ def process_inventory_menu() -> None:
 
 def process_change_menu() -> None:
     global fighting_menu_state, selected_menu_option_index, player
-    pikemnon_name = change_options[selected_menu_option_index]
-    if player['pikemnons'][selected_menu_option_index]['current_health'] <= 0:
+    # Retrieve the UUID of the selected Pikemnon from the menu options
+    pikemnon_uuid = change_options[selected_menu_option_index]
+
+    # Find the Pikemnon with the matching UUID
+    pikemnon = next((p for p in player['pikemnons'] if p['id'] == pikemnon_uuid), None)
+    
+    # If no Pikemnon was found or the selected Pikemnon has 0 health, exit the function
+    if pikemnon is None or pikemnon['current_health'] <= 0:
         return
-    player = change_active_pikemnon(player, pikemnon_name)
+
+    # Change the active Pikemnon to the selected one using its UUID
+    player = change_active_pikemnon(player, pikemnon_uuid)
+    
+    # Reset the state and selection index
     fighting_menu_state = 'main'
     selected_menu_option_index = 0
+
 
 
 def handle_attack_result() -> None:
@@ -218,6 +265,7 @@ def handle_attack_result() -> None:
         set_fight_stat('continue')
     elif fight_stat == "end":
         end_fight()
+        set_fight_stat(None)
 
 @window.event
 def on_key_release(symbol: int, _) -> None:
@@ -291,7 +339,7 @@ def on_draw() -> None:
         global menu_direction, attack_options, inventory_options, change_options
         inventory_options = ['pikeball', 'better pikeball', 'potion', 'better potion']
         attack_options = list(get_player_pikemnon(player['pikemnons'])['moves'].keys())
-        change_options = list(pikemnon['name'] for pikemnon in player['pikemnons'])
+        change_options = list(pikemnon['id'] for pikemnon in player['pikemnons'])
         
         menu_options_dict = {
             'attack': attack_options,

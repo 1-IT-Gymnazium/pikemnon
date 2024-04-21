@@ -1,6 +1,7 @@
 import json
 from entity import create_entity
 import random
+import uuid
 
 
 def create_player(image_file, x, y, speed=220):
@@ -20,6 +21,7 @@ def create_player(image_file, x, y, speed=220):
             pikemnon['stage']['attack'] = 0
             pikemnon['name'] = player_pikemnons[x]['name']
             pikemnon['active'] = True if x == 0 else False
+            pikemnon['id'] = str(uuid.uuid4())
             pikemnons.append(pikemnon)
         player['pikemnons'] = pikemnons
         player['potion'] = 5
@@ -64,9 +66,9 @@ def add_random_item(player):
     player[item] += 1
     return item
 
-def change_active_pikemnon(player: dict[str, any], pikemnon_name: str) -> dict[str, any]:
+def change_active_pikemnon(player: dict[str, any], pikemnon_id: str) -> dict[str, any]:
     for pikemnon in player['pikemnons']:
-        if pikemnon['name'] == pikemnon_name:
+        if pikemnon['id'] == pikemnon_id:
             pikemnon['active'] = True
         else:
             pikemnon['active'] = False
