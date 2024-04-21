@@ -109,7 +109,14 @@ def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
             text_to_display = "No Pikeballs left."
             return player
         if "wild" in npc_pokemon:
-            player = catch_pikemnon(player)
+            base_catch_rate = 0.5
+            health_percentage = npc_pokemon['current_health'] / npc_pokemon['health']
+            catch_probability = base_catch_rate + (1 - health_percentage) * (1 - base_catch_rate)
+            if random.random() < catch_probability:
+                player = catch_pikemnon(player)
+                text_to_display = "You caught the Pokémon!"
+            else:
+                text_to_display = "You didn't catch the Pokémon."
         else:
             text_to_display = "You can't catch this Pokémon."
     return player
@@ -178,6 +185,8 @@ def npc_attack():
 
 def check_battle_end() -> str:
     global player_pokemon, npc_pokemon, turn, text_to_display
+    if get_fight_stat() == "end":
+        return "end"
     if player_pokemon['current_health'] <= 0:
         player_pokemon['current_health'] = 0
         for pix in current_player['pikemnons']:

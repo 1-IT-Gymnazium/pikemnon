@@ -165,12 +165,15 @@ def process_attack_menu() -> None:
 
 
 def process_inventory_menu() -> None:
-    global fighting_menu_state, player
+    global fighting_menu_state, player, selected_menu_option_index
     player_pikemnons = len(player['pikemnons'])
     handle_item(inventory_options[selected_menu_option_index], player)
     new_player_pikemnons = len(player['pikemnons'])
     player[inventory_options[selected_menu_option_index]] -= 1
     fighting_menu_state = 'main'
+    if new_player_pikemnons > player_pikemnons:
+        selected_menu_option_index = 0
+        set_fight_stat('end')
 
 def process_change_menu() -> None:
     global fighting_menu_state, selected_menu_option_index, player
@@ -213,6 +216,8 @@ def handle_attack_result() -> None:
     elif fight_stat == "change":
         fighting_menu_state = 'change'
         set_fight_stat('continue')
+    elif fight_stat == "end":
+        end_fight()
 
 @window.event
 def on_key_release(symbol: int, _) -> None:
