@@ -1,6 +1,6 @@
 import pyglet
 from pyglet.gl import *
-from conf import SCALE
+from config.conf import SCALE
 
 current_map = None
 

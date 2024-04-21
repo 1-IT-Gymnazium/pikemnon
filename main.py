@@ -4,17 +4,18 @@ import time
 import pyglet
 from pyglet.window import key
 from pyglet.gl import *
-from main_menu import create_menu_labels, draw_menu, get_selected_action, update_selection
-from player import change_active_pikemnon, create_player, update_player, get_player_pikemnon, add_random_item
-from entity import draw_entity
-from camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
-from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, get_current_map
-from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
-import maps as mps
-from npc import create_npc, update_npc
-from fighting import fighting_screen, handle_item, npc_attack, player_attack, set_text_to_display
-from game_state import get_display_text, get_fight_stat, get_fight_status, end_fight, get_main_menu, set_fight_stat, set_main_menu, start_fight
-from settings_menu import adjust_volume, create_volume_labels, draw_settings, update_settings_selection
+from src.main_menu import create_menu_labels, draw_menu, get_selected_action, update_selection
+from src.player import change_active_pikemnon, create_player, update_player, get_player_pikemnon, add_random_item
+from src.entity import draw_entity
+from src.camera import set_camera_target, set_camera_window_size, update_camera, begin_camera, end_camera
+from src.mapp import create_map_sprites, what_tile_is_player_on, set_current_map, get_current_map
+from config.conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
+import src.maps as mps
+from src.npc import create_npc, update_npc
+from src.fighting import fighting_screen, handle_item, npc_attack, player_attack, set_text_to_display
+from src.game_state import get_fight_stat, get_fight_status, end_fight, get_main_menu, set_fight_stat, set_main_menu, start_fight
+from src.settings_menu import adjust_volume, create_volume_labels, draw_settings, update_settings_selection
+from src.inventory import draw_inventory, remove_selected_pikemnon, select_selected_pikemnon, kill_pikemnon
 
 # Window dimensions
 window_width = WINDOW_WIDTH*SCALE
@@ -27,7 +28,7 @@ window = pyglet.window.Window(window_width, window_height, "Pikemnon")
 
 player = create_player('assets/player.png', window.width//2, window.height//2)
 
-with open('npcs.json') as f:
+with open('data/npcs.json') as f:
     data = json.load(f)
 
 outside_npcs = []
@@ -52,6 +53,11 @@ change_options = None
 
 set_camera_target(player)
 set_camera_window_size(window_width, window_height)
+
+inventory = False
+kill_inventory = False
+kill_index = 0
+inventory_index = 0
 
 key_state = {
     'up': False,
@@ -127,14 +133,50 @@ def handle_non_fighting_key_press(symbol: int) -> None:
     Returns:
     None
     """
-    if symbol == key.W:
-        key_state['up'] = True
-    if symbol == key.S:
-        key_state['down'] = True
-    if symbol == key.A:
-        key_state['left'] = True
-    if symbol == key.D:
-        key_state['right'] = True
+    global inventory, inventory_index, kill_inventory, kill_index
+
+    if not inventory:
+        if symbol == key.W:
+            key_state['up'] = True
+        if symbol == key.S:
+            key_state['down'] = True
+        if symbol == key.A:
+            key_state['left'] = True
+        if symbol == key.D:
+            key_state['right'] = True
+    elif inventory and not kill_inventory:
+        if symbol in [key.W, key.UP]:
+            inventory_index = (inventory_index - 2) % 4
+        elif symbol in [key.S, key.DOWN]:
+            inventory_index = (inventory_index + 2) % 4
+        elif symbol in [key.A, key.LEFT]:
+            if inventory_index % 2 > 0:
+                inventory_index -= 1
+        elif symbol in [key.D, key.RIGHT]:
+            if inventory_index % 2 < 2 - 1:
+                inventory_index += 1
+        elif symbol == key.SPACE:
+            select_selected_pikemnon(player['pikemnons'], inventory_index)
+            kill_inventory = True
+    elif kill_inventory:
+        if symbol == key.A:
+            kill_index = 0
+        elif symbol == key.D:
+            kill_index = 1
+        elif symbol == key.SPACE:
+            kill_pikemnon(player)
+            inventory = False
+            kill_inventory = False
+            kill_index = 0
+            inventory_index = 0
+    if symbol == key.I:
+        if inventory:
+            inventory = False
+            remove_selected_pikemnon()
+            inventory_index = 0
+        elif not inventory:
+            inventory = True
+
     wild_encounter()
 
 
@@ -332,6 +374,8 @@ def on_draw() -> None:
         if current_map == mps.outside_map:
             for npc in outside_npcs:
                 draw_entity(npc)
+        if inventory:
+            draw_inventory(window, player['pikemnons'], inventory_index, player['sprite'].x, player['sprite'].y, kill_index)
         
         
         end_camera()

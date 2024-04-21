@@ -1,5 +1,5 @@
 import json
-from entity import create_entity
+from src.entity import create_entity
 import random
 import uuid
 
@@ -8,11 +8,11 @@ def create_player(image_file, x, y, speed=220):
     player = create_entity(image_file, x, y)
     player['speed'] = speed
     player['canMove'] = True
-    with open('player.json') as f:
+    with open('data/player.json') as f:
         data = json.load(f)
         player_pikemnons = data['inventory']['pikemnons']
         pikemnons = []
-        with open('pokemon.json') as f:
+        with open('data/pokemon.json') as f:
             pokemon_data = json.load(f)
         for x, pikemnon in enumerate(player_pikemnons):
             pikemnon = pokemon_data[pikemnon['name']]
@@ -81,3 +81,9 @@ def change_active_pikemnon(player: dict[str, any], pikemnon_id: str) -> dict[str
         else:
             pikemnon['active'] = False
     return player
+
+def remove_pikemnon(player: dict[str, any], pikemnon_id: str) -> dict[str, any]:
+    for pikemnon in player['pikemnons']:
+        if pikemnon['id'] == pikemnon_id:
+            player['pikemnons'].remove(pikemnon)
+            break

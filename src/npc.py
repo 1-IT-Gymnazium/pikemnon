@@ -1,7 +1,7 @@
 import json
-from entity import create_entity
-from player import change_move
-from game_state import start_fight
+from src.entity import create_entity
+from src.player import change_move
+from src.game_state import start_fight
 
 def create_npc(image_file, x, y, look, pikemnons):
     npc = create_entity(image_file, x, y)
@@ -9,7 +9,7 @@ def create_npc(image_file, x, y, look, pikemnons):
     npc['fought'] = False
     npc['pikemnons'] = []
     npc['pikemnon_index'] = 0
-    with open('pokemon.json') as f:
+    with open('data/pokemon.json') as f:
         data = json.load(f)
     for pikemnon in pikemnons:
         if pikemnon in data:

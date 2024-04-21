@@ -3,11 +3,11 @@ import random
 import time
 import uuid
 import pyglet
-from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
+from config.conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
-from game_state import get_current_npc, get_fight_stat, set_display_text, set_fight_stat
-from conf import FONT_NAME
-from player import add_random_item, get_player_pikemnon
+from src.game_state import get_current_npc, get_fight_stat, set_display_text, set_fight_stat
+from config.conf import FONT_NAME
+from src.player import add_random_item, get_player_pikemnon
 
 npc_pikemnon = None
 player_pikemnon = None
@@ -108,7 +108,7 @@ def handle_attack(attack_name: str, attacking_pikemnon: dict[str, any], defendin
         text_to_display = f"{attacking_pikemnon['name']} used {attack_name} and decreased {defending_pikemnon['name']}'s {target_stat}."
 
 def load_type_effectiveness():
-    with open('type_advantages.json') as f:
+    with open('data/type_advantages.json') as f:
         return json.load(f)
 
 def player_attack(attack_name: str) -> str:
@@ -123,18 +123,29 @@ def player_attack(attack_name: str) -> str:
 
 def handle_item(item: str, player: dict[str, any]):
     global player_pikemnon, text_to_display
-    if item == "potion":
-        if player['potion'] <= 0:
+    if item == "potion" or item == "better potion":
+        if player['potion'] <= 0 and item == "potion":
             text_to_display = "No potions left."
-        if player_pikemnon['current_health'] == player_pikemnon['health']:
+            return
+        elif player['better potion'] == 0 and item == "better potion":
+            text_to_display = "No Better Potions left."
+            return
+        elif player_pikemnon['current_health'] == player_pikemnon['health']:
             text_to_display = "Pokémon is already at full health."
-        player_pikemnon['current_health'] = min(player_pikemnon['current_health'] + 10, player_pikemnon['health'])
-        text_to_display = "Healed 10 HP."
+            return
+        if item == "potion":
+            player_pikemnon['current_health'] = min(player_pikemnon['health'], player_pikemnon['current_health'] + 10)
+            text_to_display = "Pokémon's health was restored by 10."
+        elif item == "better potion":
+            player_pikemnon['current_health'] = min(player_pikemnon['health'], player_pikemnon['current_health'] + 20)
+            text_to_display = "Pokémon's health was restored by 20."
     if item == "pikeball" or item == "better pikeball":
         if player['pikeball'] <= 0 and item == "pikeball":
             text_to_display = "No Pikeballs left."
-        elif player['better pikeball'] <= 0 and item == "better pikeball":
+            return
+        elif player['better pikeball'] == 0 and item == "better pikeball":
             text_to_display = "No Better Pikeballs left."
+            return
         elif len(player['pikemnons']) == 4:
             text_to_display = "You can't catch this Pokémon. You already have 4 Pokémon."
         elif "wild" in npc_pikemnon:
@@ -285,9 +296,9 @@ def draw_menu_options(menu_options, selected_option_index, state):
     menu_box_height = 150
 
     # Colors
-    default_color = (0, 0, 0, 255)  # Black for unselected options
-    highlight_color = (255, 255, 255, 255)  # White for the selected option text
-    highlight_background_color = (0, 0, 255, 255)  # Blue background for selected option
+    default_color = (0, 0, 0, 255)
+    highlight_color = (255, 255, 255, 255)
+    highlight_background_color = (0, 0, 255, 255)
 
     grid_columns = 2
     grid_rows = 2
@@ -449,7 +460,3 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
 def set_text_to_display(text: str) -> None:
     global text_to_display
     text_to_display = text
-
-
-
-
