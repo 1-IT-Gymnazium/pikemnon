@@ -449,7 +449,3 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
 def set_text_to_display(text: str) -> None:
     global text_to_display
     text_to_display = text
-
-
-
-

@@ -15,6 +15,7 @@ from npc import create_npc, update_npc
 from fighting import fighting_screen, handle_item, npc_attack, player_attack, set_text_to_display
 from game_state import get_display_text, get_fight_stat, get_fight_status, end_fight, get_main_menu, set_fight_stat, set_main_menu, start_fight
 from settings_menu import adjust_volume, create_volume_labels, draw_settings, update_settings_selection
+from inventory import draw_inventory
 
 # Window dimensions
 window_width = WINDOW_WIDTH*SCALE
@@ -52,6 +53,9 @@ change_options = None
 
 set_camera_target(player)
 set_camera_window_size(window_width, window_height)
+
+inventory = False
+inventory_index = 0
 
 key_state = {
     'up': False,
@@ -127,14 +131,31 @@ def handle_non_fighting_key_press(symbol: int) -> None:
     Returns:
     None
     """
-    if symbol == key.W:
-        key_state['up'] = True
-    if symbol == key.S:
-        key_state['down'] = True
-    if symbol == key.A:
-        key_state['left'] = True
-    if symbol == key.D:
-        key_state['right'] = True
+    global inventory, inventory_index
+
+    if not inventory:
+        if symbol == key.W:
+            key_state['up'] = True
+        if symbol == key.S:
+            key_state['down'] = True
+        if symbol == key.A:
+            key_state['left'] = True
+        if symbol == key.D:
+            key_state['right'] = True
+    elif inventory:
+        if symbol in [key.W, key.UP]:
+            inventory_index = (inventory_index - 2) % 4
+        elif symbol in [key.S, key.DOWN]:
+            inventory_index = (inventory_index + 2) % 4
+        elif symbol in [key.A, key.LEFT]:
+            if inventory_index % 2 > 0:
+                inventory_index -= 1
+        elif symbol in [key.D, key.RIGHT]:
+            if inventory_index % 2 < 2 - 1:
+                inventory_index += 1
+    if symbol == key.I:
+        inventory = not inventory
+
     wild_encounter()
 
 
@@ -332,6 +353,8 @@ def on_draw() -> None:
         if current_map == mps.outside_map:
             for npc in outside_npcs:
                 draw_entity(npc)
+        if inventory:
+            draw_inventory(window, player['pikemnons'], inventory_index, player['sprite'].x, player['sprite'].y)
         
         
         end_camera()
