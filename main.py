@@ -12,8 +12,8 @@ from mapp import create_map_sprites, what_tile_is_player_on, set_current_map, ge
 from conf import SCALE, WINDOW_WIDTH, WINDOW_HEIGHT
 import maps as mps
 from npc import create_npc, update_npc
-from fighting import fighting_screen, handle_item, player_attack, next_turn
-from game_state import get_fight_status, end_fight, get_main_menu, set_main_menu, start_fight
+from fighting import fighting_screen, handle_item, npc_attack, player_attack, next_turn
+from game_state import get_display_text, get_fight_stat, get_fight_status, end_fight, get_main_menu, set_fight_stat, set_main_menu, start_fight
 from settings_menu import adjust_volume, create_volume_labels, draw_settings, update_settings_selection
 
 # Window dimensions
@@ -61,6 +61,8 @@ key_state = {
 }
 
 menu_direction = None
+
+fight_status = None
 
 @window.event
 def on_key_press(symbol: int, _) -> None:
@@ -157,8 +159,8 @@ def process_main_menu() -> None:
 
 def process_attack_menu() -> None:
     global player
-    player_atk = player_attack(attack_options[selected_menu_option_index])
-    handle_attack_result(player_atk)
+    player_attack(attack_options[selected_menu_option_index])
+
 
 def process_inventory_menu() -> None:
     global fighting_menu_state, player
@@ -182,22 +184,29 @@ def process_change_menu() -> None:
     selected_menu_option_index = 0
 
 
-def handle_attack_result(player_atk: str) -> None:
+def handle_attack_result() -> None:
     global fighting_menu_state, selected_menu_option_index
 
-    if player_atk == "player":
+    fight_stat = get_fight_stat()
+
+    if fight_stat == 'continue':
+        return
+    elif fight_stat == "attacked":
+        npc_attack()
+        set_fight_stat('continue')
+    elif fight_stat == "player":
         end_fight()
         random_item = add_random_item(player)
         print(f"Player won! You got a {random_item}")
         return
     fighting_menu_state = 'main'
-    if player_atk == "no pp":
+    if fight_stat == "no pp":
         fighting_menu_state = 'attack'
         return
     selected_menu_option_index = 0
-    if player_atk != "no pp" and next_turn() == "npc":
+    if fight_stat == "npc":
         for pikemnon in player['pikemnons']:
-            if pikemnon['current_health'] >= 0:
+            if pikemnon['current_health'] > 0:
                 fighting_menu_state = 'change'
                 return
         end_fight()
@@ -271,7 +280,7 @@ def on_draw() -> None:
         
         end_camera()
     elif fighton:
-        global menu_direction, attack_options, inventory_options, change_options
+        global menu_direction, attack_options, inventory_options, change_options, fight_status
         inventory_options = ['pikeball', 'better pikeball', 'potion', 'better potion']
         attack_options = list(get_player_pikemnon(player['pikemnons'])['moves'].keys())
         change_options = list(pikemnon['name'] for pikemnon in player['pikemnons'])
@@ -285,8 +294,10 @@ def on_draw() -> None:
 
         current_menu_options = menu_options_dict[fighting_menu_state]
 
-        fighting_screen(window, player, menu_direction, current_menu_options, selected_menu_option_index, fighting_menu_state)
+        fight_status = fighting_screen(window, player, menu_direction, current_menu_options, selected_menu_option_index, fighting_menu_state)
         menu_direction = None  # Reset after use to avoid unintended navigation
+
+        handle_attack_result()
 
 
 if __name__ == '__main__':

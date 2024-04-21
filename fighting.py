@@ -3,7 +3,7 @@ import time
 import pyglet
 from conf import WINDOW_WIDTH, WINDOW_HEIGHT, SCALE
 from pyglet.gl import glTexParameteri, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER, GL_NEAREST
-from game_state import get_current_npc
+from game_state import get_current_npc, get_fight_stat, set_display_text, set_fight_stat
 from conf import FONT_NAME
 from player import get_player_pikemnon
 
@@ -84,7 +84,7 @@ def player_attack(attack_name: str) -> str:
         return "no pp"
     player_pokemon['moves'][attack_name]['pp'] -= 1
     handle_attack(attack_name, player_pokemon, npc_pokemon)
-    return check_battle_end()
+    set_fight_stat("attacked")
 
 def handle_item(item: str, player: dict[str, any]) -> dict[str, any]:
     global player_pokemon, text_to_display
@@ -161,27 +161,27 @@ def npc_attack():
     npc_pokemon['moves'][attack_name]['pp'] -= 1
 
     handle_attack(attack_name, npc_pokemon, player_pokemon)
-    return check_battle_end()
 
 def check_battle_end() -> str:
-    global player_pokemon, npc_pokemon, turn
-    if player_pokemon['current_health'] <= 0:
-        player_pokemon['current_health'] = 0
-        print("Player's Pokémon fainted. NPC wins!")
-        turn = 0
-        return "npc"
-    elif npc_pokemon['current_health'] <= 0:
-        current_npc = get_current_npc()
-        if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
-            current_npc['pikemnon_index'] += 1
-            npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
-            print("NPC sends out another Pokémon.")
-        else:
-            npc_pokemon['current_health'] = 0
-            print("NPC's Pokémon fainted. Player wins!")
+    global player_pokemon, npc_pokemon, turn, text_to_display
+    if not text_to_display:
+        if player_pokemon['current_health'] <= 0:
+            player_pokemon['current_health'] = 0
+            text_to_display = "Player's Pokémon fainted. NPC wins!"
             turn = 0
-            return "player"
-    return "continue"
+            return "npc"
+        elif npc_pokemon['current_health'] <= 0:
+            current_npc = get_current_npc()
+            if current_npc['pikemnon_index'] < len(current_npc['pikemnons']) - 1:
+                current_npc['pikemnon_index'] += 1
+                npc_pokemon = current_npc['pikemnons'][current_npc['pikemnon_index']]
+                print("NPC sends out another Pokémon.")
+            else:
+                npc_pokemon['current_health'] = 0
+                print("NPC's Pokémon fainted. Player wins!")
+                turn = 0
+                return "player"
+    return "continue" if get_fight_stat() != "attacked" else "attacked"
 
 def next_turn():
     global turn
@@ -189,13 +189,12 @@ def next_turn():
     return npc_attack()
 
 
-
 def draw_health_bar(x, y, width, height, health_percentage):
     # Draw the health bar background (e.g., gray for depleted health)
     pyglet.graphics.glColor4f(0.5, 0.5, 0.5, 1)  # Gray color
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + width, y, x + width, y + height, x, y + height]))
     
-    # Draw the current health (e.g., green for current health)
+    # Draw the current health
     pyglet.graphics.glColor4f(0, 1, 0, 1)  # Green color
     current_health_width = width * health_percentage
     pyglet.graphics.draw(4, pyglet.gl.GL_QUADS, ('v2f', [x, y, x + current_health_width, y, x + current_health_width, y + height, x, y + height]))
@@ -342,6 +341,9 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
     draw_health_bar(40, 450 - 20, 200, 10, player_pokemon['current_health']/player_pokemon['health'])
     draw_health_bar(400, 200 - 20, 200, 10, npc_pokemon['current_health']/npc_pokemon['health'])
 
+    if text_to_display:
+        set_display_text(True)
+
     draw_label(text_to_display, 50, 150, font_size=16) if text_to_display else draw_menu_options(window, menu_options, selected_option_index, menu_state, player_pokemon)
 
     if text_to_display and not display_time:
@@ -354,6 +356,8 @@ def fighting_screen(window, player, direction, menu_options, selected_option_ind
 
     if direction:
         navigate_menu(direction)
+
+    set_fight_stat(check_battle_end())
 
 
 
