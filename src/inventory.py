@@ -1,32 +1,37 @@
 import pyglet
 from pyglet.gl import *
-from config.conf import FONT_NAME
+from conf import FONT_NAME
 from src.player import remove_pikemnon
 
 selected_pikemnon = None
 
-def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y, kill_index=None):
+def draw_inventory(window, player_pikemnons, selected_index, player_x, player_y, kill_index=None):
     """
-    Draws a 2x2 grid of blocks in the middle of the screen, with the names of the player's Pokemon.
-    Highlights the selected Pokemon.
+    Draws the player's inventory on the screen.
 
-    Parameters:
-    window (pyglet.window.Window): The window in which to draw the blocks.
-    player_pikemnons (list): The list of the player's Pokemon.
-    selected_index (int): The index of the selected Pokemon.
-    camera_x (float): The x-coordinate of the camera's position.
-    camera_y (float): The y-coordinate of the camera's position.
+    This function draws a grid of the player's Pokemon, highlighting the currently selected one. If a Pokemon is selected, it draws a detailed view of that Pokemon with the option to kill it.
 
-    Returns:
-    None
+    :param window: The window to draw on.
+    :type window: pyglet.window.Window
+    :param player_pikemnons: The player's list of Pokemon.
+    :type player_pikemnons: list
+    :param selected_index: The index of the currently selected Pokemon.
+    :type selected_index: int
+    :param player_x: The x-coordinate of the player's position.
+    :type player_x: float
+    :param player_y: The y-coordinate of the player's position.
+    :type player_y: float
+    :param kill_index: The index of the kill option, if a Pokemon is selected. Defaults to None.
+    :type kill_index: int, optional
+    :return: None
     """
     if selected_pikemnon:
         # Set up the drawing for the selected Pokemon
         glColor3f(1.0, 1.0, 1.0)  # White background
         block_width = 400
         block_height = 300
-        x = window.width // 2 - block_width // 2
-        y = window.height // 2 - block_height // 2
+        x = int(player_x - window.width // 2 + block_width // 2)
+        y = int(player_y - window.height // 2 + block_height // 2)
 
         # Draw background rectangle
         pyglet.graphics.draw(4, GL_QUADS,
@@ -37,17 +42,17 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         label = pyglet.text.Label(selected_pikemnon['name'],
                                   font_name=FONT_NAME,
                                   font_size=24,
-                                  x=window.width // 2,
-                                  y=window.height // 2 + 50,
+                                  x=x + block_width // 2,
+                                  y=y + block_height - 30,
                                   anchor_x='center', anchor_y='center',
                                   color=(0, 0, 0, 255))
         label.draw()
 
         subtext = pyglet.text.Label("Do you want to kill this Pikemnon?",
                                     font_name=FONT_NAME,
-                                    font_size=18,
-                                    x=window.width // 2,
-                                    y=window.height // 2 - 10,
+                                    font_size=16,
+                                    x=x + block_width // 2,
+                                    y=y + block_height - 150,
                                     anchor_x='center', anchor_y='center',
                                     color=(0, 0, 0, 255))
         subtext.draw()
@@ -59,8 +64,8 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         yes_label = pyglet.text.Label("Yes",
                                       font_name=FONT_NAME,
                                       font_size=18,
-                                      x=window.width // 2 - 60,
-                                      y=window.height // 2 - 60,
+                                      x=x + block_width // 2 - 60,
+                                      y=y + block_height // 2 - 60,
                                       anchor_x='center', anchor_y='center',
                                       color=yes_color)
         yes_label.draw()
@@ -68,8 +73,8 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         no_label = pyglet.text.Label("No",
                                      font_name=FONT_NAME,
                                      font_size=18,
-                                     x=window.width // 2 + 60,
-                                     y=window.height // 2 - 60,
+                                     x=x + block_width // 2 + 60,
+                                     y=y + block_height // 2 - 60,
                                      anchor_x='center', anchor_y='center',
                                      color=no_color)
         no_label.draw()
@@ -86,8 +91,8 @@ def draw_inventory(window, player_pikemnons, selected_index, camera_x, camera_y,
         grid_height = 2 * block_height
 
         # Calculate the position of the grid relative to the camera's position
-        grid_x = camera_x - window.width // 2 + grid_width // 2
-        grid_y = camera_y - window.height // 2 + grid_height // 2
+        grid_x = player_x - window.width // 2 + grid_width // 2
+        grid_y = player_y - window.height // 2 + grid_height // 2
 
         # Create a label for each Pokemon
         labels = [pyglet.text.Label(pikemnon['name'],
@@ -118,12 +123,12 @@ def select_selected_pikemnon(player_pikemnons, selected_index):
     """
     Assigns the selected pikemnon to a global variable and prints its name.
 
-    Parameters:
-    player_pikemnons (list): The list of the player's pikemnons.
-    selected_index (int): The index of the selected pikemnon.
-
-    Returns:
-    None
+    :param player_pikemnons: The list of the player's pikemnons.
+    :type player_pikemnons: list
+    :param selected_index: The index of the selected pikemnon.
+    :type selected_index: int
+    :return: None
+    :rtype: None
     """
     global selected_pikemnon
     if 0 <= selected_index < len(player_pikemnons):
@@ -136,11 +141,8 @@ def remove_selected_pikemnon():
     """
     Removes the selected pikemnon from the global variable.
 
-    Parameters:
-    None
-
-    Returns:
-    None
+    :param: None
+    :return: None
     """
     global selected_pikemnon
     selected_pikemnon = None
@@ -149,11 +151,10 @@ def kill_pikemnon(player: dict[str, any]) -> dict[str, any]:
     """
     Kills the selected pikemnon.
 
-    Parameters:
-    None
-
-    Returns:
-    None
+    :param player: The player's dictionary.
+    :type player: dict[str, any]
+    :return: The modified player's dictionary.
+    :rtype: dict[str, any]
     """
     global selected_pikemnon
     if selected_pikemnon:
