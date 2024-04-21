@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.settings_menu &#8212; Pikemnon 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.settings_menu</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyglet</span>
+
+<span class="c1"># Global variables for settings</span>
+<span class="n">volume_settings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Music Volume&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>  <span class="c1"># Initial volume levels in percentage</span>
+    <span class="s1">&#39;SFX Volume&#39;</span><span class="p">:</span> <span class="mi">50</span>
+<span class="p">}</span>
+<span class="n">volume_labels</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">selected_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="create_volume_labels">
+<a class="viewcode-back" href="../../src.html#src.settings_menu.create_volume_labels">[docs]</a>
+<span class="k">def</span> <span class="nf">create_volume_labels</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Changes the active Pikemnon in the player&#39;s inventory.</span>
+
+<span class="sd">    :param player: The player entity.</span>
+<span class="sd">    :type player: dict</span>
+<span class="sd">    :param pikemnon_id: The ID of the Pikemnon to activate.</span>
+<span class="sd">    :type pikemnon_id: str</span>
+<span class="sd">    :return: The updated player entity.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">volume_labels</span>
+    <span class="c1"># Create labels for each volume setting</span>
+    <span class="n">volume_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">pyglet</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">setting</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">volume_settings</span><span class="p">[</span><span class="n">setting</span><span class="p">]</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span>
+                                       <span class="n">font_name</span><span class="o">=</span><span class="s1">&#39;Times New Roman&#39;</span><span class="p">,</span>
+                                       <span class="n">font_size</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+                                       <span class="n">x</span><span class="o">=</span><span class="n">window</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                                       <span class="n">y</span><span class="o">=</span><span class="n">window</span><span class="o">.</span><span class="n">height</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">50</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">),</span>
+                                       <span class="n">anchor_x</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                                       <span class="n">anchor_y</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">setting</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">volume_settings</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="draw_settings">
+<a class="viewcode-back" href="../../src.html#src.settings_menu.draw_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">draw_settings</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws the settings on the window.</span>
+
+<span class="sd">    :param window: The window to draw the settings on.</span>
+<span class="sd">    :type window: pyglet.window.Window</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * volume_labels (list): The list of volume setting labels.</span>
+<span class="sd">        * selected_index (int): The index of the currently selected setting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">glClearColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Set the clear color to white</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">volume_labels</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">selected_index</span><span class="p">:</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>  <span class="c1"># Highlight the selected setting in red</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>  <span class="c1"># Other settings in black</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="update_selection">
+<a class="viewcode-back" href="../../src.html#src.settings_menu.update_selection">[docs]</a>
+<span class="k">def</span> <span class="nf">update_selection</span><span class="p">(</span><span class="n">direction</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates the selected setting based on the input direction.</span>
+
+<span class="sd">    :param direction: The direction to move the selection. Possible values are &quot;up&quot; and &quot;down&quot;.</span>
+<span class="sd">    :type direction: str</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * selected_index (int): The index of the currently selected setting.</span>
+<span class="sd">        * volume_settings (dict): The dictionary of volume settings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">selected_index</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;up&#39;</span> <span class="ow">and</span> <span class="n">selected_index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">selected_index</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;down&#39;</span> <span class="ow">and</span> <span class="n">selected_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">volume_settings</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">selected_index</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="adjust_volume">
+<a class="viewcode-back" href="../../src.html#src.settings_menu.adjust_volume">[docs]</a>
+<span class="k">def</span> <span class="nf">adjust_volume</span><span class="p">(</span><span class="n">direction</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adjusts the volume of the selected setting based on the input direction.</span>
+
+<span class="sd">    :param direction: The direction to adjust the volume. Possible values are &quot;increase&quot; and &quot;decrease&quot;.</span>
+<span class="sd">    :type direction: str</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * selected_index (int): The index of the currently selected setting.</span>
+<span class="sd">        * volume_settings (dict): The dictionary of volume settings.</span>
+<span class="sd">        * volume_labels (list): The list of volume setting labels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">setting</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">volume_settings</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">selected_index</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;increase&#39;</span> <span class="ow">and</span> <span class="n">volume_settings</span><span class="p">[</span><span class="n">setting</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="n">volume_settings</span><span class="p">[</span><span class="n">setting</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">10</span>  <span class="c1"># Increase volume</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;decrease&#39;</span> <span class="ow">and</span> <span class="n">volume_settings</span><span class="p">[</span><span class="n">setting</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">volume_settings</span><span class="p">[</span><span class="n">setting</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">10</span>  <span class="c1"># Decrease volume</span>
+    <span class="c1"># Update label text</span>
+    <span class="n">volume_labels</span><span class="p">[</span><span class="n">selected_index</span><span class="p">]</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">setting</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">volume_settings</span><span class="p">[</span><span class="n">setting</span><span class="p">]</span><span class="si">}</span><span class="s2">%&quot;</span></div>
+
+
+<div class="viewcode-block" id="update_settings_selection">
+<a class="viewcode-back" href="../../src.html#src.settings_menu.update_settings_selection">[docs]</a>
+<span class="k">def</span> <span class="nf">update_settings_selection</span><span class="p">(</span><span class="n">direction</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates the selected setting based on the input direction.</span>
+
+<span class="sd">    :param direction: The direction to move the selection. Possible values are &quot;up&quot; and &quot;down&quot;.</span>
+<span class="sd">    :type direction: str</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * selected_index (int): The index of the currently selected setting.</span>
+<span class="sd">        * volume_settings (dict): The dictionary of volume settings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">selected_index</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;up&#39;</span> <span class="ow">and</span> <span class="n">selected_index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">selected_index</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;down&#39;</span> <span class="ow">and</span> <span class="n">selected_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">volume_settings</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">selected_index</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Pikemnon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">pikemnon</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zdenek Sojka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

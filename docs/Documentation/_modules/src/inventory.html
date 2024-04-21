@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.inventory &#8212; Pikemnon 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.inventory</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyglet</span>
+<span class="kn">from</span> <span class="nn">pyglet.gl</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">conf</span> <span class="kn">import</span> <span class="n">FONT_NAME</span>
+<span class="kn">from</span> <span class="nn">src.player</span> <span class="kn">import</span> <span class="n">remove_pikemnon</span>
+
+<span class="n">selected_pikemnon</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="draw_inventory">
+<a class="viewcode-back" href="../../src.html#src.inventory.draw_inventory">[docs]</a>
+<span class="k">def</span> <span class="nf">draw_inventory</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">player_pikemnons</span><span class="p">,</span> <span class="n">selected_index</span><span class="p">,</span> <span class="n">player_x</span><span class="p">,</span> <span class="n">player_y</span><span class="p">,</span> <span class="n">kill_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws the player&#39;s inventory on the screen.</span>
+
+<span class="sd">    This function draws a grid of the player&#39;s Pokemon, highlighting the currently selected one. If a Pokemon is selected, it draws a detailed view of that Pokemon with the option to kill it.</span>
+
+<span class="sd">    :param window: The window to draw on.</span>
+<span class="sd">    :type window: pyglet.window.Window</span>
+<span class="sd">    :param player_pikemnons: The player&#39;s list of Pokemon.</span>
+<span class="sd">    :type player_pikemnons: list</span>
+<span class="sd">    :param selected_index: The index of the currently selected Pokemon.</span>
+<span class="sd">    :type selected_index: int</span>
+<span class="sd">    :param player_x: The x-coordinate of the player&#39;s position.</span>
+<span class="sd">    :type player_x: float</span>
+<span class="sd">    :param player_y: The y-coordinate of the player&#39;s position.</span>
+<span class="sd">    :type player_y: float</span>
+<span class="sd">    :param kill_index: The index of the kill option, if a Pokemon is selected. Defaults to None.</span>
+<span class="sd">    :type kill_index: int, optional</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">selected_pikemnon</span><span class="p">:</span>
+        <span class="c1"># Set up the drawing for the selected Pokemon</span>
+        <span class="n">glColor3f</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># White background</span>
+        <span class="n">block_width</span> <span class="o">=</span> <span class="mi">400</span>
+        <span class="n">block_height</span> <span class="o">=</span> <span class="mi">300</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">player_x</span> <span class="o">-</span> <span class="n">window</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">block_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">player_y</span> <span class="o">-</span> <span class="n">window</span><span class="o">.</span><span class="n">height</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">block_height</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Draw background rectangle</span>
+        <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">GL_QUADS</span><span class="p">,</span>
+                             <span class="p">(</span><span class="s1">&#39;v2i&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">block_width</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">block_width</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">block_height</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">block_height</span><span class="p">)),</span>
+                             <span class="p">(</span><span class="s1">&#39;c3B&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)))</span>
+
+        <span class="c1"># Draw the selected Pokemon&#39;s name and subtext</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">selected_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                                  <span class="n">font_name</span><span class="o">=</span><span class="n">FONT_NAME</span><span class="p">,</span>
+                                  <span class="n">font_size</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+                                  <span class="n">x</span><span class="o">=</span><span class="n">x</span> <span class="o">+</span> <span class="n">block_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                                  <span class="n">y</span><span class="o">=</span><span class="n">y</span> <span class="o">+</span> <span class="n">block_height</span> <span class="o">-</span> <span class="mi">30</span><span class="p">,</span>
+                                  <span class="n">anchor_x</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">anchor_y</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                                  <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+        <span class="n">subtext</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Do you want to kill this Pikemnon?&quot;</span><span class="p">,</span>
+                                    <span class="n">font_name</span><span class="o">=</span><span class="n">FONT_NAME</span><span class="p">,</span>
+                                    <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                                    <span class="n">x</span><span class="o">=</span><span class="n">x</span> <span class="o">+</span> <span class="n">block_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                                    <span class="n">y</span><span class="o">=</span><span class="n">y</span> <span class="o">+</span> <span class="n">block_height</span> <span class="o">-</span> <span class="mi">150</span><span class="p">,</span>
+                                    <span class="n">anchor_x</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">anchor_y</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                                    <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="n">subtext</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+        <span class="c1"># Draw &quot;Yes&quot; and &quot;No&quot; options with highlighting based on selection_index</span>
+        <span class="n">yes_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span> <span class="k">if</span> <span class="n">kill_index</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+        <span class="n">no_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span> <span class="k">if</span> <span class="n">kill_index</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+
+        <span class="n">yes_label</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Yes&quot;</span><span class="p">,</span>
+                                      <span class="n">font_name</span><span class="o">=</span><span class="n">FONT_NAME</span><span class="p">,</span>
+                                      <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+                                      <span class="n">x</span><span class="o">=</span><span class="n">x</span> <span class="o">+</span> <span class="n">block_width</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">60</span><span class="p">,</span>
+                                      <span class="n">y</span><span class="o">=</span><span class="n">y</span> <span class="o">+</span> <span class="n">block_height</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">60</span><span class="p">,</span>
+                                      <span class="n">anchor_x</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">anchor_y</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                                      <span class="n">color</span><span class="o">=</span><span class="n">yes_color</span><span class="p">)</span>
+        <span class="n">yes_label</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+        <span class="n">no_label</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;No&quot;</span><span class="p">,</span>
+                                     <span class="n">font_name</span><span class="o">=</span><span class="n">FONT_NAME</span><span class="p">,</span>
+                                     <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+                                     <span class="n">x</span><span class="o">=</span><span class="n">x</span> <span class="o">+</span> <span class="n">block_width</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">60</span><span class="p">,</span>
+                                     <span class="n">y</span><span class="o">=</span><span class="n">y</span> <span class="o">+</span> <span class="n">block_height</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">60</span><span class="p">,</span>
+                                     <span class="n">anchor_x</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">anchor_y</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                                     <span class="n">color</span><span class="o">=</span><span class="n">no_color</span><span class="p">)</span>
+        <span class="n">no_label</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Set the color to white</span>
+        <span class="n">glColor3f</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the size of the blocks</span>
+        <span class="n">block_width</span> <span class="o">=</span> <span class="mi">150</span>
+        <span class="n">block_height</span> <span class="o">=</span> <span class="mi">150</span>
+
+        <span class="c1"># Calculate the size of the grid</span>
+        <span class="n">grid_width</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">block_width</span>
+        <span class="n">grid_height</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">block_height</span>
+
+        <span class="c1"># Calculate the position of the grid relative to the camera&#39;s position</span>
+        <span class="n">grid_x</span> <span class="o">=</span> <span class="n">player_x</span> <span class="o">-</span> <span class="n">window</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">grid_width</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">grid_y</span> <span class="o">=</span> <span class="n">player_y</span> <span class="o">-</span> <span class="n">window</span><span class="o">.</span><span class="n">height</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">grid_height</span> <span class="o">//</span> <span class="mi">2</span>
+
+        <span class="c1"># Create a label for each Pokemon</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">pyglet</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                                    <span class="n">font_name</span><span class="o">=</span><span class="n">FONT_NAME</span><span class="p">,</span>
+                                    <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                                    <span class="n">x</span><span class="o">=</span><span class="n">grid_x</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_width</span> <span class="o">+</span> <span class="n">block_width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                                    <span class="n">y</span><span class="o">=</span><span class="n">grid_y</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_height</span> <span class="o">+</span> <span class="n">block_height</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                                    <span class="n">anchor_x</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">anchor_y</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                                    <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pikemnon</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">player_pikemnons</span><span class="p">)]</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pikemnon</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">player_pikemnons</span><span class="p">):</span>
+            <span class="n">block_x</span> <span class="o">=</span> <span class="n">grid_x</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_width</span>
+            <span class="n">block_y</span> <span class="o">=</span> <span class="n">grid_y</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_height</span>
+
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">selected_index</span><span class="p">:</span>
+                <span class="n">glColor3f</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">glColor3f</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+            <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">GL_QUADS</span><span class="p">,</span>
+            <span class="p">(</span><span class="s1">&#39;v2i&#39;</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">block_x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">block_y</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">block_x</span> <span class="o">+</span> <span class="n">block_width</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">block_y</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">block_x</span> <span class="o">+</span> <span class="n">block_width</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">block_y</span> <span class="o">+</span> <span class="n">block_height</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">block_x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">block_y</span> <span class="o">+</span> <span class="n">block_height</span><span class="p">)))</span>
+            <span class="p">)</span>
+
+            <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="select_selected_pikemnon">
+<a class="viewcode-back" href="../../src.html#src.inventory.select_selected_pikemnon">[docs]</a>
+<span class="k">def</span> <span class="nf">select_selected_pikemnon</span><span class="p">(</span><span class="n">player_pikemnons</span><span class="p">,</span> <span class="n">selected_index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Assigns the selected pikemnon to a global variable and prints its name.</span>
+
+<span class="sd">    :param player_pikemnons: The list of the player&#39;s pikemnons.</span>
+<span class="sd">    :type player_pikemnons: list</span>
+<span class="sd">    :param selected_index: The index of the selected pikemnon.</span>
+<span class="sd">    :type selected_index: int</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">selected_pikemnon</span>
+    <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">selected_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">player_pikemnons</span><span class="p">):</span>
+        <span class="n">selected_pikemnon</span> <span class="o">=</span> <span class="n">player_pikemnons</span><span class="p">[</span><span class="n">selected_index</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">player_pikemnons</span><span class="p">[</span><span class="n">selected_index</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid index&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="remove_selected_pikemnon">
+<a class="viewcode-back" href="../../src.html#src.inventory.remove_selected_pikemnon">[docs]</a>
+<span class="k">def</span> <span class="nf">remove_selected_pikemnon</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes the selected pikemnon from the global variable.</span>
+
+<span class="sd">    :param: None</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">selected_pikemnon</span>
+    <span class="n">selected_pikemnon</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="kill_pikemnon">
+<a class="viewcode-back" href="../../src.html#src.inventory.kill_pikemnon">[docs]</a>
+<span class="k">def</span> <span class="nf">kill_pikemnon</span><span class="p">(</span><span class="n">player</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Kills the selected pikemnon.</span>
+
+<span class="sd">    :param player: The player&#39;s dictionary.</span>
+<span class="sd">    :type player: dict[str, any]</span>
+<span class="sd">    :return: The modified player&#39;s dictionary.</span>
+<span class="sd">    :rtype: dict[str, any]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">selected_pikemnon</span>
+    <span class="k">if</span> <span class="n">selected_pikemnon</span><span class="p">:</span>
+        <span class="n">remove_pikemnon</span><span class="p">(</span><span class="n">player</span><span class="p">,</span> <span class="n">selected_pikemnon</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+        <span class="n">selected_pikemnon</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No pikemnon selected&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Pikemnon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">pikemnon</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zdenek Sojka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

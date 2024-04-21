@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.camera &#8212; Pikemnon 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.camera</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pyglet</span>
+
+<span class="c1"># Initialize variables</span>
+<span class="n">target</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">window_width</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">window_height</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">offset_x</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">offset_y</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="set_camera_target">
+<a class="viewcode-back" href="../../src.html#src.camera.set_camera_target">[docs]</a>
+<span class="k">def</span> <span class="nf">set_camera_target</span><span class="p">(</span><span class="n">new_target</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the target for the camera.</span>
+
+<span class="sd">    This function updates the global target variable to the new target object.</span>
+
+<span class="sd">    :param new_target: The new target object for the camera.</span>
+<span class="sd">    :type new_target: object</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * target (object): The current target of the camera.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">target</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">new_target</span></div>
+
+
+<div class="viewcode-block" id="set_camera_window_size">
+<a class="viewcode-back" href="../../src.html#src.camera.set_camera_window_size">[docs]</a>
+<span class="k">def</span> <span class="nf">set_camera_window_size</span><span class="p">(</span><span class="n">new_window_width</span><span class="p">,</span> <span class="n">new_window_height</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the target for the camera.</span>
+
+<span class="sd">    This function updates the global target variable to the new target object.</span>
+
+<span class="sd">    :param new_target: The new target object for the camera.</span>
+<span class="sd">    :type new_target: object</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * target (object): The current target of the camera.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">window_width</span><span class="p">,</span> <span class="n">window_height</span>
+    <span class="n">window_width</span> <span class="o">=</span> <span class="n">new_window_width</span>
+    <span class="n">window_height</span> <span class="o">=</span> <span class="n">new_window_height</span></div>
+
+
+<div class="viewcode-block" id="update_camera">
+<a class="viewcode-back" href="../../src.html#src.camera.update_camera">[docs]</a>
+<span class="k">def</span> <span class="nf">update_camera</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates the camera&#39;s position based on the target&#39;s position.</span>
+
+<span class="sd">    This function calculates the new offsets for the camera based on the target&#39;s position and the window size.</span>
+<span class="sd">    The camera is always centered on the target.</span>
+
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * offset_x (int): The current x-offset of the camera.</span>
+<span class="sd">        * offset_y (int): The current y-offset of the camera.</span>
+<span class="sd">        * window_width (int): The current width of the camera window.</span>
+<span class="sd">        * window_height (int): The current height of the camera window.</span>
+<span class="sd">        * target (dict): The current target of the camera, which is a dictionary containing a &#39;sprite&#39; key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">offset_x</span><span class="p">,</span> <span class="n">offset_y</span><span class="p">,</span> <span class="n">window_width</span><span class="p">,</span> <span class="n">window_height</span><span class="p">,</span> <span class="n">target</span>
+    <span class="n">offset_x</span> <span class="o">=</span> <span class="n">window_width</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">target</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">offset_y</span> <span class="o">=</span> <span class="n">window_height</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">target</span><span class="p">[</span><span class="s1">&#39;sprite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="begin_camera">
+<a class="viewcode-back" href="../../src.html#src.camera.begin_camera">[docs]</a>
+<span class="k">def</span> <span class="nf">begin_camera</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Begins the camera transformation.</span>
+
+<span class="sd">    This function pushes the current matrix stack down by one, duplicating the current matrix.</span>
+<span class="sd">    Then it applies a translation transformation to the matrix using the current camera offsets.</span>
+
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * offset_x (int): The current x-offset of the camera.</span>
+<span class="sd">        * offset_y (int): The current y-offset of the camera.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">glPushMatrix</span><span class="p">()</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">glTranslatef</span><span class="p">(</span><span class="n">offset_x</span><span class="p">,</span> <span class="n">offset_y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="end_camera">
+<a class="viewcode-back" href="../../src.html#src.camera.end_camera">[docs]</a>
+<span class="k">def</span> <span class="nf">end_camera</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ends the camera transformation.</span>
+
+<span class="sd">    This function pops the current matrix stack up by one, removing the current matrix.</span>
+
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">glPopMatrix</span><span class="p">()</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Pikemnon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">pikemnon</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zdenek Sojka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

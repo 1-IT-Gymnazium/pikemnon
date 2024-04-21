@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>src.fighting &#8212; Pikemnon 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for src.fighting</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">import</span> <span class="nn">pyglet</span>
+<span class="kn">from</span> <span class="nn">conf</span> <span class="kn">import</span> <span class="n">WINDOW_WIDTH</span><span class="p">,</span> <span class="n">WINDOW_HEIGHT</span><span class="p">,</span> <span class="n">SCALE</span><span class="p">,</span> <span class="n">FONT_NAME</span>
+<span class="kn">from</span> <span class="nn">pyglet.gl</span> <span class="kn">import</span> <span class="n">glTexParameteri</span><span class="p">,</span> <span class="n">GL_TEXTURE_MAG_FILTER</span><span class="p">,</span> <span class="n">GL_TEXTURE_MIN_FILTER</span><span class="p">,</span> <span class="n">GL_NEAREST</span>
+<span class="kn">from</span> <span class="nn">data.type_advantage_data</span> <span class="kn">import</span> <span class="n">get_type_advantages</span>
+<span class="kn">from</span> <span class="nn">src.game_state</span> <span class="kn">import</span> <span class="n">get_current_npc</span><span class="p">,</span> <span class="n">get_fight_stat</span><span class="p">,</span> <span class="n">set_display_text</span><span class="p">,</span> <span class="n">set_fight_stat</span>
+<span class="kn">from</span> <span class="nn">src.player</span> <span class="kn">import</span> <span class="n">add_random_item</span><span class="p">,</span> <span class="n">get_player_pikemnon</span>
+
+<span class="n">npc_pikemnon</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">player_pikemnon</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">selected_option_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">window_width</span> <span class="o">=</span> <span class="n">WINDOW_WIDTH</span><span class="o">*</span><span class="n">SCALE</span>
+<span class="n">window_height</span> <span class="o">=</span> <span class="n">WINDOW_HEIGHT</span><span class="o">*</span><span class="n">SCALE</span>
+
+<span class="n">main_menu_options</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Attack&quot;</span><span class="p">,</span> <span class="s2">&quot;Item&quot;</span><span class="p">,</span> <span class="s2">&quot;Run&quot;</span><span class="p">,</span> <span class="s2">&quot;Swap&quot;</span><span class="p">]</span>
+<span class="c1"># attack_menu_options = None</span>
+<span class="n">current_menu</span> <span class="o">=</span> <span class="n">main_menu_options</span>
+
+<span class="n">turn</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">current_player</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">text_to_display</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+<span class="n">display_time</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">old_fight_stat</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="calculate_damage">
+<a class="viewcode-back" href="../../src.html#src.fighting.calculate_damage">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_damage</span><span class="p">(</span><span class="n">attack</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">defense</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">attack_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defense_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">calculate_damage</span><span class="p">(</span><span class="n">attack</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">defense</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">power</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">attack_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">defense_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the damage dealt by an attack in a Pikemnon battle.</span>
+
+<span class="sd">        :param attack: The attack stat of the attacking Pikemnon.</span>
+<span class="sd">        :param defense: The defense stat of the defending Pikemnon.</span>
+<span class="sd">        :param power: The power of the attack.</span>
+<span class="sd">        :param stage: The stage of the attack.</span>
+<span class="sd">        :param attack_type: The type of the attacking Pikemnon.</span>
+<span class="sd">        :param defense_type: The type of the defending Pikemnon.</span>
+<span class="sd">        :return: The final damage dealt by the attack.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="n">stage_multipliers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">-</span><span class="mi">6</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">5</span><span class="p">:</span> <span class="mf">0.29</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">4</span><span class="p">:</span> <span class="mf">0.33</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">3</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">2</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.67</span><span class="p">,</span>
+    <span class="mi">0</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">,</span>
+    <span class="mi">4</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="mi">5</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span>
+    <span class="mi">6</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="p">}</span>
+
+    <span class="n">attack_stage</span> <span class="o">=</span> <span class="n">stage_multipliers</span><span class="p">[</span><span class="n">stage</span><span class="p">[</span><span class="s1">&#39;attack&#39;</span><span class="p">]]</span>
+    <span class="n">type_effectiveness</span> <span class="o">=</span> <span class="n">load_type_effectiveness</span><span class="p">()</span>
+
+    <span class="n">effectiveness</span> <span class="o">=</span> <span class="n">type_effectiveness</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attack_type</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">defense_type</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">base_damage</span> <span class="o">=</span> <span class="p">(</span><span class="n">power</span> <span class="o">*</span> <span class="p">(</span><span class="n">attack</span> <span class="o">*</span> <span class="n">attack_stage</span><span class="p">)</span> <span class="o">/</span> <span class="n">defense</span><span class="p">)</span> <span class="o">/</span> <span class="mi">50</span>
+    <span class="n">random_factor</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span> 
+    <span class="n">final_damage</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_damage</span> <span class="o">*</span> <span class="n">effectiveness</span> <span class="o">*</span> <span class="n">random_factor</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+    
+    
+    <span class="k">return</span> <span class="n">final_damage</span></div>
+
+
+<div class="viewcode-block" id="handle_attack">
+<a class="viewcode-back" href="../../src.html#src.fighting.handle_attack">[docs]</a>
+<span class="k">def</span> <span class="nf">handle_attack</span><span class="p">(</span><span class="n">attack_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">attacking_pikemnon</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">any</span><span class="p">],</span> <span class="n">defending_pikemnon</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the attack action in the game.</span>
+
+<span class="sd">    This function takes the name of the attack, the attacking Pikemnon, and the defending Pikemnon as arguments.</span>
+<span class="sd">    It calculates the damage based on the attack type and updates the health of the defending Pikemnon.</span>
+<span class="sd">    It also updates the global variable `text_to_display` with the result of the attack.</span>
+
+<span class="sd">    :param attack_name: The name of the attack.</span>
+<span class="sd">    :type attack_name: str</span>
+<span class="sd">    :param attacking_pikemnon: The dictionary representing the attacking Pikemnon.</span>
+<span class="sd">    :type attacking_pikemnon: dict[str, any]</span>
+<span class="sd">    :param defending_pikemnon: The dictionary representing the defending Pikemnon.</span>
+<span class="sd">    :type defending_pikemnon: dict[str, any]</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">text_to_display</span>
+    <span class="n">move</span> <span class="o">=</span> <span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">][</span><span class="n">attack_name</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">move</span><span class="p">[</span><span class="s1">&#39;move_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;attack&quot;</span><span class="p">:</span>
+        <span class="n">damage</span> <span class="o">=</span> <span class="n">calculate_damage</span><span class="p">(</span><span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;attack&#39;</span><span class="p">],</span> <span class="n">defending_pikemnon</span><span class="p">[</span><span class="s1">&#39;defense&#39;</span><span class="p">],</span> <span class="n">move</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">],</span> <span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;stage&#39;</span><span class="p">],</span> <span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span> <span class="n">defending_pikemnon</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+        <span class="n">defending_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">damage</span>
+        <span class="n">text_to_display</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> used </span><span class="si">{</span><span class="n">attack_name</span><span class="si">}</span><span class="s2"> and dealt </span><span class="si">{</span><span class="n">damage</span><span class="si">}</span><span class="s2"> damage.&quot;</span>
+    <span class="k">elif</span> <span class="n">move</span><span class="p">[</span><span class="s1">&#39;move_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;buff&quot;</span><span class="p">:</span>
+        <span class="n">target_stat</span> <span class="o">=</span> <span class="n">move</span><span class="p">[</span><span class="s1">&#39;target_stat&#39;</span><span class="p">]</span>
+        <span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;stage&#39;</span><span class="p">][</span><span class="n">target_stat</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;stage&#39;</span><span class="p">][</span><span class="n">target_stat</span><span class="p">]</span> <span class="o">+</span> <span class="n">move</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">],</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">text_to_display</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> used </span><span class="si">{</span><span class="n">attack_name</span><span class="si">}</span><span class="s2"> and increased </span><span class="si">{</span><span class="n">target_stat</span><span class="si">}</span><span class="s2">.&quot;</span>
+    <span class="k">elif</span> <span class="n">move</span><span class="p">[</span><span class="s1">&#39;move_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;debuff&quot;</span><span class="p">:</span>
+        <span class="n">target_stat</span> <span class="o">=</span> <span class="n">move</span><span class="p">[</span><span class="s1">&#39;target_stat&#39;</span><span class="p">]</span>
+        <span class="n">defending_pikemnon</span><span class="p">[</span><span class="s1">&#39;stage&#39;</span><span class="p">][</span><span class="n">target_stat</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">defending_pikemnon</span><span class="p">[</span><span class="s1">&#39;stage&#39;</span><span class="p">][</span><span class="n">target_stat</span><span class="p">]</span> <span class="o">-</span> <span class="n">move</span><span class="p">[</span><span class="s1">&#39;power&#39;</span><span class="p">],</span> <span class="o">-</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">text_to_display</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attacking_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> used </span><span class="si">{</span><span class="n">attack_name</span><span class="si">}</span><span class="s2"> and decreased </span><span class="si">{</span><span class="n">defending_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;s </span><span class="si">{</span><span class="n">target_stat</span><span class="si">}</span><span class="s2">.&quot;</span></div>
+
+
+<div class="viewcode-block" id="load_type_effectiveness">
+<a class="viewcode-back" href="../../src.html#src.fighting.load_type_effectiveness">[docs]</a>
+<span class="k">def</span> <span class="nf">load_type_effectiveness</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads the type effectiveness data from a JSON file.</span>
+
+<span class="sd">    This function reads the &#39;type_advantages.json&#39; file and returns the JSON object.</span>
+
+<span class="sd">    :return: A dictionary representing the type effectiveness data.</span>
+<span class="sd">    :rtype: dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_type_advantages</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="player_attack">
+<a class="viewcode-back" href="../../src.html#src.fighting.player_attack">[docs]</a>
+<span class="k">def</span> <span class="nf">player_attack</span><span class="p">(</span><span class="n">attack_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the player&#39;s attack during a fight.</span>
+
+<span class="sd">    This function checks if the player&#39;s Pikemnon has enough PP for the chosen attack.</span>
+<span class="sd">    If there is enough PP, it decreases the PP by 1 and calls the handle_attack function.</span>
+<span class="sd">    If there is not enough PP, it sets the text_to_display to a message indicating this.</span>
+
+<span class="sd">    :param attack_name: The name of the attack to be used.</span>
+<span class="sd">    :type attack_name: str</span>
+<span class="sd">    :return: &quot;no pp&quot; if there is not enough PP for the attack, None otherwise.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * player_pikemnon (dict): The player&#39;s current Pikemnon.</span>
+<span class="sd">        * text_to_display (str): The text to be displayed on the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">player_pikemnon</span><span class="p">,</span> <span class="n">text_to_display</span>
+    <span class="k">if</span> <span class="n">get_fight_stat</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">][</span><span class="n">attack_name</span><span class="p">][</span><span class="s1">&#39;pp&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;No PP left for this move.&quot;</span>
+            <span class="k">return</span> <span class="s2">&quot;no pp&quot;</span>
+        <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">][</span><span class="n">attack_name</span><span class="p">][</span><span class="s1">&#39;pp&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">handle_attack</span><span class="p">(</span><span class="n">attack_name</span><span class="p">,</span> <span class="n">player_pikemnon</span><span class="p">,</span> <span class="n">npc_pikemnon</span><span class="p">)</span>
+        <span class="n">set_fight_stat</span><span class="p">(</span><span class="s2">&quot;attacked&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="handle_item">
+<a class="viewcode-back" href="../../src.html#src.fighting.handle_item">[docs]</a>
+<span class="k">def</span> <span class="nf">handle_item</span><span class="p">(</span><span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">player</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">any</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the use of an item during a fight.</span>
+
+<span class="sd">    This function checks the type of the item and performs the appropriate action.</span>
+<span class="sd">    If the item is a potion, it restores the player&#39;s Pikemnon&#39;s health.</span>
+<span class="sd">    If the item is a pikeball, it attempts to catch the NPC&#39;s Pikemnon.</span>
+
+<span class="sd">    :param item: The name of the item to be used.</span>
+<span class="sd">    :type item: str</span>
+<span class="sd">    :param player: The player using the item. The player should be a dictionary with keys for &#39;potion&#39;, &#39;better potion&#39;, &#39;pikeball&#39;, &#39;better pikeball&#39;, and &#39;pikemnons&#39;.</span>
+<span class="sd">    :type player: dict[str, any]</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * player_pikemnon (dict): The player&#39;s current Pikemnon.</span>
+<span class="sd">        * text_to_display (str): The text to be displayed on the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">player_pikemnon</span><span class="p">,</span> <span class="n">text_to_display</span>
+    <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;potion&quot;</span> <span class="ow">or</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;better potion&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;potion&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;potion&quot;</span><span class="p">:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;No potions left.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;better potion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;better potion&quot;</span><span class="p">:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;No Better Potions left.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;health&#39;</span><span class="p">]:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;Pokémon is already at full health.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;potion&quot;</span><span class="p">:</span>
+            <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;health&#39;</span><span class="p">],</span> <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;Pokémon&#39;s health was restored by 10.&quot;</span>
+        <span class="k">elif</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;better potion&quot;</span><span class="p">:</span>
+            <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;health&#39;</span><span class="p">],</span> <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">20</span><span class="p">)</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;Pokémon&#39;s health was restored by 20.&quot;</span>
+    <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;pikeball&quot;</span> <span class="ow">or</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;better pikeball&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;pikeball&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;pikeball&quot;</span><span class="p">:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;No Pikeballs left.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="n">player</span><span class="p">[</span><span class="s1">&#39;better pikeball&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;better pikeball&quot;</span><span class="p">:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;No Better Pikeballs left.&quot;</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;You can&#39;t catch this Pokémon. You already have 4 Pokémon.&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;wild&quot;</span> <span class="ow">in</span> <span class="n">npc_pikemnon</span><span class="p">:</span>
+            <span class="n">base_catch_rate</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;pikeball&quot;</span> <span class="k">else</span> <span class="mf">0.8</span>
+            <span class="n">health_percentage</span> <span class="o">=</span> <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;health&#39;</span><span class="p">]</span>
+            <span class="n">catch_rate</span> <span class="o">=</span> <span class="n">base_catch_rate</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">health_percentage</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">base_catch_rate</span><span class="p">)</span>
+            <span class="n">catch_rate</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">catch_rate</span><span class="p">)</span>  <span class="c1"># Ensure catch rate does not exceed 1</span>
+            <span class="n">random_factor</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># Random factor between 0.7 and 1.0</span>
+            <span class="n">final_catch_probability</span> <span class="o">=</span> <span class="n">catch_rate</span> <span class="o">*</span> <span class="n">random_factor</span>
+            <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">final_catch_probability</span><span class="p">:</span>
+                <span class="n">player</span> <span class="o">=</span> <span class="n">catch_pikemnon</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
+                <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;You caught the Pokémon!&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;You didn&#39;t catch the Pokémon.&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;You can&#39;t catch this Pokémon.&quot;</span>
+    <span class="n">player</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="catch_pikemnon">
+<a class="viewcode-back" href="../../src.html#src.fighting.catch_pikemnon">[docs]</a>
+<span class="k">def</span> <span class="nf">catch_pikemnon</span><span class="p">(</span><span class="n">player</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the use of an item during a fight.</span>
+
+<span class="sd">    This function checks the type of the item and performs the appropriate action.</span>
+<span class="sd">    If the item is a potion, it restores the player&#39;s Pikemnon&#39;s health.</span>
+<span class="sd">    If the item is a pikeball, it attempts to catch the NPC&#39;s Pikemnon.</span>
+
+<span class="sd">    :param item: The name of the item to be used.</span>
+<span class="sd">    :type item: str</span>
+<span class="sd">    :param player: The player using the item. The player should be a dictionary with keys for &#39;potion&#39;, &#39;better potion&#39;, &#39;pikeball&#39;, &#39;better pikeball&#39;, and &#39;pikemnons&#39;.</span>
+<span class="sd">    :type player: dict[str, any]</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * player_pikemnon (dict): The player&#39;s current Pikemnon.</span>
+<span class="sd">        * text_to_display (str): The text to be displayed on the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">player_pikemnon</span><span class="p">,</span> <span class="n">npc_pikemnon</span><span class="p">,</span> <span class="n">text_to_display</span>
+    <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;You caught the Pokémon!&quot;</span>
+    <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+    <span class="n">player</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">npc_pikemnon</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">player</span></div>
+
+    
+
+<div class="viewcode-block" id="draw_player_image">
+<a class="viewcode-back" href="../../src.html#src.fighting.draw_player_image">[docs]</a>
+<span class="k">def</span> <span class="nf">draw_player_image</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws the player&#39;s active Pikemnon image on the screen.</span>
+
+<span class="sd">    This function loads the image of the player&#39;s active Pikemnon, creates a sprite from the image, scales and positions the sprite, and then draws it on the screen.</span>
+
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * window_width (int): The current width of the window.</span>
+<span class="sd">        * window_height (int): The current height of the window.</span>
+<span class="sd">        * current_player (dict): The current player, which is a dictionary containing a &#39;pikemnons&#39; key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Load the image</span>
+    <span class="n">active_pikemnon</span> <span class="o">=</span> <span class="n">get_player_pikemnon</span><span class="p">(</span><span class="n">current_player</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">])</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;assets/</span><span class="si">{</span><span class="n">active_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Apply nearest neighbor filtering to prevent blurring when scaling</span>
+    <span class="n">texture</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">get_texture</span><span class="p">()</span>
+    <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">GL_TEXTURE_MAG_FILTER</span><span class="p">,</span> <span class="n">GL_NEAREST</span><span class="p">)</span>
+    <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">GL_TEXTURE_MIN_FILTER</span><span class="p">,</span> <span class="n">GL_NEAREST</span><span class="p">)</span>
+
+    <span class="c1"># Create a sprite from the image</span>
+    <span class="n">sprite</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">sprite</span><span class="o">.</span><span class="n">Sprite</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">sprite</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">sprite</span><span class="o">.</span><span class="n">scale_x</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Flip the sprite horizontally</span>
+
+    <span class="c1"># Calculate the position to center the scaled sprite</span>
+    <span class="n">sprite</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">window_width</span> <span class="o">-</span> <span class="n">sprite</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">100</span>
+    <span class="n">sprite</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">window_height</span> <span class="o">-</span> <span class="n">sprite</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">50</span>
+
+    <span class="c1"># Reset color to default (white) to ensure no unintended tint is applied</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">glColor4f</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    
+    <span class="c1"># Draw the scaled sprite</span>
+    <span class="n">sprite</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="draw_npc_image">
+<a class="viewcode-back" href="../../src.html#src.fighting.draw_npc_image">[docs]</a>
+<span class="k">def</span> <span class="nf">draw_npc_image</span><span class="p">(</span><span class="n">img_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws the NPC&#39;s Pikemnon image on the screen.</span>
+
+<span class="sd">    This function loads the image from the provided path, creates a sprite from the image, scales and positions the sprite, and then draws it on the screen.</span>
+
+<span class="sd">    :param img_path: The file path of the image for the NPC&#39;s Pikemnon.</span>
+<span class="sd">    :type img_path: str</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * window_width (int): The current width of the window.</span>
+<span class="sd">        * window_height (int): The current height of the window.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">resource</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+
+    <span class="n">texture</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">get_texture</span><span class="p">()</span>
+    <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">GL_TEXTURE_MAG_FILTER</span><span class="p">,</span> <span class="n">GL_NEAREST</span><span class="p">)</span>
+    <span class="n">glTexParameteri</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">GL_TEXTURE_MIN_FILTER</span><span class="p">,</span> <span class="n">GL_NEAREST</span><span class="p">)</span>
+
+    <span class="n">sprite</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">sprite</span><span class="o">.</span><span class="n">Sprite</span><span class="p">(</span><span class="n">img</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">sprite</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="mi">7</span>
+
+    <span class="n">sprite</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">window_width</span> <span class="o">-</span> <span class="n">sprite</span><span class="o">.</span><span class="n">width</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">150</span>
+    <span class="n">sprite</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">window_height</span> <span class="o">-</span> <span class="n">sprite</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">150</span>
+
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">glColor4f</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="n">sprite</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="npc_attack">
+<a class="viewcode-back" href="../../src.html#src.fighting.npc_attack">[docs]</a>
+<span class="k">def</span> <span class="nf">npc_attack</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the NPC&#39;s attack during a fight.</span>
+
+<span class="sd">    This function selects an attack or buff/debuff move for the NPC&#39;s Pikemnon based on the move&#39;s power and remaining PP.</span>
+<span class="sd">    The selected move&#39;s PP is then decreased by 1, and the handle_attack function is called with the selected move.</span>
+
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * player_pikemnon (dict): The player&#39;s current Pikemnon.</span>
+<span class="sd">        * npc_pikemnon (dict): The NPC&#39;s current Pikemnon.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">player_pikemnon</span><span class="p">,</span> <span class="n">npc_pikemnon</span>
+    <span class="n">moves</span> <span class="o">=</span> <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">]</span>
+
+    <span class="n">attacks</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">details</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">details</span> <span class="ow">in</span> <span class="n">moves</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">details</span><span class="p">[</span><span class="s1">&#39;move_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;attack&#39;</span><span class="p">}</span>
+    <span class="n">buffs_and_debuffs</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">details</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">details</span> <span class="ow">in</span> <span class="n">moves</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">details</span><span class="p">[</span><span class="s1">&#39;move_type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;buff&#39;</span><span class="p">,</span> <span class="s1">&#39;debuff&#39;</span><span class="p">]}</span>
+
+    <span class="n">chance_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">attack</span> <span class="ow">in</span> <span class="n">attacks</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">attacks</span><span class="p">[</span><span class="n">attack</span><span class="p">][</span><span class="s1">&#39;power&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">][</span><span class="n">attack</span><span class="p">][</span><span class="s1">&#39;pp&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">chance_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attack</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">buffs_and_debuffs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">buff</span> <span class="ow">in</span> <span class="n">buffs_and_debuffs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">][</span><span class="n">buff</span><span class="p">][</span><span class="s1">&#39;pp&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chance_list</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):</span>
+                    <span class="n">chance_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>
+    
+        <span class="k">if</span> <span class="n">turn</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">buffs_and_debuffs</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">buff</span> <span class="ow">in</span> <span class="n">buffs_and_debuffs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">][</span><span class="n">buff</span><span class="p">][</span><span class="s1">&#39;pp&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chance_list</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):</span>
+                        <span class="n">chance_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>
+    
+    <span class="n">attack_name</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">chance_list</span><span class="p">)</span>
+    <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">][</span><span class="n">attack_name</span><span class="p">][</span><span class="s1">&#39;pp&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="n">handle_attack</span><span class="p">(</span><span class="n">attack_name</span><span class="p">,</span> <span class="n">npc_pikemnon</span><span class="p">,</span> <span class="n">player_pikemnon</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_battle_end">
+<a class="viewcode-back" href="../../src.html#src.fighting.check_battle_end">[docs]</a>
+<span class="k">def</span> <span class="nf">check_battle_end</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the battle has ended and handles the end of the battle.</span>
+
+<span class="sd">    This function checks the health of the player&#39;s and the NPC&#39;s Pikemnons to determine if the battle has ended.</span>
+<span class="sd">    If a Pikemnon&#39;s health is 0, it handles the end of the battle by displaying a message and returning a status string.</span>
+
+<span class="sd">    :return: A string indicating the status of the battle. Possible values are &quot;end&quot;, &quot;change&quot;, &quot;text&quot;, &quot;npc&quot;, &quot;player&quot;, &quot;continue&quot;, and &quot;attacked&quot;.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * player_pikemnon (dict): The player&#39;s current Pikemnon.</span>
+<span class="sd">        * npc_pikemnon (dict): The NPC&#39;s current Pikemnon.</span>
+<span class="sd">        * turn (int): The current turn number.</span>
+<span class="sd">        * text_to_display (str): The text to be displayed on the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">player_pikemnon</span><span class="p">,</span> <span class="n">npc_pikemnon</span><span class="p">,</span> <span class="n">turn</span><span class="p">,</span> <span class="n">text_to_display</span>
+    <span class="k">if</span> <span class="n">get_fight_stat</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;end&quot;</span>
+    <span class="k">if</span> <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">pix</span> <span class="ow">in</span> <span class="n">current_player</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">pix</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;change&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">text_to_display</span> <span class="ow">and</span> <span class="n">get_fight_stat</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;Player&#39;s Pokémon fainted. NPC wins!&quot;</span>
+            <span class="k">return</span> <span class="s2">&quot;text&quot;</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">text_to_display</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;npc&quot;</span>
+    <span class="k">elif</span> <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">current_npc</span> <span class="o">=</span> <span class="n">get_current_npc</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">current_npc</span><span class="p">[</span><span class="s1">&#39;pikemnon_index&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_npc</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">current_npc</span><span class="p">[</span><span class="s1">&#39;pikemnon_index&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">npc_pikemnon</span> <span class="o">=</span> <span class="n">current_npc</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">][</span><span class="n">current_npc</span><span class="p">[</span><span class="s1">&#39;pikemnon_index&#39;</span><span class="p">]]</span>
+            <span class="n">text_to_display</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;NPC sent out </span><span class="si">{</span><span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">text_to_display</span> <span class="ow">and</span> <span class="n">get_fight_stat</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span>
+                <span class="n">random_item</span> <span class="o">=</span> <span class="n">add_random_item</span><span class="p">(</span><span class="n">current_player</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player won! You got a </span><span class="si">{</span><span class="n">random_item</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">text_to_display</span> <span class="o">=</span> <span class="s2">&quot;NPC&#39;s Pokémon fainted. Player wins!&quot;</span>
+                <span class="k">return</span> <span class="s2">&quot;text&quot;</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">text_to_display</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;player&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;continue&quot;</span> <span class="k">if</span> <span class="n">get_fight_stat</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;attacked&quot;</span> <span class="k">else</span> <span class="s2">&quot;attacked&quot;</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">draw_health_bar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">health_percentage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws a health bar on the screen.</span>
+
+<span class="sd">    This function first draws the background of the health bar in gray, representing the depleted health.</span>
+<span class="sd">    Then it draws the current health in green over the background.</span>
+
+<span class="sd">    :param x: The x-coordinate of the bottom-left corner of the health bar.</span>
+<span class="sd">    :type x: int</span>
+<span class="sd">    :param y: The y-coordinate of the bottom-left corner of the health bar.</span>
+<span class="sd">    :type y: int</span>
+<span class="sd">    :param width: The width of the health bar.</span>
+<span class="sd">    :type width: int</span>
+<span class="sd">    :param height: The height of the health bar.</span>
+<span class="sd">    :type height: int</span>
+<span class="sd">    :param health_percentage: The current health as a percentage of the total health.</span>
+<span class="sd">    :type health_percentage: float</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Draw the health bar background (e.g., gray for depleted health)</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">glColor4f</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Gray color</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">GL_QUADS</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;v2f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">]))</span>
+    
+    <span class="c1"># Draw the current health</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">glColor4f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Green color</span>
+    <span class="n">current_health_width</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">health_percentage</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">GL_QUADS</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;v2f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">current_health_width</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">current_health_width</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">]))</span>
+
+<div class="viewcode-block" id="draw_menu_options">
+<a class="viewcode-back" href="../../src.html#src.fighting.draw_menu_options">[docs]</a>
+<span class="k">def</span> <span class="nf">draw_menu_options</span><span class="p">(</span><span class="n">menu_options</span><span class="p">,</span> <span class="n">selected_option_index</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws the menu options on the screen.</span>
+
+<span class="sd">    This function displays the menu options in a grid layout. The selected option is highlighted with a different color.</span>
+
+<span class="sd">    :param menu_options: A list of the menu options to be displayed.</span>
+<span class="sd">    :type menu_options: list[str]</span>
+<span class="sd">    :param selected_option_index: The index of the currently selected menu option.</span>
+<span class="sd">    :type selected_option_index: int</span>
+<span class="sd">    :param state: The current state of the game, which determines the display text function to be used.</span>
+<span class="sd">    :type state: str</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * current_menu (str): The current menu being displayed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">current_menu</span> 
+    <span class="n">menu_box_x</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">menu_box_y</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">menu_box_width</span> <span class="o">=</span> <span class="mi">600</span>
+    <span class="n">menu_box_height</span> <span class="o">=</span> <span class="mi">150</span>
+
+    <span class="c1"># Colors</span>
+    <span class="n">default_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="n">highlight_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="n">highlight_background_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+
+    <span class="n">grid_columns</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">grid_rows</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">column_width</span> <span class="o">=</span> <span class="n">menu_box_width</span> <span class="o">/</span> <span class="n">grid_columns</span>
+    <span class="n">row_height</span> <span class="o">=</span> <span class="n">menu_box_height</span> <span class="o">/</span> <span class="n">grid_rows</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">option</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">menu_options</span><span class="p">):</span>
+        <span class="n">column</span> <span class="o">=</span> <span class="n">i</span> <span class="o">%</span> <span class="n">grid_columns</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="n">grid_columns</span>
+
+        <span class="n">x_center</span> <span class="o">=</span> <span class="n">menu_box_x</span> <span class="o">+</span> <span class="p">(</span><span class="n">column</span> <span class="o">*</span> <span class="n">column_width</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">column_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">y_center</span> <span class="o">=</span> <span class="n">menu_box_y</span> <span class="o">+</span> <span class="p">(</span><span class="n">menu_box_height</span> <span class="o">-</span> <span class="p">(</span><span class="n">row</span> <span class="o">*</span> <span class="n">row_height</span><span class="p">))</span> <span class="o">-</span> <span class="p">(</span><span class="n">row_height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">display_text_functions</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;attack&#39;</span><span class="p">:</span> <span class="n">attack_display_text</span><span class="p">,</span>
+            <span class="s1">&#39;inventory&#39;</span><span class="p">:</span> <span class="n">inventory_display_text</span><span class="p">,</span>
+            <span class="s1">&#39;menu&#39;</span><span class="p">:</span> <span class="n">menu_display_text</span><span class="p">,</span>
+            <span class="s1">&#39;change&#39;</span><span class="p">:</span> <span class="n">change_display_text</span>
+        <span class="p">}</span>
+
+        <span class="n">display_text_function</span> <span class="o">=</span> <span class="n">display_text_functions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">display_text_functions</span><span class="p">[</span><span class="s1">&#39;menu&#39;</span><span class="p">])</span>
+
+        <span class="n">display_text</span> <span class="o">=</span> <span class="n">display_text_function</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+
+        <span class="c1"># Use index to check if the option is the selected one</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">selected_option_index</span><span class="p">:</span>
+            <span class="c1"># Draw highlighted background</span>
+            <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">glColor4ub</span><span class="p">(</span><span class="o">*</span><span class="n">highlight_background_color</span><span class="p">)</span>
+            <span class="n">margin</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># Margin for the background rectangle</span>
+            <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">GL_QUADS</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;v2f&#39;</span><span class="p">,</span> <span class="p">[</span>
+                <span class="n">x_center</span> <span class="o">-</span> <span class="n">column_width</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">margin</span><span class="p">,</span> <span class="n">y_center</span> <span class="o">-</span> <span class="n">row_height</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">margin</span><span class="p">,</span>
+                <span class="n">x_center</span> <span class="o">+</span> <span class="n">column_width</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">margin</span><span class="p">,</span> <span class="n">y_center</span> <span class="o">-</span> <span class="n">row_height</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">margin</span><span class="p">,</span>
+                <span class="n">x_center</span> <span class="o">+</span> <span class="n">column_width</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">margin</span><span class="p">,</span> <span class="n">y_center</span> <span class="o">+</span> <span class="n">row_height</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">margin</span><span class="p">,</span>
+                <span class="n">x_center</span> <span class="o">-</span> <span class="n">column_width</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">margin</span><span class="p">,</span> <span class="n">y_center</span> <span class="o">+</span> <span class="n">row_height</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">margin</span><span class="p">,</span>
+            <span class="p">]))</span>
+
+            <span class="n">color</span> <span class="o">=</span> <span class="n">highlight_color</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">default_color</span>
+
+        <span class="c1"># Create and draw the label for the option with the number appended</span>
+        <span class="n">option_label</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">display_text</span><span class="p">,</span>
+                                         <span class="n">font_name</span><span class="o">=</span><span class="n">FONT_NAME</span><span class="p">,</span>
+                                         <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+                                         <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                                         <span class="n">x</span><span class="o">=</span><span class="n">x_center</span><span class="p">,</span>
+                                         <span class="n">y</span><span class="o">=</span><span class="n">y_center</span><span class="p">,</span>
+                                         <span class="n">anchor_x</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">anchor_y</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+        <span class="n">option_label</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+    <span class="c1"># Reset color to default after drawing</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">glColor4ub</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="attack_display_text">
+<a class="viewcode-back" href="../../src.html#src.fighting.attack_display_text">[docs]</a>
+<span class="k">def</span> <span class="nf">attack_display_text</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the display text for an attack option.</span>
+
+<span class="sd">    This function returns a string that includes the name of the attack option and the remaining PP for that attack.</span>
+
+<span class="sd">    :param option: The name of the attack option.</span>
+<span class="sd">    :type option: str</span>
+<span class="sd">    :return: A string in the format &quot;{option} {PP}&quot;, where {option} is the name of the attack option and {PP} is the remaining PP for that attack.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * player_pikemnon (dict): The player&#39;s current Pikemnon.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">option</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;moves&#39;</span><span class="p">][</span><span class="n">option</span><span class="p">][</span><span class="s1">&#39;pp&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="inventory_display_text">
+<a class="viewcode-back" href="../../src.html#src.fighting.inventory_display_text">[docs]</a>
+<span class="k">def</span> <span class="nf">inventory_display_text</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the display text for an inventory option.</span>
+
+<span class="sd">    This function returns a string that includes the name of the inventory option and the quantity of that item in the player&#39;s inventory.</span>
+
+<span class="sd">    :param option: The name of the inventory option.</span>
+<span class="sd">    :type option: str</span>
+<span class="sd">    :return: A string in the format &quot;{option} {quantity}&quot;, where {option} is the name of the inventory option and {quantity} is the quantity of that item in the player&#39;s inventory.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * current_player (dict): The current player, which is a dictionary containing keys for each inventory item and their quantities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">option</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">current_player</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="menu_display_text">
+<a class="viewcode-back" href="../../src.html#src.fighting.menu_display_text">[docs]</a>
+<span class="k">def</span> <span class="nf">menu_display_text</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the display text for a menu option.</span>
+
+<span class="sd">    This function returns a string that is the same as the input option.</span>
+
+<span class="sd">    :param option: The name of the menu option.</span>
+<span class="sd">    :type option: str</span>
+<span class="sd">    :return: A string that is the same as the input option.</span>
+<span class="sd">    :rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">option</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="change_display_text">
+<a class="viewcode-back" href="../../src.html#src.fighting.change_display_text">[docs]</a>
+<span class="k">def</span> <span class="nf">change_display_text</span><span class="p">(</span><span class="n">option</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the display text for a change option.</span>
+
+<span class="sd">    This function returns a string that includes the name of the Pikemnon and its current health as a percentage of its total health.</span>
+
+<span class="sd">    :param option: The id of the Pikemnon.</span>
+<span class="sd">    :type option: str</span>
+<span class="sd">    :return: A string in the format &quot;{name} {health_percentage}%&quot;, where {name} is the name of the Pikemnon and {health_percentage} is the Pikemnon&#39;s current health as a percentage of its total health.</span>
+<span class="sd">    :rtype: str</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * current_player (dict): The current player, which is a dictionary containing a &#39;pikemnons&#39; key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pikemn</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">pikemnon</span> <span class="ow">in</span> <span class="n">current_player</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">pikemnon</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">option</span><span class="p">:</span>
+            <span class="n">pikemn</span> <span class="o">=</span> <span class="n">pikemnon</span>
+    <span class="n">health_percentage</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">pikemn</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">pikemn</span><span class="p">[</span><span class="s1">&#39;health&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pikemn</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">health_percentage</span><span class="si">}</span><span class="s2">%&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="navigate_menu">
+<a class="viewcode-back" href="../../src.html#src.fighting.navigate_menu">[docs]</a>
+<span class="k">def</span> <span class="nf">navigate_menu</span><span class="p">(</span><span class="n">direction</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Navigates the menu options based on the input direction.</span>
+
+<span class="sd">    This function changes the selected option index based on the input direction. The menu options are arranged in a grid, so the selected option index can be moved up, down, left, or right.</span>
+
+<span class="sd">    :param direction: The direction to move the selected option index. Possible values are &quot;up&quot;, &quot;down&quot;, &quot;left&quot;, and &quot;right&quot;.</span>
+<span class="sd">    :type direction: str</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * selected_option_index (int): The index of the currently selected menu option.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">selected_option_index</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;up&#39;</span> <span class="ow">and</span> <span class="n">selected_option_index</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">selected_option_index</span> <span class="o">-=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;down&#39;</span> <span class="ow">and</span> <span class="n">selected_option_index</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">selected_option_index</span> <span class="o">+=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span> <span class="ow">and</span> <span class="n">selected_option_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">selected_option_index</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span> <span class="ow">and</span> <span class="n">selected_option_index</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">selected_option_index</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="clear_screen">
+<a class="viewcode-back" href="../../src.html#src.fighting.clear_screen">[docs]</a>
+<span class="k">def</span> <span class="nf">clear_screen</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clears the screen.</span>
+
+<span class="sd">    This function sets the clear color to white and then clears the window.</span>
+
+<span class="sd">    :param window: The window to be cleared.</span>
+<span class="sd">    :type window: pyglet.window.Window</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">glClearColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="draw_box">
+<a class="viewcode-back" href="../../src.html#src.fighting.draw_box">[docs]</a>
+<span class="k">def</span> <span class="nf">draw_box</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">border_thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws a box on the screen.</span>
+
+<span class="sd">    This function first draws the border of the box in black, then fills the box with white.</span>
+
+<span class="sd">    :param x: The x-coordinate of the bottom-left corner of the box.</span>
+<span class="sd">    :type x: int</span>
+<span class="sd">    :param y: The y-coordinate of the bottom-left corner of the box.</span>
+<span class="sd">    :type y: int</span>
+<span class="sd">    :param width: The width of the box.</span>
+<span class="sd">    :type width: int</span>
+<span class="sd">    :param height: The height of the box.</span>
+<span class="sd">    :type height: int</span>
+<span class="sd">    :param border_thickness: The thickness of the box&#39;s border. Default is 2.</span>
+<span class="sd">    :type border_thickness: int</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Draw border</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">glColor4f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">GL_QUADS</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;v2f&#39;</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">x</span> <span class="o">-</span> <span class="n">border_thickness</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">border_thickness</span><span class="p">,</span>
+        <span class="n">x</span> <span class="o">+</span> <span class="n">width</span> <span class="o">+</span> <span class="n">border_thickness</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">border_thickness</span><span class="p">,</span>
+        <span class="n">x</span> <span class="o">+</span> <span class="n">width</span> <span class="o">+</span> <span class="n">border_thickness</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span> <span class="o">+</span> <span class="n">border_thickness</span><span class="p">,</span>
+        <span class="n">x</span> <span class="o">-</span> <span class="n">border_thickness</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span> <span class="o">+</span> <span class="n">border_thickness</span><span class="p">]))</span>
+    <span class="c1"># Fill</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">glColor4f</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">GL_QUADS</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;v2f&#39;</span><span class="p">,</span> <span class="p">[</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="draw_label">
+<a class="viewcode-back" href="../../src.html#src.fighting.draw_label">[docs]</a>
+<span class="k">def</span> <span class="nf">draw_label</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws a label on the screen.</span>
+
+<span class="sd">    This function creates a label with the specified text, font size, and color, and then draws it at the specified x and y coordinates.</span>
+
+<span class="sd">    :param text: The text to be displayed in the label.</span>
+<span class="sd">    :type text: str</span>
+<span class="sd">    :param x: The x-coordinate of the bottom-left corner of the label.</span>
+<span class="sd">    :type x: int</span>
+<span class="sd">    :param y: The y-coordinate of the bottom-left corner of the label.</span>
+<span class="sd">    :type y: int</span>
+<span class="sd">    :param font_size: The size of the font to be used in the label. Default is 12.</span>
+<span class="sd">    :type font_size: int</span>
+<span class="sd">    :param color: The color of the text in the label. It is a tuple of four integers representing the red, green, blue, and alpha values. Default is black.</span>
+<span class="sd">    :type color: Tuple[int, int, int, int]</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">font_name</span><span class="o">=</span><span class="n">FONT_NAME</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">anchor_x</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">anchor_y</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="n">label</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="draw_health_bar">
+<a class="viewcode-back" href="../../src.html#src.fighting.draw_health_bar">[docs]</a>
+<span class="k">def</span> <span class="nf">draw_health_bar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">percentage</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draws a health bar on the screen.</span>
+
+<span class="sd">    This function first draws the background of the health bar in gray, then fills the health bar with green based on the percentage of health.</span>
+
+<span class="sd">    :param x: The x-coordinate of the bottom-left corner of the health bar.</span>
+<span class="sd">    :type x: int</span>
+<span class="sd">    :param y: The y-coordinate of the bottom-left corner of the health bar.</span>
+<span class="sd">    :type y: int</span>
+<span class="sd">    :param width: The width of the health bar.</span>
+<span class="sd">    :type width: int</span>
+<span class="sd">    :param height: The height of the health bar.</span>
+<span class="sd">    :type height: int</span>
+<span class="sd">    :param percentage: The percentage of health. This determines how much of the health bar is filled with green.</span>
+<span class="sd">    :type percentage: float</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Background</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">glColor4f</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">GL_QUADS</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;v2f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">]))</span>
+    <span class="c1"># Health</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">glColor4f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">pyglet</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">pyglet</span><span class="o">.</span><span class="n">gl</span><span class="o">.</span><span class="n">GL_QUADS</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;v2f&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span> <span class="o">*</span> <span class="n">percentage</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">width</span> <span class="o">*</span> <span class="n">percentage</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">height</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="fighting_screen">
+<a class="viewcode-back" href="../../src.html#src.fighting.fighting_screen">[docs]</a>
+<span class="k">def</span> <span class="nf">fighting_screen</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">player</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">menu_options</span><span class="p">,</span> <span class="n">selected_option_index</span><span class="p">,</span> <span class="n">menu_state</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the fighting screen of the game.</span>
+
+<span class="sd">    This function draws the fighting screen, including the player and NPC pikemnons, their health bars, and the menu options. It also handles the navigation of the menu options and the end of the battle.</span>
+
+<span class="sd">    :param window: The window to draw the fighting screen on.</span>
+<span class="sd">    :param player: The player&#39;s data.</span>
+<span class="sd">    :param direction: The direction to move the selected menu option. Possible values are &quot;up&quot;, &quot;down&quot;, &quot;left&quot;, and &quot;right&quot;.</span>
+<span class="sd">    :param menu_options: The menu options to be displayed.</span>
+<span class="sd">    :param selected_option_index: The index of the currently selected menu option.</span>
+<span class="sd">    :param menu_state: The current state of the menu.</span>
+<span class="sd">    :type window: pyglet.window.Window</span>
+<span class="sd">    :type player: dict</span>
+<span class="sd">    :type direction: str</span>
+<span class="sd">    :type menu_options: list</span>
+<span class="sd">    :type selected_option_index: int</span>
+<span class="sd">    :type menu_state: str</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * npc_pikemnon (dict): The NPC&#39;s current pikemnon.</span>
+<span class="sd">        * player_pikemnon (dict): The player&#39;s current pikemnon.</span>
+<span class="sd">        * current_player (dict): The current player.</span>
+<span class="sd">        * display_time (float): The time when the display text was set.</span>
+<span class="sd">        * text_to_display (str): The text to be displayed on the screen.</span>
+<span class="sd">        * old_fight_stat (str): The previous fight state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clear_screen</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+
+    <span class="k">global</span> <span class="n">npc_pikemnon</span><span class="p">,</span> <span class="n">player_pikemnon</span><span class="p">,</span> <span class="n">current_player</span><span class="p">,</span> <span class="n">display_time</span><span class="p">,</span> <span class="n">text_to_display</span><span class="p">,</span> <span class="n">old_fight_stat</span>
+    <span class="n">current_npc</span> <span class="o">=</span> <span class="n">get_current_npc</span><span class="p">()</span>
+    <span class="n">npc_pikemnon</span> <span class="o">=</span> <span class="n">current_npc</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">][</span><span class="n">current_npc</span><span class="p">[</span><span class="s1">&#39;pikemnon_index&#39;</span><span class="p">]]</span>
+    <span class="n">current_player</span> <span class="o">=</span> <span class="n">player</span>
+
+    <span class="n">player_pikemnon</span> <span class="o">=</span> <span class="n">get_player_pikemnon</span><span class="p">(</span><span class="n">player</span><span class="p">[</span><span class="s1">&#39;pikemnons&#39;</span><span class="p">])</span>
+
+    <span class="n">draw_box</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">450</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+    <span class="n">draw_box</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+
+    <span class="n">draw_box</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+
+    <span class="n">draw_label</span><span class="p">(</span><span class="s1">&#39;Player&#39;</span><span class="p">,</span> <span class="mi">40</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">450</span> <span class="o">+</span> <span class="mi">80</span> <span class="o">-</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">draw_label</span><span class="p">(</span><span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="mi">40</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">450</span> <span class="o">+</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="n">draw_label</span><span class="p">(</span><span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="mi">400</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">200</span> <span class="o">+</span> <span class="mi">80</span> <span class="o">-</span> <span class="mi">10</span><span class="p">)</span>
+
+    <span class="n">draw_health_bar</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">450</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">player_pikemnon</span><span class="p">[</span><span class="s1">&#39;health&#39;</span><span class="p">])</span>
+    <span class="n">draw_health_bar</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">200</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;current_health&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;health&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">text_to_display</span><span class="p">:</span>
+        <span class="n">set_display_text</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">draw_label</span><span class="p">(</span><span class="n">text_to_display</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span> <span class="k">if</span> <span class="n">text_to_display</span> <span class="k">else</span> <span class="n">draw_menu_options</span><span class="p">(</span><span class="n">menu_options</span><span class="p">,</span> <span class="n">selected_option_index</span><span class="p">,</span> <span class="n">menu_state</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">text_to_display</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">display_time</span><span class="p">:</span>
+        <span class="n">display_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">old_fight_stat</span> <span class="o">=</span> <span class="n">get_fight_stat</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">display_time</span> <span class="ow">and</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">display_time</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">text_to_display</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">display_time</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">set_fight_stat</span><span class="p">(</span><span class="n">old_fight_stat</span><span class="p">)</span>
+        <span class="n">old_fight_stat</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">draw_player_image</span><span class="p">()</span>
+    <span class="n">draw_npc_image</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;assets/</span><span class="si">{</span><span class="n">npc_pikemnon</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">direction</span><span class="p">:</span>
+        <span class="n">navigate_menu</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span>
+
+    <span class="n">set_fight_stat</span><span class="p">(</span><span class="n">check_battle_end</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">text_to_display</span><span class="p">:</span>
+        <span class="n">set_fight_stat</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_text_to_display">
+<a class="viewcode-back" href="../../src.html#src.fighting.set_text_to_display">[docs]</a>
+<span class="k">def</span> <span class="nf">set_text_to_display</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sets the global variable &#39;text_to_display&#39; to the input text.</span>
+
+<span class="sd">    :param text: The text to be set.</span>
+<span class="sd">    :type text: str</span>
+<span class="sd">    :return: None</span>
+
+<span class="sd">    :Global Variables: </span>
+<span class="sd">        * text_to_display (str): The text to be displayed on the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">text_to_display</span>
+    <span class="n">text_to_display</span> <span class="o">=</span> <span class="n">text</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Pikemnon</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">pikemnon</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zdenek Sojka.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
