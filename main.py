@@ -79,12 +79,19 @@ def on_key_press(symbol: int, modifier: int) -> None:
     It handles navigation and selection in the main menu and options menu, adjusts the volume,
     and handles key presses during fighting and non-fighting game states.
 
-    Parameters:
-    symbol (int): The key symbol of the pressed key.
-    modifier (int): The modifier key pressed along with the symbol key.
+    :param symbol: The key symbol of the pressed key.
+    :type symbol: int
+    :param modifier: The modifier key pressed along with the symbol key.
+    :type modifier: int
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * menu_direction (str): The direction of the currently selected menu option.
+        * fighting_menu_state (str): The current state of the fighting menu.
+        * selected_menu_option_index (int): The index of the currently selected menu option.
+        * menu_options (list): A list of the main menu options.
+        * attack_options (list): A list of the player's current pikemnon's moves.
+        * player (dict): The player object, which is a dictionary that includes a 'sprite' key and a 'pikemnons' key.
     """
     global menu_direction, fighting_menu_state, selected_menu_option_index, menu_options, attack_options, player
     if get_fight_stat() != "text":
@@ -127,11 +134,12 @@ def handle_non_fighting_key_press(symbol: int) -> None:
     It handles navigation in the game world by setting the appropriate direction to True in the key_state dictionary.
     It also checks for wild encounters after each key press.
 
-    Parameters:
-    symbol (int): The key symbol of the pressed key.
+    :param symbol: The key symbol of the pressed key.
+    :type symbol: int
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * key_state (dict): A dictionary that maps directions ('up', 'down', 'left', 'right') to booleans indicating whether the corresponding key is pressed.
     """
     global inventory, inventory_index, kill_inventory, kill_index
 
@@ -192,11 +200,13 @@ def handle_fighting_key_press(symbol: int) -> None:
     This function takes the key symbol and modifies the selected menu option index and the fighting menu state
     based on the key pressed. It handles navigation and selection in the fighting menu.
 
-    Parameters:
-    symbol (int): The key symbol of the pressed key.
+    :param symbol: The key symbol of the pressed key.
+    :type symbol: int
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * selected_menu_option_index (int): The index of the currently selected menu option.
+        * fighting_menu_state (str): The current state of the fighting menu.
     """
     global selected_menu_option_index, fighting_menu_state
 
@@ -221,13 +231,12 @@ def process_space_key() -> None:
     This function checks the current state of the fighting menu and calls the appropriate function to process the action.
     The fighting menu state can be one of the following: 'main', 'attack', 'inventory', or 'change'.
 
-    Global variables:
-    fighting_menu_state (str): The current state of the fighting menu.
-    selected_menu_option_index (int): The index of the currently selected menu option.
-    player (Player): The player object.
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * fighting_menu_state (str): The current state of the fighting menu.
+        * selected_menu_option_index (int): The index of the currently selected menu option.
+        * player (Player): The player object.
     """
     global fighting_menu_state, selected_menu_option_index, player
 
@@ -248,13 +257,12 @@ def process_main_menu() -> None:
     This function checks the current state of the fighting menu and calls the appropriate function to process the action.
     The fighting menu state can be one of the following: 'main', 'attack', 'inventory', or 'change'.
 
-    Global variables:
-    fighting_menu_state (str): The current state of the fighting menu.
-    selected_menu_option_index (int): The index of the currently selected menu option.
-    player (Player): The player object.
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * fighting_menu_state (str): The current state of the fighting menu.
+        * selected_menu_option_index (int): The index of the currently selected menu option.
+        * player (Player): The player object.
     """
     global fighting_menu_state, selected_menu_option_index
     menu_actions = {
@@ -277,12 +285,12 @@ def process_attack_menu() -> None:
 
     This function calls the player_attack function with the attack corresponding to the selected menu option.
 
-    Global variables:
-    player (Player): The player object.
-    selected_menu_option_index (int): The index of the currently selected menu option.
+    :param None
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * player (Player): The player object.
+        * selected_menu_option_index (int): The index of the currently selected menu option.
     """
     global player
     player_attack(attack_options[selected_menu_option_index])
@@ -294,12 +302,12 @@ def process_inventory_menu() -> None:
 
     This function calls the player_attack function with the attack corresponding to the selected menu option.
 
-    Global variables:
-    player (Player): The player object.
-    selected_menu_option_index (int): The index of the currently selected menu option.
+    :param None
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * player (Player): The player object.
+        * selected_menu_option_index (int): The index of the currently selected menu option.
     """
     global fighting_menu_state, player, selected_menu_option_index
     player_pikemnons = len(player['pikemnons'])
@@ -317,13 +325,13 @@ def process_change_menu() -> None:
     This function changes the active pikemnon to the one corresponding to the selected menu option, if it is valid and has more than 0 health.
     After changing the active pikemnon, it resets the selected menu option index and changes the fighting menu state to 'main'.
 
-    Global variables:
-    fighting_menu_state (str): The current state of the fighting menu.
-    player (dict): The player object, which is a dictionary that includes a 'pikemnons' key.
-    selected_menu_option_index (int): The index of the currently selected menu option.
+    :param None:
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * fighting_menu_state (str): The current state of the fighting menu.
+        * player (dict): The player object, which is a dictionary that includes a 'pikemnons' key.
+        * selected_menu_option_index (int): The index of the currently selected menu option.
     """
     global fighting_menu_state, selected_menu_option_index, player
     # Retrieve the UUID of the selected Pikemnon from the menu options
@@ -358,13 +366,13 @@ def handle_attack_result() -> None:
     If the fight status is 'change', it changes the fighting menu state to 'change'.
     If the fight status is 'end', it ends the fight.
 
-    Global variables:
-    fighting_menu_state (str): The current state of the fighting menu.
-    player (dict): The player object, which is a dictionary that includes a 'pikemnons' key.
-    selected_menu_option_index (int): The index of the currently selected menu option.
+    :param None:
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * fighting_menu_state (str): The current state of the fighting menu.
+        * player (dict): The player object, which is a dictionary that includes a 'pikemnons' key.
+        * selected_menu_option_index (int): The index of the currently selected menu option.
     """
     global fighting_menu_state, selected_menu_option_index
 
@@ -403,18 +411,18 @@ def handle_attack_result() -> None:
 @window.event
 def on_key_release(symbol: int, _: int) -> None:
     """
-    Checks if a wild encounter should occur and starts a fight if so.
+    Checks if a wild encounter should occur and starts a fight if necessary.
 
     This function checks if the player is on a "Tall Grass" tile, if at least 5 seconds have passed since the last fight, 
     if there is not currently a fight ongoing, and if a random number is less than the fight chance (0.1).
     If all these conditions are met, it starts a wild fight and updates the last fight time.
 
-    Global variables:
-    last_fight_time (float): The time when the last fight occurred.
-    player (dict): The player object, which is a dictionary that includes a 'position' key.
+    :param None:
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * last_fight_time (float): The time when the last fight occurred.
+        * player (dict): The player object, which is a dictionary that includes a 'position' key.
     """
     if symbol == key.W:
         key_state['up'] = False
@@ -434,12 +442,12 @@ def wild_encounter() -> None:
     if there is not currently a fight ongoing, and if a random number is less than the fight chance (0.1).
     If all these conditions are met, it starts a wild fight and updates the last fight time.
 
-    Global variables:
-    last_fight_time (float): The time when the last fight occurred.
-    player (dict): The player object, which is a dictionary that includes a 'position' key.
+    :param None:
+    :return: None
 
-    Returns:
-    None
+    :Global Variables: 
+        * last_fight_time (float): The time when the last fight occurred.
+        * player (dict): The player object, which is a dictionary that includes a 'position' key.
     """
     global last_fight_time
     figt_chance = 0.1
@@ -457,19 +465,17 @@ def update(dt: float) -> None:
     checks the tile the player is on and performs the appropriate action (e.g., prevents the player from moving onto a "Nothing" tile, 
     changes the current map to the outside map if the player is on a "Door" tile), and updates the camera.
 
-    Parameters:
-    dt (float): The time elapsed since the last frame.
+    :param dt: The time elapsed since the last frame.
+    :type dt: float
 
-    Global variables:
-    player (dict): The player object, which is a dictionary that includes a 'sprite' key.
-    key_state (dict): A dictionary that maps directions ('up', 'down', 'left', 'right') to booleans indicating whether the corresponding key is pressed.
-    last_player_tile (str): The type of the tile the player was on in the last frame.
-    map_sprites (list): A list of sprite objects for the current map.
-    map_overlay (list): A list of overlay objects for the current map.
-    overlay_batch (pyglet.graphics.Batch): A batch of graphics to be drawn over the map.
+    :global player: The player object, which is a dictionary that includes a 'sprite' key.
+    :global key_state: A dictionary that maps directions ('up', 'down', 'left', 'right') to booleans indicating whether the corresponding key is pressed.
+    :global last_player_tile: The type of the tile the player was on in the last frame.
+    :global map_sprites: A list of sprite objects for the current map.
+    :global map_overlay: A list of overlay objects for the current map.
+    :global overlay_batch: A batch of graphics to be drawn over the map.
 
-    Returns:
-    None
+    :return: None
     """
     # Update the player
     old_x, old_y = player['sprite'].x, player['sprite'].y
@@ -505,24 +511,23 @@ def on_draw() -> None:
     If a fight is not ongoing, it draws the current map, the player, any NPCs on the map, and the inventory if it is open.
     If a fight is ongoing, it draws the fighting screen.
 
-    Global variables:
-    window (pyglet.window.Window): The game window.
-    map_sprites (list): A list of sprite objects for the current map.
-    player (dict): The player object, which is a dictionary that includes a 'sprite' key and a 'pikemnons' key.
-    outside_npcs (list): A list of NPC objects for the outside map.
-    inventory (bool): A boolean indicating whether the inventory is open.
-    inventory_index (int): The index of the currently selected inventory item.
-    kill_index (int): The index of the pikemnon to be removed from the player's pikemnons.
-    menu_direction (str): The direction of the currently selected menu option.
-    attack_options (list): A list of the player's current pikemnon's moves.
-    inventory_options (list): A list of the player's inventory items.
-    change_options (list): A list of the player's pikemnons.
-    menu_options (list): A list of the main menu options.
-    fighting_menu_state (str): The current state of the fighting menu.
-    selected_menu_option_index (int): The index of the currently selected menu option.
+    :param None:
+    :return: None
 
-    Returns:
-    None
+    :global window: The game window.
+    :global map_sprites: A list of sprite objects for the current map.
+    :global player: The player object, which is a dictionary that includes a 'sprite' key and a 'pikemnons' key.
+    :global outside_npcs: A list of NPC objects for the outside map.
+    :global inventory: A boolean indicating whether the inventory is open.
+    :global inventory_index: The index of the currently selected inventory item.
+    :global kill_index: The index of the pikemnon to be removed from the player's pikemnons.
+    :global menu_direction: The direction of the currently selected menu option.
+    :global attack_options: A list of the player's current pikemnon's moves.
+    :global inventory_options: A list of the player's inventory items.
+    :global change_options: A list of the player's pikemnons.
+    :global menu_options: A list of the main menu options.
+    :global fighting_menu_state: The current state of the fighting menu.
+    :global selected_menu_option_index: The index of the currently selected menu option.
     """
     pyglet.gl.glClearColor(0, 0, 0, 1)
     window.clear()
