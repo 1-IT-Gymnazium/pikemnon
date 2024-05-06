@@ -10,7 +10,7 @@ def get_npcs_data():
             "image": "assets/player.png",
             "x": 300,
             "y": 150,
-            "direction": "top",
+            "direction": "up",
             "pikemnons": 1
         },
         {
@@ -31,7 +31,7 @@ def get_npcs_data():
             "image": "assets/player.png",
             "x": 300,
             "y": 100,
-            "direction": "top",
+            "direction": "up",
             "pikemnons": 4
         },
         {
@@ -45,7 +45,7 @@ def get_npcs_data():
             "image": "assets/player.png",
             "x": 350,
             "y": 150,
-            "direction": "top",
+            "direction": "up",
             "pikemnons": 2
         }
     ]
