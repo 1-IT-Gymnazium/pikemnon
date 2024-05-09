@@ -31,9 +31,8 @@ display_time = None
 
 old_fight_stat = None
 
-def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_type: str, defense_type: str) -> int:
-    def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_type: str, defense_type: str) -> int:
-        """
+def calculate_damage(attack: int, defense: int, power: int, stage: list, attack_type: str, defense_type: str, defende_stage: list) -> int:
+    """
         Calculates the damage dealt by an attack in a Pikemnon battle.
 
         :param attack: The attack stat of the attacking Pikemnon.
@@ -44,7 +43,7 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_t
         :param defense_type: The type of the defending Pikemnon.
         :return: The final damage dealt by the attack.
         :rtype: int
-        """
+    """
     stage_multipliers = {
     -6: 0.25,
     -5: 0.29,
@@ -62,11 +61,12 @@ def calculate_damage(attack: int, defense: int, power: int, stage: int, attack_t
     }
 
     attack_stage = stage_multipliers[stage['attack']]
+    defende_stage = stage_multipliers[defende_stage['defense']]
     type_effectiveness = load_type_effectiveness()
 
     effectiveness = type_effectiveness.get(attack_type, {}).get(defense_type, 1)
 
-    base_damage = (power * (attack * attack_stage) / defense) / 50
+    base_damage = (power * (attack * attack_stage) / (defense * defende_stage)) / 50
     random_factor = random.uniform(0.5, 2.0) 
     final_damage = int(base_damage * effectiveness * random_factor) + 2
     
@@ -92,7 +92,7 @@ def handle_attack(attack_name: str, attacking_pikemnon: dict[str, any], defendin
     global text_to_display
     move = attacking_pikemnon['moves'][attack_name]
     if move['move_type'] == "attack":
-        damage = calculate_damage(attacking_pikemnon['attack'], defending_pikemnon['defense'], move['power'], attacking_pikemnon['stage'], attacking_pikemnon['type'], defending_pikemnon['type'])
+        damage = calculate_damage(attacking_pikemnon['attack'], defending_pikemnon['defense'], move['power'], attacking_pikemnon['stage'], attacking_pikemnon['type'], defending_pikemnon['type'], defending_pikemnon['stage'])
         defending_pikemnon['current_health'] -= damage
         text_to_display = f"{attacking_pikemnon['name']} used {attack_name} and dealt {damage} damage."
     elif move['move_type'] == "buff":
