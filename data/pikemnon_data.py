@@ -60,9 +60,9 @@ def get_pikemnon_data():
             "defense": 20,
             "type": "normal",
             "moves": {
-                "sing": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "sleep", "pp": 15},
+                "sing": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "defense", "pp": 15},
                 "pound": {"power": 40, "move_type": "attack", "type": "normal", "pp": 35},
-                "disable": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "move", "pp": 20},
+                "disable": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "attack", "pp": 20},
                 "double slap": {"power": 15, "move_type": "attack", "type": "normal", "pp": 10}
             }
         },
@@ -87,7 +87,7 @@ def get_pikemnon_data():
                 "tackle": {"power": 40, "move_type": "attack", "type": "normal", "pp": 35},
                 "tail whip": {"power": 1, "move_type": "debuff", "type": "normal", "target_stat": "defense", "pp": 30},
                 "bite": {"power": 60, "move_type": "attack", "type": "dark", "pp": 25},
-                "sand attack": {"power": 1, "move_type": "debuff", "type": "ground", "target_stat": "accuracy", "pp": 15}
+                "sand attack": {"power": 1, "move_type": "debuff", "type": "ground", "target_stat": "attack", "pp": 15}
             }
         }
     }

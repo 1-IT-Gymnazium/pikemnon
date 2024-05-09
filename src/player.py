@@ -31,6 +31,7 @@ def create_player(x, y, speed=220):
         pikemnon['current_health'] = pikemnon['health']
         pikemnon['stage'] = {}
         pikemnon['stage']['attack'] = 0
+        pikemnon['stage']['defense'] = 0
         pikemnon['name'] = player_pikemnons[x]['name']
         pikemnon['active'] = True if x == 0 else False
         pikemnon['id'] = str(uuid.uuid4())
